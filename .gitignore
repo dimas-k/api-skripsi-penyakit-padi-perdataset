@@ -1,0 +1,61 @@
+# ── Virtual Environment ───────────────────────────────────────────
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# ── Model files ───────────────────────────────────────────────────
+models/
+*.h5
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+
+# ── Environment variables ─────────────────────────────────────────
+.env
+.env.local
+.env.production
+
+# ── Python ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# ── PyTorch / timm cache ──────────────────────────────────────────
+.cache/
+*.cache
+
+# ── Jupyter ───────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── OS ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE ───────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Logs ──────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Upload / temp files ───────────────────────────────────────────
+uploads/
+temp/
+tmp/
+
