@@ -11,13 +11,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from schemas import (
-    PredictionResponse, ChatResponse, HistoryResponse, HistoryItem,
+    PredictionResponse, SwingModelResult, ChatResponse, HistoryResponse, HistoryItem,
     Pagination, SensorResponse, SensorStatus,
     CompareResponse, ModelCompareResult, DetectionTimeStats,
 )
 from model import load_model, load_all_models, predict, ARCH_LABELS, DATASET_LABELS
 from llm import (
     get_recommendation, get_recommendation_groq, get_recommendation_gemini,
+    get_recommendation_groq_rag, get_recommendation_gemini_rag,
     get_chat_response_groq, get_chat_response_gemini,
     compare_llm_recommendation,
 )
@@ -328,7 +329,7 @@ async def get_sensor_data():
 
 
 # ═════════════════════════════════════════════════════════════════
-# DETECTION — /predict  (model utama: Swin Base dari MODEL_PATH)
+# DETECTION — /predict  (semua 4 Swin Base + weighted voting)
 # ═════════════════════════════════════════════════════════════════
 @app.post("/predict", response_model=PredictionResponse, tags=["Detection"])
 async def predict_disease(
@@ -339,9 +340,14 @@ async def predict_disease(
     llm          : str           = "groq",
 ):
     """
-    Upload gambar → prediksi dengan **model utama (Swin Base)** + rekomendasi LLM.
+    Upload gambar → prediksi menggunakan **semua 4 Swin Transformer Base**
+    (Citra Daun Padi, Jenis Penyakit Padi, Paddy V3 Augmentasi,
+    Paddy Disease Classification) → confidence-weighted voting → rekomendasi LLM+RAG.
 
-    Model utama dikonfigurasi via `MODEL_PATH` di `.env`.
+    Flow:
+    1. Gambar diproses oleh ke-4 Swin secara sequential
+    2. Hasil voting (confidence-weighted) menentukan `predicted_class` akhir
+    3. Kelas pemenang dikirim ke LLM untuk rekomendasi berbasis RAG
 
     - `use_sensor=true` → sertakan data sensor dummy dalam rekomendasi LLM
     - `llm=groq`        → Groq / LLaMA 3.3 70B (default)
@@ -354,28 +360,106 @@ async def predict_disease(
     if len(image_bytes) > 10 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Ukuran file maksimal 10MB")
 
-    if "model" not in ml_model:
-        raise HTTPException(status_code=503, detail="Model utama belum siap")
+    # ── Ambil semua 4 Swin dari ml_models ────────────────────────
+    swin_models = {
+        key: meta for key, meta in ml_models.items()
+        if meta["arch_key"] == "swin_base"
+    }
 
-    # ── Prediksi ──────────────────────────────────────────────────
-    t0 = time.perf_counter()
-    predicted_class, confidence = predict(
-        image_bytes = image_bytes,
-        model       = ml_model["model"],
-        class_names = ml_model["class_names"],
-        model_name  = ml_model["model_name"],
+    # Fallback ke model utama tunggal jika ml_models belum terisi
+    if not swin_models:
+        if "model" not in ml_model:
+            raise HTTPException(
+                status_code = 503,
+                detail      = "Tidak ada model Swin yang tersedia",
+            )
+        swin_models = {
+            "swin_base__default": {
+                "model"        : ml_model["model"],
+                "class_names"  : ml_model["class_names"],
+                "model_name"   : ml_model["model_name"],
+                "arch_key"     : "swin_base",
+                "dataset_label": "Default (MODEL_PATH)",
+            }
+        }
+
+    # ── Prediksi ke-4 Swin (sequential) ──────────────────────────
+    swin_results    : dict[str, SwingModelResult] = {}
+    pred_with_conf  : list[tuple[str, float]]     = []
+    total_time_ms   : float = 0.0
+
+    for model_key, meta in swin_models.items():
+        try:
+            t0 = time.perf_counter()
+            predicted_class_i, confidence_i = predict(
+                image_bytes = image_bytes,
+                model       = meta["model"],
+                class_names = meta["class_names"],
+                model_name  = meta["model_name"],
+            )
+            elapsed_ms   = round((time.perf_counter() - t0) * 1000, 2)
+            total_time_ms += elapsed_ms
+
+            swin_results[model_key] = SwingModelResult(
+                dataset               = meta["dataset_label"],
+                predicted_class       = predicted_class_i,
+                confidence_percentage = confidence_i,
+                detection_time_ms     = elapsed_ms,
+                status                = "success",
+            )
+            pred_with_conf.append((predicted_class_i, confidence_i))
+
+        except Exception as e:
+            swin_results[model_key] = SwingModelResult(
+                dataset               = meta.get("dataset_label", model_key),
+                predicted_class       = None,
+                confidence_percentage = None,
+                detection_time_ms     = None,
+                status                = f"error: {str(e)}",
+            )
+
+    if not pred_with_conf:
+        raise HTTPException(
+            status_code = 500,
+            detail      = "Semua model Swin gagal melakukan prediksi",
+        )
+
+    # ── Confidence-weighted voting ────────────────────────────────
+    majority_class, weight_detail, vote_method = _weighted_vote(
+        pred_with_conf, min_confidence=60.0
     )
-    detection_time_ms = round((time.perf_counter() - t0) * 1000, 2)
+    majority_count = sum(1 for cls, _ in pred_with_conf if cls == majority_class)
 
-    # ── Sensor & LLM ─────────────────────────────────────────────
+    # ── Statistik 4 Swin ─────────────────────────────────────────
+    sukses = [v for v in swin_results.values() if v.status == "success"]
+
+    avg_confidence = round(
+        sum(v.confidence_percentage for v in sukses) / len(sukses), 2
+    )
+    avg_time_ms = round(
+        sum(v.detection_time_ms for v in sukses) / len(sukses), 2
+    )
+
+    # Model Swin dengan confidence tertinggi
+    best_swin_key = max(
+        (k for k, v in swin_results.items() if v.status == "success"),
+        key     = lambda k: swin_results[k].confidence_percentage,
+        default = None,
+    )
+    best_swin_detail = swin_results[best_swin_key] if best_swin_key else None
+
+    # confidence_percentage yang dikembalikan = confidence model Swin terbaik
+    best_confidence = best_swin_detail.confidence_percentage if best_swin_detail else avg_confidence
+
+    # ── Sensor & LLM (dengan RAG) ─────────────────────────────────
     sensor_data = _generate_sensor_data() if use_sensor else None
 
     if llm == "gemini":
-        recommendation = get_recommendation_gemini(predicted_class, sensor_data)
-        llm_used       = "gemini"
+        recommendation, _ = get_recommendation_gemini_rag(majority_class, sensor_data)
+        llm_used           = "gemini"
     else:
-        recommendation = get_recommendation_groq(predicted_class, sensor_data)
-        llm_used       = "groq"
+        recommendation, _ = get_recommendation_groq_rag(majority_class, sensor_data)
+        llm_used           = "groq"
 
     # ── Simpan ke history ─────────────────────────────────────────
     prediction_id = str(uuid.uuid4())
@@ -384,21 +468,40 @@ async def predict_disease(
 
     history_store.setdefault(device_id, []).insert(0, {
         "prediction_id"    : prediction_id,
-        "predicted_class"  : predicted_class,
-        "confidence"       : confidence,
-        "detection_time_ms": detection_time_ms,
+        "predicted_class"  : majority_class,
+        "confidence"       : best_confidence,
+        "detection_time_ms": round(total_time_ms, 2),
         "timestamp"        : timestamp,
         "llm_used"         : llm_used,
         "sensor_used"      : use_sensor,
     })
 
     return PredictionResponse(
-        predicted_class       = predicted_class,
-        confidence_percentage = confidence,
-        detection_time_ms     = detection_time_ms,
+        # ── Hasil akhir ───────────────────────────────────────────
+        predicted_class       = majority_class,
+        confidence_percentage = best_confidence,
+        detection_time_ms     = round(total_time_ms, 2),
         recommendation        = recommendation,
         prediction_id         = prediction_id,
         saved_to_database     = True,
+
+        # ── Detail 4 Swin ─────────────────────────────────────────
+        swin_results          = swin_results,
+        total_swin_models     = len(swin_models),
+        successful_models     = len(sukses),
+
+        # ── Voting ────────────────────────────────────────────────
+        vote_detail           = weight_detail,
+        vote_method           = vote_method,
+        majority_count        = f"{majority_count} / {len(pred_with_conf)} model pilih kelas ini",
+
+        # ── Statistik ─────────────────────────────────────────────
+        avg_confidence        = avg_confidence,
+        avg_detection_time_ms = avg_time_ms,
+        best_swin_model       = {
+            "model_key": best_swin_key,
+            "detail"   : best_swin_detail.model_dump() if best_swin_detail else None,
+        },
     )
 
 
@@ -450,13 +553,13 @@ async def predict_with_model(
     )
     detection_time_ms = round((time.perf_counter() - t0) * 1000, 2)
 
-    # ── Sensor & LLM ─────────────────────────────────────────────
+    # ── Sensor & LLM (dengan RAG) ─────────────────────────────────
     sensor_data = _generate_sensor_data() if use_sensor else None
 
     if llm == "gemini":
-        recommendation = get_recommendation_gemini(predicted_class, sensor_data)
+        recommendation, _ = get_recommendation_gemini_rag(predicted_class, sensor_data)
     else:
-        recommendation = get_recommendation_groq(predicted_class, sensor_data)
+        recommendation, _ = get_recommendation_groq_rag(predicted_class, sensor_data)
 
     return {
         "model_key"            : model_key,
@@ -614,12 +717,12 @@ async def compare_all_models(
         stats_per_dataset    = stats_per_dataset,
     )
 
-    # ── Rekomendasi LLM untuk kelas mayoritas ─────────────────────
+    # ── Rekomendasi LLM untuk kelas mayoritas (dengan RAG) ────────
     recommendation = None
     if majority_class:
         try:
-            sd             = sensor_data if use_sensor else None
-            recommendation = get_recommendation_groq(majority_class, sd)
+            sd                 = sensor_data if use_sensor else None
+            recommendation, _ = get_recommendation_groq_rag(majority_class, sd)
         except Exception:
             recommendation = None
 

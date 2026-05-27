@@ -2,14 +2,39 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
 
-# ── /predict ─────────────────────────────────────────────────────
+# ── /predict (4 Swin + voting) ────────────────────────────────────
+class SwingModelResult(BaseModel):
+    """Hasil prediksi satu model Swin Transformer."""
+    dataset               : str
+    predicted_class       : Optional[str]
+    confidence_percentage : Optional[float]
+    detection_time_ms     : Optional[float]
+    status                : str
+
+
 class PredictionResponse(BaseModel):
+    # ── Hasil akhir (dari voting 4 Swin) ─────────────────────────
     predicted_class       : str
-    confidence_percentage : float
-    detection_time_ms     : float
+    confidence_percentage : float          # confidence model Swin terbaik
+    detection_time_ms     : float          # total waktu inferensi 4 Swin (ms)
     recommendation        : str
     prediction_id         : str
     saved_to_database     : bool = False
+
+    # ── Detail 4 Swin ─────────────────────────────────────────────
+    swin_results          : Optional[Dict[str, SwingModelResult]] = None
+    total_swin_models     : Optional[int]   = None
+    successful_models     : Optional[int]   = None
+
+    # ── Voting ────────────────────────────────────────────────────
+    vote_detail           : Optional[Dict[str, float]] = None
+    vote_method           : Optional[str]  = None
+    majority_count        : Optional[str]  = None
+
+    # ── Statistik 4 Swin ──────────────────────────────────────────
+    avg_confidence        : Optional[float] = None
+    avg_detection_time_ms : Optional[float] = None
+    best_swin_model       : Optional[Dict[str, Any]] = None
 
 
 # ── /chat ────────────────────────────────────────────────────────
@@ -54,10 +79,10 @@ class DetectionTimeStats(BaseModel):
     min_ms              : Optional[float]
     max_ms              : Optional[float]
     avg_ms              : Optional[float]
-    fastest_model       : Optional[str]    # model_key tercepat
-    slowest_model       : Optional[str]    # model_key terlambat
-    stats_per_arsitektur: Optional[Dict[str, float]]   # rata-rata ms per arsitektur
-    stats_per_dataset   : Optional[Dict[str, float]]   # rata-rata ms per dataset
+    fastest_model       : Optional[str]
+    slowest_model       : Optional[str]
+    stats_per_arsitektur: Optional[Dict[str, float]]
+    stats_per_dataset   : Optional[Dict[str, float]]
 
 
 class CompareResponse(BaseModel):
