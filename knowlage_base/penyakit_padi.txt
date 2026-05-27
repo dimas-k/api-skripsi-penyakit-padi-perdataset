@@ -1,0 +1,391 @@
+===== PENANGANAN PENYAKIT TANAMAN PADI =====
+Sumber: Panduan Teknis Pengendalian Penyakit Padi, Balai Penelitian Tanaman Padi
+
+========================================
+PENYAKIT: HAWAR DAUN BAKTERI (Bacterial Leaf Blight)
+Nama Ilmiah: Xanthomonas oryzae pv. oryzae
+Kode: bacterial_leaf_blight
+========================================
+
+DESKRIPSI:
+Hawar Daun Bakteri (HDB) merupakan salah satu penyakit padi yang paling merusak dan tersebar luas di Asia. Penyakit ini disebabkan oleh bakteri Xanthomonas oryzae pv. oryzae yang menginfeksi melalui luka atau stomata daun padi.
+
+GEJALA:
+Gejala awal berupa bercak basah dan berminyak pada tepi daun yang kemudian meluas menjadi hawar (blight) berwarna kuning pucat hingga putih keabu-abuan. Gejala berkembang dari ujung dan tepi daun ke arah pangkal. Pada kondisi lembab, eksudat bakteri berwarna kekuningan (bacterial ooze) terlihat pada permukaan daun di pagi hari. Daun yang terinfeksi parah mengering dan berwarna seperti jerami. Serangan berat dapat menyebabkan seluruh daun mati.
+
+KONDISI PENYEBARAN:
+Penyakit ini berkembang pesat pada kondisi suhu udara 25-35°C, kelembaban udara tinggi >85%, intensitas hujan tinggi, angin kencang, pemupukan nitrogen berlebihan, dan persawahan dengan genangan air. Kondisi sensor IoT yang mendukung penyebaran: suhu udara 28-32°C, kelembaban udara >80%, curah hujan >10 mm/hari.
+
+PENANGANAN DAN PENGENDALIAN:
+1. Pengendalian Kimiawi: Semprot dengan bakterisida berbahan aktif tembaga (copper hydroxide) seperti Kocide 77 WP dosis 2-3 g/L air, atau Agrept 20 WP (streptomycin sulfate) dosis 1-2 g/L air. Lakukan penyemprotan setiap 7-10 hari sekali saat gejala mulai muncul.
+2. Pengendalian Hayati: Aplikasikan Bacillus subtilis atau Pseudomonas fluorescens sebagai agen hayati dengan dosis 10 g/L air.
+3. Pengendalian Budidaya: Kurangi dosis pupuk nitrogen, perbaiki drainase sawah, tanam varietas tahan HDB seperti IR64, Ciherang, atau Mekongga.
+4. Sanitasi: Cabut dan musnahkan tanaman yang terinfeksi berat untuk mencegah penyebaran.
+5. Pengaturan air: Hindari penggenangan berlebih, atur irigasi berselang (intermittent irrigation).
+
+PENCEGAHAN:
+Gunakan benih sehat bersertifikat, rendam benih dalam larutan bakterisida sebelum tanam, tanam varietas tahan, atur jarak tanam optimal 25x25 cm atau jajar legowo, hindari pemupukan nitrogen berlebihan, dan jaga kebersihan lahan dari sisa tanaman terinfeksi.
+
+TINGKAT KEPARAHAN:
+Ringan (<25% daun terserang): penyemprotan bakterisida 1-2 kali.
+Sedang (25-50% daun terserang): penyemprotan bakterisida 2-3 kali interval 7 hari.
+Berat (>50% daun terserang): penyemprotan intensif + pengurangan nitrogen + drainase.
+
+========================================
+PENYAKIT: HAWAR DAUN BERGARIS BAKTERI (Bacterial Leaf Streak)
+Nama Ilmiah: Xanthomonas oryzae pv. oryzicola
+Kode: bacterial_leaf_streak
+========================================
+
+DESKRIPSI:
+Hawar Daun Bergaris Bakteri adalah penyakit yang disebabkan oleh bakteri Xanthomonas oryzae pv. oryzicola. Penyakit ini berbeda dari Hawar Daun Bakteri karena menghasilkan lesi berbentuk garis-garis sempit di antara tulang daun.
+
+GEJALA:
+Gejala berupa lesi basah berwarna hijau gelap hingga kuning berbentuk garis-garis sempit yang terbatas di antara tulang daun (interveinal). Lesi kemudian berubah warna menjadi coklat kekuningan dan dapat menyatu membentuk area nekrotik yang lebih luas. Pada kondisi lembab, eksudat bakteri berbentuk butiran kecil kekuningan terlihat pada permukaan daun. Gejala dimulai dari daun bagian bawah dan menyebar ke daun atas.
+
+KONDISI PENYEBARAN:
+Berkembang optimal pada suhu 25-28°C, kelembaban tinggi >80%, dan kondisi hujan gerimis berkepanjangan. Penularan melalui percikan air hujan, aliran air irigasi, dan kontak langsung antar tanaman.
+
+PENANGANAN DAN PENGENDALIAN:
+1. Pengendalian Kimiawi: Gunakan bakterisida berbahan aktif bismerthiazol seperti Xanthocide 20 WP dosis 2 g/L air, atau copper-based bactericide seperti Cupravit OB 21 dosis 2-3 g/L air. Interval penyemprotan 7-10 hari.
+2. Pengendalian Budidaya: Hindari pemupukan nitrogen berlebihan, perbaiki sirkulasi udara dengan mengatur jarak tanam, kurangi kelembaban mikroklimat tanaman.
+3. Drainase: Perbaiki sistem drainase untuk mengurangi kelembaban berlebih di area pertanaman.
+4. Rotasi tanaman: Lakukan rotasi dengan tanaman bukan padi untuk memutus siklus patogen.
+
+PENCEGAHAN:
+Gunakan varietas tahan, lakukan perlakuan benih dengan bakterisida, hindari lahan yang pernah terserang tanpa disanitasi, dan jaga kebersihan alat pertanian untuk mencegah penularan antar petak.
+
+========================================
+PENYAKIT: HAWAR MALAI BAKTERI (Bacterial Panicle Blight)
+Nama Ilmiah: Burkholderia glumae
+Kode: bacterial_panicle_blight
+========================================
+
+DESKRIPSI:
+Hawar Malai Bakteri disebabkan oleh bakteri Burkholderia glumae yang menyerang malai padi, menyebabkan gabah hampa dan penurunan hasil panen yang signifikan. Penyakit ini semakin penting karena meningkat akibat suhu tinggi akibat perubahan iklim.
+
+GEJALA:
+Gejala utama berupa malai yang berdiri tegak karena gabah hampa (tidak berisi). Biji padi yang terinfeksi berwarna coklat hingga abu-abu dan mengeriput. Infeksi terjadi saat pembungaan, menyebabkan gabah gagal terisi. Pada serangan berat, seluruh malai dapat terlihat hampa dan berwarna coklat. Pangkal gabah berwarna coklat dengan batas yang jelas antara bagian sehat dan sakit.
+
+KONDISI PENYEBARAN:
+Berkembang optimal pada suhu tinggi 30-35°C terutama saat pembungaan, kelembaban tinggi, dan kondisi angin. Infeksi terjadi pada saat anthesis (pembungaan) sehingga serangan pada periode ini sangat kritis.
+
+PENANGAHAN DAN PENGENDALIAN:
+1. Pengendalian Kimiawi: Semprot dengan bakterisida berbahan aktif kasugamycin seperti Kasumin 2L dosis 1-2 ml/L air pada saat primordial malai dan awal pembungaan. Atau gunakan oxolinic acid (Staimer 200 EC).
+2. Pengendalian Budidaya: Hindari pemupukan nitrogen berlebih, atur waktu tanam agar pembungaan tidak bertepatan dengan suhu terlalu tinggi (>35°C).
+3. Perlakuan benih: Rendam benih dalam air panas 52-54°C selama 10 menit atau dalam larutan bakterisida untuk meminimalkan infeksi terbawa benih.
+4. Pengelolaan air: Irigasi malam hari untuk menurunkan suhu kanopi saat pembungaan.
+
+PENCEGAHAN:
+Gunakan benih sehat bersertifikat, lakukan perlakuan benih sebelum semai, pilih waktu tanam yang tepat agar pembungaan berlangsung saat suhu tidak terlalu tinggi, dan hindari pemupukan nitrogen berlebihan menjelang pembungaan.
+
+========================================
+PENYAKIT: BERCAK COKLAT (Brown Spot)
+Nama Ilmiah: Cochliobolus miyabeanus (Helminthosporium oryzae)
+Kode: brown_spot
+========================================
+
+DESKRIPSI:
+Bercak Coklat merupakan penyakit jamur yang umum terjadi di pertanaman padi, terutama pada lahan dengan status hara rendah. Penyakit ini disebabkan oleh jamur Cochliobolus miyabeanus dan dapat menyebabkan kerugian hasil 5-45%.
+
+GEJALA:
+Gejala berupa bercak oval hingga bundar berwarna coklat dengan ukuran 0,5-1 cm pada daun, pelepah, dan gabah. Bercak memiliki pusat berwarna abu-abu atau putih yang dikelilingi cincin berwarna coklat tua hingga ungu kecoklatan. Pada serangan berat, bercak-bercak menyatu sehingga daun tampak terbakar (blight). Bercak juga dapat muncul pada gabah menyebabkan biji berubah warna dan kualitas beras menurun.
+
+KONDISI PENYEBARAN:
+Berkembang pesat pada lahan defisiensi kalium (K) dan silika, suhu 16-36°C (optimum 25-30°C), kelembaban >80%, dan lahan dengan kesuburan rendah. Kondisi sensor: kelembaban tinggi, pH tanah rendah, nitrogen dan kalium rendah.
+
+PENANGANAN DAN PENGENDALIAN:
+1. Pengendalian Kimiawi: Semprot dengan fungisida berbahan aktif mancozeb (Dithane M-45 dosis 2 g/L), tricyclazole (Beam 75 WP dosis 0.5-1 g/L), atau propiconazole (Tilt 250 EC dosis 0.5 ml/L). Lakukan penyemprotan 2-3 kali dengan interval 10-14 hari.
+2. Pemupukan: Tambahkan pupuk kalium (KCl) dosis 50-75 kg/ha dan pupuk silikat. Perbaiki keseimbangan hara dengan penambahan pupuk organik.
+3. Pengendalian Hayati: Aplikasikan Trichoderma harzianum sebagai agen hayati.
+4. Sanitasi: Bakar atau kubur sisa tanaman sakit untuk mengurangi sumber inokulum.
+
+PENCEGAHAN:
+Gunakan varietas tahan, lakukan pemupukan berimbang (N:P:K sesuai kebutuhan), tambahkan pupuk organik untuk memperbaiki struktur tanah, gunakan benih sehat, dan lakukan pergiliran tanaman.
+
+KAITAN SENSOR IoT:
+Serangan bercak coklat meningkat ketika nitrogen tinggi tetapi kalium dan fosfor rendah, pH tanah <5.5, kelembaban tanah tinggi, dan suhu udara 25-30°C. Monitor data sensor untuk deteksi dini.
+
+========================================
+PENYAKIT: BATANG MATI / SUNDEP (Dead Heart)
+Nama Ilmiah: Scirpophaga incertulas, Chilo suppressalis
+Kode: dead_heart
+========================================
+
+DESKRIPSI:
+Batang Mati atau Sundep adalah kerusakan yang disebabkan oleh larva penggerek batang padi (stem borer), terutama Scirpophaga incertulas (penggerek batang kuning) dan Chilo suppressalis (penggerek batang bergaris). Serangan terjadi pada fase vegetatif menyebabkan pucuk tanaman muda mati.
+
+GEJALA:
+Gejala khas adalah pucuk/tunas yang mati berwarna kuning kecoklatan yang mudah dicabut karena batang bagian dalam telah dimakan larva. Daun tengah tanaman muda layu dan mati sementara daun luar masih hijau. Pada serangan parah, sebagian besar rumpun mengalami kematian pucuk (dead heart) sehingga tampak botak/gundul. Sering terlihat lubang kecil bekas gerekan pada batang dan kotoran larva berbentuk serbuk coklat.
+
+KONDISI PENYEBARAN:
+Populasi penggerek meningkat pada kelembaban tinggi, periode tanpa hujan panjang diselingi hujan ringan, dan pada tanaman yang dipupuk nitrogen berlebihan. Suhu optimum untuk perkembangan larva: 25-30°C.
+
+PENANGAHAN DAN PENGENDALIAN:
+1. Pengendalian Insektisida: Gunakan insektisida karbofuran (Furadan 3G) dengan cara tabur 17 kg/ha pada saat 7-10 hari setelah tanam. Atau semprot dengan klorpirifos (Dursban 20 EC dosis 2 ml/L), fipronil (Regent 50 SC dosis 0.5-1 ml/L), atau imidakloprid (Confidor 200 SL dosis 0.5 ml/L) pada saat imago (ngengat) terlihat.
+2. Pengendalian Hayati: Lepaskan parasitoid telur Trichogramma japonicum dengan dosis 200.000 parasitoid/ha/minggu. Gunakan Bacillus thuringiensis (Bt) sebagai insektisida hayati.
+3. Pemasangan Lampu Perangkap: Pasang light trap untuk menangkap imago penggerek batang pada malam hari, terutama saat periode penerbangan (flight period).
+4. Sanitasi: Cabut dan musnahkan tanaman yang terserang dead heart, bakar jerami setelah panen.
+5. Pengaturan Waktu Tanam: Tanam serempak dalam satu hamparan untuk memutus siklus hama.
+
+PENCEGAHAN:
+Tanam serempak dan serentak dengan petani sekitar, gunakan varietas tahan penggerek, hindari pemupukan nitrogen berlebih, semprot insektisida saat telur ditemukan (sebelum menetas), dan pertahankan musuh alami seperti laba-laba dan kumbang.
+
+========================================
+PENYAKIT: EMBUN BULU (Downy Mildew)
+Nama Ilmiah: Sclerophthora macrospora
+Kode: downy_mildew
+========================================
+
+DESKRIPSI:
+Embun Bulu Padi disebabkan oleh Sclerophthora macrospora, oomycete yang berkembang pada kondisi lembab. Penyakit ini juga dikenal sebagai "crazy seedling disease" atau penyakit semai gila karena menyebabkan malformasi tanaman.
+
+GEJALA:
+Gejala pada daun berupa lapisan serbuk berwarna putih seperti tepung pada permukaan bawah daun, terutama terlihat pada pagi hari saat embun. Daun yang terinfeksi dapat menunjukkan klorosis (menguning), distorsi, dan pertumbuhan abnormal. Pada serangan sistemik, tanaman menunjukkan gejala "crazy top" di mana daun-daun atas berubah menjadi struktur seperti daun sempit, berkerut, dan malai berubah menjadi daun hijau (phyllody). Tanaman yang terinfeksi berat tampak kerdil dan tidak produktif.
+
+KONDISI PENYEBARAN:
+Berkembang pesat pada genangan air, kelembaban sangat tinggi >90%, dan suhu dingin 15-25°C. Spora menyebar melalui air irigasi dan tanah yang terinfeksi.
+
+PENANGAHAN DAN PENGENDALIAN:
+1. Pengendalian Kimiawi: Aplikasikan fungisida sistemik berbahan aktif metalaxil (Ridomil Gold 35 WS dosis 2 g/kg benih untuk seed treatment, atau 2 g/L untuk semprot), atau fosetil-Al (Aliette 80 WP dosis 2 g/L).
+2. Pengelolaan Air: Kurangi genangan air di persemaian dan pertanaman, perbaiki drainase untuk mengurangi kelembaban berlebih.
+3. Sanitasi: Cabut dan musnahkan tanaman yang menunjukkan gejala "crazy top" untuk mencegah penyebaran.
+4. Perlakuan Benih: Rendam benih dalam fungisida metalaxil sebelum semai untuk mencegah infeksi dari benih.
+
+PENCEGAHAN:
+Hindari penggunaan air irigasi dari sumber yang tercemar, perbaiki drainase lahan, gunakan varietas toleran, dan hindari penanaman terlalu rapat yang meningkatkan kelembaban mikro.
+
+========================================
+TANAMAN SEHAT (Healthy)
+Kode: healthy
+========================================
+
+DESKRIPSI:
+Tanaman padi yang sehat menunjukkan pertumbuhan optimal dengan warna daun hijau segar, batang tegak, dan perkembangan yang sesuai dengan fase pertumbuhannya. Kondisi sehat dicirikan oleh sistem perakaran yang baik, daun lebar dan mengkilap, serta tidak adanya gejala penyakit atau serangan hama.
+
+CIRI-CIRI TANAMAN SEHAT:
+Daun berwarna hijau tua mengkilap tanpa bercak atau lesi. Batang kokoh dan tegak tidak mudah rebah. Pertumbuhan seragam dan sesuai umur tanaman. Akar putih dan sehat, tidak berbau busuk. Malai berisi penuh dengan gabah bernas pada fase generatif. Tidak ada eksudat atau cairan abnormal pada permukaan tanaman.
+
+KONDISI SENSOR OPTIMAL TANAMAN SEHAT:
+Suhu udara: 24-30°C (optimal 28°C). Kelembaban udara: 60-80%. Suhu tanah: 25-30°C. Kelembaban tanah: 70-85%. pH tanah: 5.5-7.0. Nitrogen: 150-300 mg/kg. Fosfor: 20-50 mg/kg. Kalium: 100-200 mg/kg. Intensitas cahaya: 20.000-80.000 lux. Curah hujan: 5-10 mm/hari.
+
+PEMELIHARAAN TANAMAN SEHAT:
+1. Pemupukan berimbang sesuai rekomendasi: N-P-K sesuai kebutuhan varietas dan fase pertumbuhan.
+2. Pengairan yang tepat: sistem irigasi berselang (intermittent) untuk menghemat air dan mencegah penyakit.
+3. Penyiangan gulma secara rutin pada umur 21 dan 42 hari setelah tanam.
+4. Pemantauan rutin setiap minggu untuk deteksi dini hama dan penyakit.
+5. Aplikasi pupuk organik untuk menjaga kesuburan tanah jangka panjang.
+6. Rotasi tanaman untuk memutus siklus hama dan penyakit.
+
+TINDAKAN SAAT TANAMAN SEHAT:
+Pertahankan kondisi optimal, lanjutkan program pemupukan dan pengairan sesuai jadwal, lakukan pemantauan preventif setiap 7-10 hari, dan persiapkan panen sesuai umur varietas.
+
+========================================
+PENYAKIT: HISPA PADI (Hispa)
+Nama Ilmiah: Dicladispa armigera
+Kode: hispa
+========================================
+
+DESKRIPSI:
+Hispa Padi disebabkan oleh serangan serangga Dicladispa armigera (kumbang hispa) yang memiliki duri-duri pada tubuhnya. Larva menggerek daun dari dalam, sedangkan imago menggores permukaan daun membentuk corengan putih.
+
+GEJALA:
+Kerusakan imago: goresan horizontal berwarna putih sejajar (linear scratches) pada permukaan daun yang memberikan penampilan bergaris-garis putih. Goresan terjadi karena imago memakan klorofil daun dari permukaan atas. Kerusakan larva: blotch atau terowongan berwarna putih transparan pada helai daun karena larva menggerek jaringan daun dari dalam mesofil. Area yang digerek tampak seperti jendela transparan (windowing effect). Serangan berat menyebabkan daun mengering berwarna putih.
+
+KONDISI PENYEBARAN:
+Populasi meningkat pada sawah dengan tanaman rapat, pemupukan nitrogen berlebih, dan musim hujan dengan kelembaban tinggi. Migrasi dari lahan rumput ke sawah terjadi pada awal musim tanam.
+
+PENANGAHAN DAN PENGENDALIAN:
+1. Pengendalian Insektisida: Semprot dengan insektisida klorpirifos (Dursban 20 EC dosis 2 ml/L), imidakloprid (Confidor 200 SL dosis 0.5 ml/L), atau deltametrin (Decis 25 EC dosis 0.5-1 ml/L). Penyemprotan pagi hari lebih efektif.
+2. Pengendalian Mekanis: Celupkan daun yang terinfeksi ke dalam air atau usap dengan kain basah untuk menghilangkan imago dan telur. Potong daun yang menunjukkan tanda penggerekan larva.
+3. Pengendalian Hayati: Pertahankan musuh alami seperti laba-laba, kumbang predator, dan parasitoid.
+4. Pengaturan Jarak Tanam: Kurangi kepadatan tanaman untuk mengurangi kelembaban mikro dan ketersediaan inang.
+
+PENCEGAHAN:
+Tanam serempak dalam hamparan luas, hindari pemupukan nitrogen berlebih, pertahankan dan tingkatkan populasi musuh alami, dan lakukan pemantauan dini pada awal musim tanam terutama saat tanaman berumur 1-4 minggu.
+
+========================================
+PENYAKIT: BLAS DAUN (Leaf Blast)
+Nama Ilmiah: Pyricularia oryzae (Magnaporthe oryzae)
+Kode: leaf_blast
+========================================
+
+DESKRIPSI:
+Blas Daun adalah penyakit yang disebabkan oleh jamur Pyricularia oryzae (teleomorf: Magnaporthe oryzae), merupakan penyakit padi paling merusak di dunia. Dapat menyebabkan kehilangan hasil total jika terjadi pada varietas rentan di kondisi yang kondusif.
+
+GEJALA:
+Lesi berbentuk belah ketupat atau jarum dengan ujung runcing pada kedua sisinya (diamond-shaped lesion). Pusat lesi berwarna abu-abu atau putih dengan tepi berwarna coklat gelap dan zona kuning di sekitarnya (halo). Pada serangan berat, lesi menyatu sehingga daun tampak seperti terbakar. Bercak awal berwarna hijau abu-abu kecil yang berkembang menjadi lesi nekrotik berukuran 0.5-1.5 cm. Infeksi berat menyebabkan daun mengering dari pucuk ke bawah.
+
+KONDISI PENYEBARAN:
+Kondisi optimal penyebaran: suhu 19-28°C (optimum 24-26°C), kelembaban udara >90%, embun pagi yang berkepanjangan (>10 jam), intensitas cahaya rendah (mendung), dan pemupukan nitrogen berlebih. Spora tersebar melalui angin. Kondisi sensor IoT yang mendukung: kelembaban udara >85%, suhu 24-28°C, intensitas cahaya rendah.
+
+PENANGAHAN DAN PENGENDALIAN:
+1. Pengendalian Kimiawi (Prioritas Utama): Semprot dengan fungisida tricyclazole (Beam 75 WP dosis 0.5-1 g/L air), atau isoprothiolane (Fuji-one 400 EC dosis 1.5-2 ml/L), atau kasugamycin+tembaga (Blascide dosis 2 ml/L). Penyemprotan dilakukan segera saat gejala pertama muncul dan diulang 7-10 hari kemudian.
+2. Pengendalian Hayati: Aplikasikan Trichoderma asperellum atau Bacillus subtilis sebagai bioagen preventif.
+3. Pemupukan: Kurangi dosis nitrogen, tambahkan pupuk kalium (K) dan silika untuk meningkatkan ketahanan tanaman.
+4. Pengaturan Irigasi: Kurangi penggenangan pada malam hari untuk mengurangi kelembaban kanopi.
+5. Sanitasi: Musnahkan tanaman sakit dan sisa jerami untuk mengurangi sumber inokulum.
+
+PENCEGAHAN:
+Tanam varietas tahan blas (Ciherang Blast, Inpari 13, Inpari 19), hindari pemupukan nitrogen berlebih, semprot fungisida preventif pada saat primordia daun, jaga drainase yang baik, dan hindari menanam pada musim dengan kelembaban sangat tinggi tanpa perlindungan fungisida.
+
+KAITAN SENSOR IoT:
+Risiko blas tinggi jika: kelembaban udara >85% selama >10 jam, suhu 24-28°C, nitrogen tanah sangat tinggi, intensitas cahaya rendah (berawan). Rekomendasi: semprot fungisida preventif segera.
+
+========================================
+PENYAKIT: GOSONG PALSU DAUN (Leaf Smut)
+Nama Ilmiah: Entyloma oryzae
+Kode: leaf_smut
+========================================
+
+DESKRIPSI:
+Gosong Palsu Daun disebabkan oleh jamur Entyloma oryzae yang menginfeksi daun padi membentuk bercak-bercak hitam kecil tersebar. Penyakit ini umumnya tidak menyebabkan kehilangan hasil yang signifikan tetapi dapat menurunkan aktivitas fotosintesis.
+
+GEJALA:
+Bercak-bercak kecil berwarna hitam atau abu-abu gelap berbentuk oval hingga memanjang tersebar pada helai daun. Bercak berukuran 1-5 mm dengan serbuk hitam (spora) di permukaan. Daun yang terinfeksi berat menunjukkan banyak titik-titik hitam yang menyebar di seluruh permukaan daun. Bercak tidak memiliki halo kuning yang jelas seperti blas, tetapi tepi bercak terkadang berwarna kuning pucat. Infeksi berat dapat menyebabkan daun menguning secara tidak merata.
+
+KONDISI PENYEBARAN:
+Berkembang pada kondisi lembab dan suhu sedang 20-28°C. Spora tersebar melalui angin dan air.
+
+PENANGAHAN DAN PENGENDALIAN:
+1. Pengendalian Kimiawi: Semprot dengan fungisida tembaga (copper hydroxide) seperti Kocide 77 WP dosis 2 g/L, mancozeb (Dithane M-45 dosis 2 g/L), atau propiconazole (Tilt 250 EC dosis 0.5 ml/L).
+2. Pengendalian Budidaya: Perbaiki drainase, hindari kepadatan tanaman berlebih, dan jaga sirkulasi udara yang baik.
+3. Pemupukan: Hindari pemupukan nitrogen berlebih yang mendorong pertumbuhan jaringan lunak yang rentan infeksi.
+
+PENCEGAHAN:
+Gunakan benih bebas penyakit, lakukan perlakuan benih dengan fungisida, tanam varietas toleran, dan jaga kebersihan lahan dari sisa tanaman yang terinfeksi.
+
+========================================
+PENYAKIT: BLAS LEHER MALAI (Neck Blast)
+Nama Ilmiah: Pyricularia oryzae (Magnaporthe oryzae)
+Kode: neck_blast
+========================================
+
+DESKRIPSI:
+Blas Leher Malai merupakan fase yang paling merusak dari penyakit blas yang disebabkan oleh jamur Pyricularia oryzae. Infeksi terjadi pada leher malai (pangkal malai) menyebabkan gabah hampa total dan kehilangan hasil yang sangat besar (dapat 100% pada varietas rentan).
+
+GEJALA:
+Lesi berwarna coklat gelap hingga hitam pada leher malai (node pertama di bawah malai) atau pada buku-buku batang. Jaringan leher malai membusuk sehingga malai patah atau malai menggantung (patah leher). Gabah pada malai yang terinfeksi menjadi hampa, berwarna coklat atau putih kering. Malai tampak berdiri tegak meski tidak berisi (whitehead) atau menggantung lemah ke bawah. Beda dengan dead heart: dead heart terjadi pada fase vegetatif, neck blast terjadi pada fase generatif (pembungaan-pengisian biji).
+
+KONDISI PENYEBARAN:
+Kondisi paling kritis: infeksi saat malai keluar (50% heading) dengan kelembaban >90%, suhu 24-28°C, angin, dan pemupukan nitrogen berlebih menjelang pembungaan. Ini adalah periode paling rentan tanaman.
+
+PENANGAHAN DAN PENGENDALIAN:
+1. TINDAKAN DARURAT - Semprot Segera: Gunakan fungisida tricyclazole (Beam 75 WP dosis 1-1.5 g/L) atau isoprothiolane (Fuji-one 400 EC dosis 2 ml/L) SEGERA saat gejala muncul. Penyemprotan tepat waktu sangat kritis - keterlambatan 3-4 hari dapat menyebabkan kehilangan hasil besar.
+2. Pencegahan pada Primordia: Semprot fungisida preventif 10-14 hari sebelum malai keluar (fase primordia) dan pada saat 50% malai keluar (heading 50%).
+3. Pemupukan: HENTIKAN pemberian nitrogen saat menjelang pembungaan. Tambahkan kalium dan silika untuk menguatkan dinding sel.
+4. Pengairan: Pertahankan penggenangan dangkal untuk menjaga suhu dan kelembaban yang sesuai.
+
+PENCEGAHAN:
+Semprot fungisida preventif 2 kali: pertama saat primordia (7-10 HST sebelum malai keluar) dan kedua saat 50% heading. Gunakan varietas tahan blas. Hindari nitrogen berlebih menjelang pembungaan.
+
+CATATAN PENTING:
+Neck blast adalah penyakit yang paling merusak dari semua penyakit blas. Jika terdeteksi, tindakan penyemprotan harus dilakukan SEGERA dalam 24-48 jam untuk meminimalkan kehilangan hasil.
+
+========================================
+PENYAKIT: BUSUK PELEPAH (Sheath Blight)
+Nama Ilmiah: Rhizoctonia solani
+Kode: sheath_blight
+========================================
+
+DESKRIPSI:
+Busuk Pelepah adalah penyakit jamur yang disebabkan oleh Rhizoctonia solani, merupakan salah satu penyakit padi yang paling penting secara ekonomi di Asia. Sklerotia jamur bertahan lama di tanah dan jerami.
+
+GEJALA:
+Lesi oval hingga tidak beraturan berwarna hijau abu-abu hingga putih keabu-abuan dengan tepi coklat pada pelepah daun (sheath) dekat permukaan air. Lesi berkembang dari pelepah bawah ke atas menuju daun. Pada kondisi lembab, miselium putih jamur terlihat pada permukaan lesi. Sklerotia berwarna coklat berbentuk tidak beraturan (seperti butiran tanah kecil) menempel pada permukaan lesi dan dapat jatuh ke air/tanah. Serangan berat menyebabkan seluruh pelepah dan daun membusuk, malai hampa atau tidak terbentuk sempurna.
+
+KONDISI PENYEBARAN:
+Berkembang optimal pada suhu 28-32°C, kelembaban >85%, penggenangan air, dan tanam terlalu rapat. Pemupukan nitrogen berlebih sangat mendorong perkembangan penyakit. Kondisi sensor IoT yang mendukung: suhu 28-32°C, kelembaban udara >80%, nitrogen tanah tinggi.
+
+PENANGAHAN DAN PENGENDALIAN:
+1. Pengendalian Kimiawi: Semprot fungisida validamycin (Validacin 3L dosis 1-2 ml/L), hexaconazole (Anvil 50 SC dosis 1 ml/L), atau propiconazole (Tilt 250 EC dosis 0.5 ml/L) langsung ke pangkal tanaman (target pelepah). Penyemprotan volume tinggi (high volume spraying) lebih efektif agar larutan mencapai pangkal batang.
+2. Pengelolaan Air: Kurangi penggenangan, gunakan irigasi berselang untuk memutus siklus infeksi.
+3. Pemupukan: Kurangi dosis nitrogen, tingkatkan kalium untuk meningkatkan ketahanan.
+4. Pengaturan Jarak Tanam: Perlebar jarak tanam (30x30 cm atau jajar legowo 2:1) untuk meningkatkan sirkulasi udara dan mengurangi kelembaban mikro.
+5. Sanitasi: Kumpulkan dan musnahkan sklerotia setelah panen, bajak jerami yang terinfeksi.
+
+PENCEGAHAN:
+Hindari tanam terlalu rapat, kurangi dosis nitrogen, perbaiki drainase, gunakan varietas dengan ketahanan moderat, dan aplikasikan fungisida preventif saat kondisi mendukung penyakit (suhu tinggi + kelembaban tinggi).
+
+KAITAN SENSOR IoT:
+Busuk pelepah berkembang cepat saat: suhu 28-32°C, kelembaban >80%, nitrogen tinggi, dan penggenangan terus-menerus. Kurangi nitrogen dan perbaiki drainase segera jika kondisi ini terpenuhi.
+
+========================================
+PENYAKIT: TUNGRO
+Nama Ilmiah: Rice Tungro Bacilliform Virus (RTBV) + Rice Tungro Spherical Virus (RTSV)
+Vektor: Nephotettix virescens (wereng hijau)
+Kode: tungro
+========================================
+
+DESKRIPSI:
+Tungro adalah penyakit virus padi yang disebabkan oleh kombinasi dua virus: Rice Tungro Bacilliform Virus (RTBV) dan Rice Tungro Spherical Virus (RTSV). Virus ditularkan oleh wereng hijau (Nephotettix virescens) secara semi-persisten. Penyakit ini menyebabkan kerugian hasil hingga 50-70% pada serangan berat.
+
+GEJALA:
+Daun berwarna kuning hingga kuning-oranye dimulai dari ujung daun, berbeda dengan defisiensi hara yang menguning dari pangkal daun. Tanaman kerdil (stunting) dengan tinggi hanya 1/3 hingga 1/2 dari tanaman normal. Jumlah anakan berkurang drastis. Daun muda menjadi sempit dan lebih pendek dari normal. Malai tidak terbentuk atau sangat sedikit dan hampa. Gejala mirip defisiensi nitrogen tetapi lebih parah dan tidak merespons pemupukan.
+
+KONDISI PENYEBARAN:
+Penyebaran sangat tergantung pada populasi wereng hijau (vektor). Populasi wereng meningkat pada: awal musim hujan, pertanaman yang tidak serempak, pemupukan nitrogen berlebih, dan lahan dengan bayah (ratoon) atau gulma inang. Suhu 20-30°C dan kelembaban sedang mendukung perkembangan wereng.
+
+PENANGAHAN DAN PENGENDALIAN:
+1. PRIORITAS UTAMA - Kendalikan Vektor (Wereng Hijau): Semprot insektisida untuk membunuh wereng: imidakloprid (Confidor 200 SL dosis 0.5 ml/L), buprofezin (Applaud 25 WP dosis 1 g/L), atau BPMC (Bassa 500 EC dosis 2 ml/L). Pengendalian wereng harus dilakukan SEBELUM virus menyebar ke tanaman sehat.
+2. Pencabutan Tanaman Sakit: Cabut dan musnahkan tanaman yang terinfeksi parah untuk mengurangi sumber virus (virus source). Kubur atau bakar tanaman yang dicabut.
+3. Penanaman Serempak: Tanam serempak dalam satu kawasan untuk memutus ketersediaan inang bagi wereng sepanjang tahun.
+4. Tidak Ada Pengobatan Langsung: Tidak ada fungisida atau bakterisida untuk penyakit virus. Fokus utama adalah MENGENDALIKAN WERENG dan MENCABUT TANAMAN SAKIT.
+5. Tanam Ulang: Jika serangan >50% rumpun, pertimbangkan tanam ulang dengan varietas tahan tungro.
+
+PENCEGAHAN:
+Gunakan varietas tahan tungro (Tukad Unda, Tukad Petanu, Bondoyudo, Inpari 7), tanam serempak, kendalikan wereng hijau secara rutin dengan insektisida atau musuh alami (laba-laba, kepik predator), hindari tanam padi sepanjang tahun tanpa jeda (break crop), dan cabut tanaman inang (gulma padi liar) di sekitar sawah.
+
+CATATAN PENTING:
+Tungro tidak dapat disembuhkan dengan pestisida. Satu-satunya cara efektif adalah mencegah penyebaran dengan mengendalikan wereng dan mencabut tanaman sakit. Jika terdeteksi, tindakan harus segera dilakukan dalam 2-3 hari.
+
+KAITAN SENSOR IoT:
+Suhu 25-30°C dan kelembaban sedang mendukung aktivitas wereng hijau. Pemupukan nitrogen berlebih meningkatkan preferensi wereng terhadap tanaman. Monitor intensitas cahaya: wereng aktif pada cahaya terang.
+
+========================================
+INFORMASI TAMBAHAN: KAITAN DATA SENSOR IoT DENGAN PENYAKIT
+========================================
+
+TABEL KONDISI SENSOR DAN RISIKO PENYAKIT:
+
+Suhu Udara Tinggi (>32°C):
+- Hawar Malai Bakteri (bacterial_panicle_blight): risiko tinggi saat pembungaan
+- Busuk Pelepah (sheath_blight): berkembang optimal
+- Penggerek Batang: peningkatan aktivitas imago
+
+Suhu Udara Sedang (24-28°C):
+- Blas Daun (leaf_blast): kondisi optimal
+- Blas Leher Malai (neck_blast): kondisi sangat kritis saat pembungaan
+- Hawar Daun Bakteri: aktif berkembang
+
+Kelembaban Udara Sangat Tinggi (>85%):
+- Blas Daun dan Blas Leher Malai: risiko sangat tinggi
+- Embun Bulu: berkembang pesat
+- Hawar Daun Bakteri: eksudat bakteri aktif
+
+Nitrogen Tanah Tinggi (>400 mg/kg):
+- Blas: tanaman rentan karena jaringan lunak
+- Busuk Pelepah: perkembangan cepat
+- Hawar Daun Bakteri: infeksi lebih parah
+- Penggerek Batang: preferensi lebih tinggi
+
+Kalium Tanah Rendah (<80 mg/kg):
+- Bercak Coklat: risiko tinggi
+- Ketahanan tanaman menurun terhadap semua penyakit
+
+pH Tanah Rendah (<5.5):
+- Bercak Coklat: kondisi mendukung
+- Defisiensi hara makro meningkat
+
+Intensitas Cahaya Rendah (<10.000 lux):
+- Blas: spora berkecambah lebih baik
+- Pertumbuhan tanaman melemah
+
+========================================
+REFERENSI DAN SUMBER
+========================================
+1. Balai Besar Penelitian Tanaman Padi (BB Padi), Sukamandi. Panduan Pengendalian Penyakit Padi. 2023.
+2. IRRI (International Rice Research Institute). Rice Doctor - Rice Diseases and Pests. 2022.
+3. Direktorat Perlindungan Tanaman Pangan, Kementan RI. Pedoman Teknis Pengendalian Hama dan Penyakit Padi. 2022.
+4. Semangun, H. Penyakit-Penyakit Tanaman Pangan di Indonesia. Gadjah Mada University Press. 2004.
+5. Ou, S.H. Rice Diseases. Commonwealth Agricultural Bureaux International. 1985.
