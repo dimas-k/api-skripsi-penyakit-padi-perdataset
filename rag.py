@@ -6,6 +6,18 @@ Implementasi Retrieval-Augmented Generation (RAG) menggunakan:
 - Vector Store: FAISS
 - Chunking: 1000 karakter dengan overlap 100 karakter
 - Top-k retrieval: k=5 chunks
+
+Kelas yang didukung (14 kelas):
+  bacterial_leaf_blight, bacterial_leaf_streak, bacterial_panicle_blight,
+  brown_spot, dead_heart, downy_mildew, healthy, hispa,
+  leaf_blast, leaf_smut, neck_blast, sheath_blight, tungro,
+  harvest_stage 
+
+Changelog v2:
+- Tambah kelas harvest_stage pada knowledge base
+- build_rag_prompt() memiliki cabang query khusus untuk harvest_stage
+- format_context() menampilkan label "Fase Panen" untuk harvest_stage
+- get_index_info() mengembalikan daftar kelas yang didukung
 """
 
 import os
@@ -28,13 +40,59 @@ CHUNK_SIZE          = 1000   # karakter per chunk
 CHUNK_OVERLAP       = 100    # overlap antar chunk
 TOP_K               = 5      # jumlah chunk yang diambil saat retrieval
 
+# Seluruh kelas yang didukung sistem (sinkron dengan model.py → CLASS_NAMES)
+SUPPORTED_CLASSES = [
+    "bacterial_leaf_blight",
+    "bacterial_leaf_streak",
+    "bacterial_panicle_blight",
+    "brown_spot",
+    "dead_heart",
+    "downy_mildew",
+    "healthy",
+    "hispa",
+    "leaf_blast",
+    "leaf_smut",
+    "neck_blast",
+    "sheath_blight",
+    "tungro",
+    "harvest_stage", 
+]
+
+# Label tampilan bahasa Indonesia untuk setiap kelas
+CLASS_LABELS_ID = {
+    "bacterial_leaf_blight"   : "Hawar Daun Bakteri",
+    "bacterial_leaf_streak"   : "Hawar Daun Bergaris Bakteri",
+    "bacterial_panicle_blight": "Hawar Malai Bakteri",
+    "brown_spot"              : "Bercak Coklat",
+    "dead_heart"              : "Batang Mati (Sundep)",
+    "downy_mildew"            : "Embun Bulu",
+    "healthy"                 : "Tanaman Sehat",
+    "hispa"                   : "Hispa Padi",
+    "leaf_blast"              : "Blas Daun",
+    "leaf_smut"               : "Gosong Palsu Daun",
+    "neck_blast"              : "Blas Leher Malai",
+    "sheath_blight"           : "Busuk Pelepah",
+    "tungro"                  : "Tungro",
+    "harvest_stage"           : "Fase Panen",  
+}
+
+# Query template khusus per kelas untuk retrieval yang lebih presisi
+_CLASS_QUERY_TEMPLATES = {
+    "harvest_stage": (
+        "fase panen padi waktu panen optimal kadar air gabah penanganan pascapanen"
+    ),
+    "healthy": (
+        "tanaman padi sehat kondisi optimal pemeliharaan pencegahan penyakit"
+    ),
+}
+
 
 # ═════════════════════════════════════════════════════════════════
 # LAZY LOAD — model & index hanya dimuat saat pertama dipakai
 # ═════════════════════════════════════════════════════════════════
 _embedding_model = None
 _faiss_index     = None
-_chunks          = None      # list of str
+_chunks          = None     
 
 
 def _get_embedding_model():
@@ -248,10 +306,17 @@ def build_rag_prompt(
     Returns:
         (prompt_string, retrieved_chunks)
     """
-    # Query menggabungkan nama penyakit dengan konteks sensor
-    query = f"penanganan penyakit {disease_name} pada tanaman padi"
+    label_id = CLASS_LABELS_ID.get(disease_name, disease_name)
+
+    # ── Query: gunakan template khusus jika tersedia, fallback ke query generik ──
+    if disease_name in _CLASS_QUERY_TEMPLATES:
+        query = _CLASS_QUERY_TEMPLATES[disease_name]
+    else:
+        query = f"penanganan penyakit {disease_name} {label_id} pada tanaman padi"
+
+    # Perkaya query dengan konteks sensor jika ada
     if sensor_data:
-        suhu = sensor_data.get("suhu_udara", "")
+        suhu      = sensor_data.get("suhu_udara", "")
         kelembaban = sensor_data.get("kelembaban_udara", "")
         if suhu:
             query += f" suhu {suhu} derajat"
@@ -277,13 +342,33 @@ Data Sensor IoT Lapangan Saat Ini:
 - Curah Hujan      : {sensor_data.get('curah_hujan', 'N/A')} mm/hari
 """
 
-    prompt = f"""Berikut adalah informasi dari basis pengetahuan penyakit padi yang relevan:
+    # ── Template prompt berbeda untuk harvest_stage vs penyakit ──
+    if disease_name == "harvest_stage":
+        prompt = f"""Berikut adalah informasi dari basis pengetahuan padi yang relevan tentang fase panen:
 
 {context}
 
 ---
 
-Kamera AI mendeteksi penyakit: **{disease_name}**
+Kamera AI mendeteksi bahwa tanaman padi saat ini berada di **Fase Panen (harvest_stage)**.
+{sensor_section}
+Berdasarkan informasi di atas, bantu petani dengan:
+1. Konfirmasi apakah tanaman siap dipanen — ciri-ciri visual yang terlihat
+2. Langkah persiapan dan pelaksanaan panen yang perlu dilakukan SEKARANG
+3. Penanganan pascapanen (perontokan, pengeringan, penyimpanan) agar kualitas gabah terjaga
+4. Risiko pasca panen yang perlu diwaspadai berdasarkan kondisi sensor saat ini (jika tersedia)
+5. Estimasi waktu dan tips penyimpanan agar gabah tidak turun kualitas
+
+Jawab dengan bahasa sederhana yang mudah dipahami petani dan langsung bisa diterapkan.
+"""
+    else:
+        prompt = f"""Berikut adalah informasi dari basis pengetahuan penyakit padi yang relevan:
+
+{context}
+
+---
+
+Kamera AI mendeteksi penyakit: **{label_id} ({disease_name})**
 {sensor_section}
 Berdasarkan informasi di atas, bantu petani dengan:
 1. Penjelasan singkat penyakit ini (gejala dan penyebab)
@@ -304,11 +389,13 @@ def get_index_info() -> dict:
     index, chunks = _get_index_and_chunks()
     model         = _get_embedding_model()
     return {
-        "total_chunks"   : len(chunks),
-        "embedding_model": EMBEDDING_MODEL,
-        "chunk_size"     : CHUNK_SIZE,
-        "chunk_overlap"  : CHUNK_OVERLAP,
-        "top_k"          : TOP_K,
-        "index_type"     : "FAISS IndexFlatIP (cosine similarity)",
-        "index_cached"   : FAISS_INDEX_PATH.exists(),
+        "total_chunks"      : len(chunks),
+        "embedding_model"   : EMBEDDING_MODEL,
+        "chunk_size"        : CHUNK_SIZE,
+        "chunk_overlap"     : CHUNK_OVERLAP,
+        "top_k"             : TOP_K,
+        "index_type"        : "FAISS IndexFlatIP (cosine similarity)",
+        "index_cached"      : FAISS_INDEX_PATH.exists(),
+        "supported_classes" : SUPPORTED_CLASSES,
+        "total_classes"     : len(SUPPORTED_CLASSES),
     }

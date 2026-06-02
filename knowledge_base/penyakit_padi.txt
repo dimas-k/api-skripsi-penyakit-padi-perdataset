@@ -446,3 +446,115 @@ yang diterbitkan dalam 5 tahun terakhir (2021–2026). Apabila tidak tersedia re
     "Looking ahead in rice disease research and management."
     Critical Reviews in Plant Sciences, 23(2): 103–127, 2004.
     [Digunakan hanya untuk aspek dasar taksonomi patogen yang belum berubah]
+
+========================================
+FASE PANEN (Harvest Stage)
+Kode: harvest_stage
+========================================
+
+DESKRIPSI:
+Fase Panen adalah tahap akhir budidaya padi yang menentukan kualitas dan kuantitas gabah yang dihasilkan. Ketepatan waktu panen sangat kritis: panen terlalu awal menghasilkan gabah hijau (chalk) dengan rendemen giling rendah, sedangkan panen terlalu lambat menyebabkan gabah rontok, retak, dan rentan serangan cendawan pasca panen. Berdasarkan IRRI (2022) dan BB Padi (2023), waktu panen optimal terjadi 28–35 hari setelah pembungaan 85% (days after heading/DAH), atau ketika 80–95% gabah pada satu malai telah menguning/matang.
+
+INDIKATOR KESIAPAN PANEN:
+1. Visual: 80–95% gabah pada malai telah berwarna kuning keemasan; daun bendera mulai mengering; malai menunduk akibat bobot gabah.
+2. Kadar Air Gabah: 20–25% kadar air (fresh basis) adalah waktu panen optimal untuk panen mekanis; 22–27% untuk panen manual. Pengeringan segera diperlukan hingga ≤14% untuk penyimpanan aman.
+3. Umur Tanaman: Bergantung varietas — Ciherang 116–125 HST, Inpari 32 115–125 HST, IR64 110–120 HST. Selalu konfirmasi dengan kondisi visual lapang.
+4. Indeks Kematangan: Rasio gabah bernas terhadap total gabah per malai ≥85%.
+
+RISIKO PADA FASE PANEN (Penyakit & Gangguan Pasca Panen):
+1. Busuk Gabah (Grain Rot) oleh Burkholderia glumae dan Fusarium spp.: Gabah berwarna coklat, hitam, atau abu-abu dengan permukaan berkeriput. Risiko meningkat jika panen terlambat pada kondisi lembab.
+2. Aflatoksin & Kapang Penyimpanan (Aspergillus flavus, A. niger): Berkembang pada gabah dengan kadar air >14% saat disimpan, terutama jika gudang lembab (kelembaban >75%) dan bersuhu >28°C.
+3. Gabah Hijau dan Chalk (Opaque Grain): Terjadi akibat panen terlalu awal (kadar air >28%), stres suhu tinggi saat pengisian biji (>35°C), atau serangan hama penghisap biji seperti walang sangit (Leptocorisa oratorius).
+4. Keretakan Gabah (Fissured Grain): Pemicu utama adalah perubahan suhu dan kelembaban yang drastis saat pengeringan — turun kadar air >1%/jam menyebabkan stress cracking yang meningkatkan persentase beras patah (broken rice) hingga 30% lebih tinggi (Gummert et al., 2020; IRRI, 2022).
+5. Serangan Walang Sangit (Leptocorisa oratorius): Imago dan nimfa menghisap cairan gabah muda pada fase pemasakan (7–14 hari setelah pembungaan) menyebabkan gabah hampa, berbintik-bintik hitam coklat, atau berbau tidak sedap. Kerugian hasil 10–40%.
+
+KONDISI SENSOR PADA FASE PANEN:
+Kondisi optimal untuk panen dan penanganan pasca panen:
+- Suhu udara saat panen: 24–32°C (panen pagi/sore lebih baik untuk menghindari kehilangan panen akibat kerontokkan)
+- Kelembaban udara saat panen: <80% (panen saat cuaca cerah mengurangi kadar air awal gabah)
+- Kadar air gabah: 20–25% (diukur dengan moisture meter)
+- Suhu pengeringan (mechanical dryer): 40–43°C untuk varietas penggilingan tinggi; ≤45°C agar tidak merusak viabilitas benih
+- Kelembaban udara gudang: <70%; suhu gudang: <25°C untuk penyimpanan aman >3 bulan
+- Indikator risiko aflatoksin: kadar air gabah >14% + kelembaban gudang >75% + suhu >28°C
+
+PENANGANAN PADA FASE PANEN:
+1. Pemilihan Waktu Panen:
+   - Panen pada pagi hari (06.00–10.00) atau sore hari (15.00–17.00) saat suhu lebih rendah untuk mengurangi kerontokan.
+   - Hindari panen saat hujan deras untuk mencegah kontaminasi dan peningkatan kadar air.
+   - Gunakan sabit bergerigi atau combine harvester yang terkalibrasi dengan celah (concave clearance) 10–14 mm untuk meminimalkan kehilangan dan kerusakan mekanis.
+
+2. Penanganan Setelah Panen (Post-Harvest):
+   - Perontokan (threshing): Lakukan dalam 24 jam setelah panen untuk menghindari fermentasi dan kehilangan kualitas. Gunakan power thresher dengan kecepatan drum 500–600 rpm.
+   - Pembersihan (cleaning): Bersihkan gabah dari jerami, gabah hampa, dan kotoran menggunakan ayakan atau blower sebelum pengeringan.
+   - Pengeringan (drying): Keringkan gabah hingga kadar air ≤14% sebelum disimpan. Pengeringan alami (sun drying): 2–3 hari cuaca cerah; pengeringan mekanis: 6–8 jam pada suhu 40–43°C. Hindari pengeringan berlebih (<12%) karena meningkatkan risiko retak beras.
+   - Penyimpanan: Simpan dalam karung plastik anyaman atau silo dengan kelembaban internal <70%. Tambahkan insektisida gudang (fosfin/phosphine) jika diperlukan untuk mencegah hama gudang (Sitophilus oryzae, Tribolium castaneum).
+
+3. Pengendalian Walang Sangit (prioritas 7–14 hari sebelum panen):
+   - Semprot insektisida malathion (Malathion 57 EC dosis 2 ml/L) atau karbosulfan (Marshal 200 SC dosis 1 ml/L) pada pagi hari saat imago aktif.
+   - Pemasangan light trap atau umpan perangkap fermentasi (campuran gula + air fermentasi) di sekitar sawah.
+   - Pertahankan musuh alami: laba-laba, kepik predator, dan parasitoid telur walang sangit.
+
+4. Penanganan Busuk Gabah:
+   - Panen segera ketika 80–95% gabah matang untuk menghindari infeksi lanjut oleh Burkholderia glumae atau Fusarium spp.
+   - Pisahkan gabah yang terinfeksi (berwarna coklat/hitam) dari gabah sehat selama proses pembersihan.
+   - Tidak ada treatment kimiawi yang efektif setelah infeksi; pencegahan melalui panen tepat waktu adalah kunci.
+
+PENCEGAHAN MASALAH PADA FASE PANEN:
+1. Tanam varietas dengan umur genjah atau sedang yang pembungaannya tidak bertepatan dengan musim hujan puncak.
+2. Monitor kadar air gabah dengan moisture meter mulai 25 HST untuk menentukan waktu panen optimal.
+3. Pastikan combine harvester atau alat panen dikalibrasi dan bersih dari sisa tanaman sebelumnya (sanitasi alat).
+4. Siapkan lantai jemur (tarpaulin/alas plastik) atau pengering mekanis sebelum panen untuk mengurangi penundaan pengeringan.
+5. Koordinasikan panen serempak dalam satu hamparan untuk mengurangi populasi walang sangit dan hama migrasi.
+
+TANDA VISUAL DARI FOTO/KAMERA AI:
+Gambar yang teridentifikasi sebagai fase panen umumnya menunjukkan:
+- Malai penuh menunduk dengan gabah berwarna kuning keemasan dominan (>80% per malai)
+- Daun bendera dan daun atas mulai mengering dan berwarna kuning hingga coklat muda
+- Kanopi tanaman secara keseluruhan berwarna kuning keemasan dengan sebagian kecil masih hijau
+- Tidak terdapat lesi, bercak, atau gejala penyakit yang mendominasi (fokus identifikasi adalah kematangan gabah, bukan penyakit aktif)
+
+KAITAN SENSOR IoT DENGAN FASE PANEN:
+Suhu udara >35°C dalam periode pengisian biji meningkatkan risiko chalk dan gabah terpanggang (heat spikelet sterility). Kelembaban udara >85% selama >3 hari setelah pembungaan meningkatkan risiko blas leher malai dan busuk gabah. Monitor nitrogen: jika nitrogen masih sangat tinggi menjelang panen, gabah cenderung hijau dan proses pemasakan tertunda. Intensitas cahaya rendah (<10.000 lux selama >5 hari) memperlambat laju pengisian biji dan menurunkan rendemen giling.
+
+TINDAKAN SEGERA SAAT TERDETEKSI FASE PANEN:
+1. Cek kadar air gabah dengan moisture meter — jika sudah 20–25%, jadwalkan panen dalam 3–5 hari ke depan.
+2. Periksa cuaca 5–7 hari ke depan; pilih hari dengan cuaca cerah berturut-turut untuk panen dan penjemuran.
+3. Siapkan tenaga panen, alat (sabit/combine harvester), wadah/karung, dan area penjemuran.
+4. Lakukan pengendalian walang sangit jika masih ditemukan populasi tinggi.
+5. Persiapkan penyimpanan: bersihkan gudang, periksa kelembaban, dan siapkan karung bersih.
+
+========================================
+INFORMASI TAMBAHAN: KONDISI SENSOR FASE PANEN
+========================================
+
+TABEL RISIKO PADA FASE PANEN BERDASARKAN DATA SENSOR:
+
+Suhu Udara Sangat Tinggi (>35°C) saat pengisian biji:
+- Gabah chalk (opaque grain): rendemen giling menurun 10–30%
+- Sterilitas spikelet akibat suhu panas (heat sterility)
+- Percepatan pembungaan walang sangit
+
+Kelembaban Udara Tinggi (>80%) mendekati waktu panen:
+- Risiko busuk gabah oleh Fusarium spp. dan Burkholderia glumae
+- Gabah sulit kering alami, memerlukan pengeringan mekanis
+- Potensi berkembangnya aflatoksin jika penyimpanan tidak segera dikeringkan
+
+Kadar Air Gabah >25% saat panen:
+- Gabah rentan retak saat pengeringan cepat
+- Peningkatan broken rice rate hingga 30%
+- Biaya energi pengeringan lebih tinggi
+
+Kadar Air Gabah <18% saat panen:
+- Kerontokan gabah berlebihan saat pemanenan (field losses)
+- Gabah sudah terlalu matang; risiko serangan burung meningkat
+- Beras sudah mulai mengalami cracking di lapang
+
+REFERENSI FASE PANEN:
+- IRRI. Post-Harvest Management Guidelines for Rice. IRRI Technical Bulletin 2022.
+- BB Padi. Teknologi Panen dan Pascapanen Padi. Sukamandi: BB Padi, Kementan RI, 2023.
+- Gummert, M. et al. "Mechanized harvesting." In: Mew, T.W., et al. (eds.), Rice Production Handbook. IRRI, 2020.
+- Bautista, E. et al. "Timing and method of harvest and its effects on grain quality." Philippine Journal of Crop Science, 47(1): 22–31, 2022.
+- Siebenmorgen, T.J. et al. "Rice fissuring: mechanism, prediction, and control." Cereal Chemistry, 98(4): 701–715, 2021.
+- Gonzaga, Z.J. et al. "Walang sangit (Leptocorisa oratorius) population dynamics and management in tropical rice." Crop Protection, 142: 105524, 2021.
+- FAO. Preventing Food Losses in Rice Post-Harvest Operations. Rome: FAO, 2023.
+- Kementan RI — Ditjen Tanaman Pangan. Pedoman Teknis Panen dan Pascapanen Padi. Jakarta: Kementan, 2022.

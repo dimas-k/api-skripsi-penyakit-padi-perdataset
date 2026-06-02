@@ -14,7 +14,8 @@ CLASS_NAMES = [
     'bacterial_leaf_blight', 'bacterial_leaf_streak',
     'bacterial_panicle_blight', 'brown_spot', 'dead_heart',
     'downy_mildew', 'healthy', 'hispa', 'leaf_blast',
-    'leaf_smut', 'neck_blast', 'sheath_blight', 'tungro'
+    'leaf_smut', 'neck_blast', 'sheath_blight', 'tungro',
+    'harvest_stage',   
 ]
 
 # ─────────────────────────────────────────────────────────────────
