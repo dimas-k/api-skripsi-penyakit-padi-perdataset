@@ -3,28 +3,36 @@ evaluate_rag.py — Evaluasi RAG Pipeline Penyakit Padi
 ======================================================
 Menghitung metrik evaluasi sesuai arahan dosen:
 
-RETRIEVER METRICS (seperti di paper CottonBot):
+RETRIEVER METRICS:
   - MRR (Mean Reciprocal Rank)
   - Hit@k  (binary: ditemukan minimal 1 chunk relevan di top-k)
   - Precision@k
 
 GENERATOR METRICS:
-  - Faithfulness (manual scoring 0–1, opsional via --faithfulness)
-  - Cosine Similarity (generated vs ground truth)
+  - ROUGE-1, ROUGE-2, ROUGE-L  — evaluasi kualitas teks output LLM
+  - Cosine Similarity (semantic similarity vs ground truth)
   - Average Generation Time (detik)
+  - Faithfulness (manual scoring 0–1, opsional via --faithfulness)
+
+3 TIER MODEL LLM YANG DIEVALUASI:
+  - LOW    : Qwen2.5-3B        (Ollama, lokal) — model kecil, sangat cepat
+  - MEDIUM : Gemini 2.5 Flash  (Google API)    — seimbang, context 1M token
+  - HIGH   : Llama3.3-70B      (Groq API)      — model besar, kualitas tinggi, cepat via cloud
 
 Cara pakai:
-  python evaluate_rag.py --k 3 --llm both --output hasil_evaluasi_rag.json
-  python evaluate_rag.py --k 5 --llm groq
-  python evaluate_rag.py --k 5 --skip-llm                  (hanya retriever)
-  python evaluate_rag.py --k 3 --llm both --faithfulness   (+ anotasi manual)
+  python evaluate_rag.py --k 3 --llm all    --output hasil_evaluasi_rag.json
+  python evaluate_rag.py --k 5 --llm low
+  python evaluate_rag.py --k 5 --llm medium
+  python evaluate_rag.py --k 5 --llm high
+  python evaluate_rag.py --k 5 --skip-llm                   (hanya retriever)
+  python evaluate_rag.py --k 3 --llm all --faithfulness     (+ anotasi manual)
 
 Changelog:
+  v5 (Jun 2026): Ganti HIGH=Llama3.3-70B dari Ollama ke Groq API
+  v4 (Jun 2026): Ganti LOW=Qwen2.5-3B(Ollama), MEDIUM=Gemini2.5Flash, HIGH=Llama3.3-70B(Ollama)
+                 Hapus dependensi Groq API, tambah Ollama factory
+  v3 (Jun 2026): +ROUGE-1/2/L metrics, 3 tier LLM (LOW/MEDIUM/LARGE)
   v2 (Jun 2025): +Q16 bacterial_leaf_streak, +Q17-Q18 harvest_stage
-                 Fix: from llm import → diganti import lokal aman
-                 Fix: generator pakai args.k, bukan hardcode k=3
-                 Fix: Hit@k menggantikan nama Recall@k yang misleading
-                 Fix: Gemini fallback model list
 """
 
 import os
@@ -42,17 +50,22 @@ logger = logging.getLogger(__name__)
 # KONFIGURASI
 # ═════════════════════════════════════════════════════════════════
 EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
-GROQ_MODEL_NAME      = "llama-3.3-70b-versatile"
 
-# Fallback list Gemini (urutan dicoba dari atas)
+# 3 Tier Model LLM
+LLM_LOW_MODEL    = "qwen2.5:3b"                 # LOW    — Ollama lokal
+LLM_MEDIUM_MODEL = "gemini-2.5-flash"           # MEDIUM — Google API
+LLM_HIGH_MODEL   = "llama-3.3-70b-versatile"   # HIGH   — Groq API
+
+# Fallback list Gemini (MEDIUM)
 GEMINI_CANDIDATES = [
-    ("gemini-2.5-flash", "v1beta"),
-    ("gemini-2.5-flash", "v1"),
-    ("gemini-2.0-flash", "v1"),
-    ("gemini-2.0-flash", "v1beta"),
+    ("gemini-2.5-flash",      "v1beta"),
+    ("gemini-2.5-flash",      "v1"),
+    ("gemini-2.0-flash",      "v1"),
+    ("gemini-2.0-flash",      "v1beta"),
+    ("gemini-2.0-flash-lite", "v1"),
 ]
 
-# System prompt lokal — tidak import dari llm.py (agar aman tanpa GEMINI_API_KEY)
+# System prompt lokal (aman tanpa import llm.py)
 _SYSTEM_PROMPT = (
     "Kamu adalah asisten pertanian yang membantu petani padi langsung di lapangan. "
     "Gunakan bahasa sederhana dan mudah dipahami. "
@@ -63,7 +76,7 @@ _SYSTEM_PROMPT = (
 
 
 # ═════════════════════════════════════════════════════════════════
-# GROUND TRUTH — 18 Skenario (14 kelas × minimal 1 query)
+# GROUND TRUTH — 18 Skenario
 # ═════════════════════════════════════════════════════════════════
 GROUND_TRUTH_QA = [
     # ── Q01 ── bacterial_leaf_blight ──────────────────────────────
@@ -269,7 +282,7 @@ GROUND_TRUTH_QA = [
             "Cabut tanaman bergejala kuning-oranye jika ada."
         ),
     },
-    # ── Q16 ── bacterial_leaf_streak ── BARU v2 ───────────────────
+    # ── Q16 ── bacterial_leaf_streak ──────────────────────────────
     {
         "id"               : "Q16",
         "query"            : "Ada garis-garis sempit kuning di antara tulang daun padi disertai butiran eksudat kekuningan, penyakit apa ini?",
@@ -283,7 +296,7 @@ GROUND_TRUTH_QA = [
             "Pencegahan: perlakuan benih, jarak tanam optimal, rotasi tanaman."
         ),
     },
-    # ── Q17 ── harvest_stage ── BARU v2 ───────────────────────────
+    # ── Q17 ── harvest_stage ──────────────────────────────────────
     {
         "id"               : "Q17",
         "query"            : "Malai padi sudah menunduk dan 80% gabah berwarna kuning keemasan, apakah sudah siap panen dan apa langkahnya?",
@@ -297,7 +310,7 @@ GROUND_TRUTH_QA = [
             "Keringkan hingga kadar air ≤14% sebelum disimpan di gudang yang kering."
         ),
     },
-    # ── Q18 ── harvest_stage (sensor) ── BARU v2 ─────────────────
+    # ── Q18 ── harvest_stage (sensor) ─────────────────────────────
     {
         "id"               : "Q18",
         "query"            : "Kelembaban udara 85% saat padi siap panen, apa risiko kualitas gabah dan apa yang harus dilakukan?",
@@ -318,160 +331,178 @@ GROUND_TRUTH_QA = [
 # HELPER: Cosine Similarity
 # ═════════════════════════════════════════════════════════════════
 def cosine_similarity(vec_a: np.ndarray, vec_b: np.ndarray) -> float:
-    norm_a = np.linalg.norm(vec_a)
-    norm_b = np.linalg.norm(vec_b)
-    if norm_a == 0 or norm_b == 0:
-        return 0.0
-    return float(np.dot(vec_a, vec_b) / (norm_a * norm_b))
-
-
-def is_relevant_chunk(chunk_text: str, relevant_keywords: list[str]) -> bool:
-    """
-    Chunk dianggap relevan jika mengandung MINIMAL 1 keyword yang diberikan.
-    """
-    chunk_lower = chunk_text.lower()
-    return any(kw.lower() in chunk_lower for kw in relevant_keywords)
+    dot = float(np.dot(vec_a, vec_b))
+    return max(-1.0, min(1.0, dot))
 
 
 # ═════════════════════════════════════════════════════════════════
-# RETRIEVER EVALUATION — MRR, Hit@k, Precision@k
+# ROUGE Scoring
+# ═════════════════════════════════════════════════════════════════
+def compute_rouge(hypothesis: str, reference: str) -> dict:
+    """
+    Hitung skor ROUGE antara output LLM dan ground truth.
+    ROUGE-1: overlap unigram | ROUGE-2: bigram | ROUGE-L: LCS
+    """
+    try:
+        from rouge_score import rouge_scorer
+        scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=False)
+        scores = scorer.score(reference, hypothesis)
+        return {
+            "rouge1": {"precision": round(scores["rouge1"].precision, 4),
+                       "recall"   : round(scores["rouge1"].recall,    4),
+                       "fmeasure" : round(scores["rouge1"].fmeasure,  4)},
+            "rouge2": {"precision": round(scores["rouge2"].precision, 4),
+                       "recall"   : round(scores["rouge2"].recall,    4),
+                       "fmeasure" : round(scores["rouge2"].fmeasure,  4)},
+            "rougeL": {"precision": round(scores["rougeL"].precision, 4),
+                       "recall"   : round(scores["rougeL"].recall,    4),
+                       "fmeasure" : round(scores["rougeL"].fmeasure,  4)},
+        }
+    except ImportError:
+        logger.error("rouge-score belum terinstall. Jalankan: pip install rouge-score")
+        return {
+            "rouge1": {"precision": 0.0, "recall": 0.0, "fmeasure": 0.0},
+            "rouge2": {"precision": 0.0, "recall": 0.0, "fmeasure": 0.0},
+            "rougeL": {"precision": 0.0, "recall": 0.0, "fmeasure": 0.0},
+        }
+
+
+# ═════════════════════════════════════════════════════════════════
+# RETRIEVER EVALUATION
 # ═════════════════════════════════════════════════════════════════
 def evaluate_retriever(ground_truth_list: list[dict], k: int = 5) -> dict:
-    """
-    Evaluasi komponen retriever RAG.
-
-    Rumus (sesuai paper CottonBot, Kandamali et al. 2025):
-      MRR        = (1/N) * Σ (1/rank_i)  — rank chunk relevan pertama di top-k
-      Hit@k      = proporsi query di mana minimal 1 chunk relevan ditemukan di top-k
-                   (disebut Recall@k di beberapa paper closed-domain, binary 0/1 per query)
-      Precision@k = rata-rata proporsi chunk relevan di top-k  (0..1)
-
-    Catatan: Hit@k berbeda dari Recall@k klasik.
-      - Hit@k (dipakai di sini): 1 jika ada ≥1 chunk relevan di top-k, 0 jika tidak.
-      - Recall@k klasik: num_relevant_retrieved / total_relevant_in_corpus.
-      Karena total_relevant tidak diketahui pasti, digunakan Hit@k.
-    """
     from rag import retrieve
 
-    mrr_scores       = []
-    hit_scores       = []
-    precision_scores = []
-    per_query_results = []
+    mrr_scores  = []
+    hit_scores  = []
+    prec_scores = []
+    per_query   = []
 
     logger.info(f"Mengevaluasi retriever untuk {len(ground_truth_list)} query (k={k})...")
 
     for qa in ground_truth_list:
-        query             = qa["query"]
-        relevant_keywords = qa["relevant_keywords"]
+        query    = qa["query"]
+        keywords = [kw.lower() for kw in qa["relevant_keywords"]]
 
-        retrieved = retrieve(query, k=k)
+        # retrieve() di rag.py sudah handle encoding sendiri — kirim string langsung
+        chunks = retrieve(query, k=k)
 
-        relevance_flags = [
-            1 if is_relevant_chunk(item["text"], relevant_keywords) else 0
-            for item in retrieved
-        ]
+        flags = []
+        for chunk in chunks:
+            text_lower = chunk["text"].lower()
+            relevant   = any(kw in text_lower for kw in keywords)
+            flags.append(1 if relevant else 0)
 
-        # ── MRR ───────────────────────────────────────────────────
-        first_relevant_rank = None
-        for i, flag in enumerate(relevance_flags):
+        rr = 0.0
+        for rank, flag in enumerate(flags, start=1):
             if flag == 1:
-                first_relevant_rank = i + 1
+                rr = 1.0 / rank
                 break
-        rr = (1.0 / first_relevant_rank) if first_relevant_rank else 0.0
         mrr_scores.append(rr)
 
-        # ── Hit@k ─────────────────────────────────────────────────
-        # Binary: 1 jika setidaknya 1 chunk relevan ditemukan di top-k
-        hit = 1.0 if sum(relevance_flags) > 0 else 0.0
+        hit  = 1.0 if any(flags) else 0.0
+        prec = sum(flags) / k
         hit_scores.append(hit)
+        prec_scores.append(prec)
 
-        # ── Precision@k ───────────────────────────────────────────
-        precision = sum(relevance_flags) / k
-        precision_scores.append(precision)
-
-        per_query_results.append({
+        per_query.append({
             "id"             : qa["id"],
-            "query"          : query[:70] + "..." if len(query) > 70 else query,
             "disease"        : qa["disease"],
-            "rr"             : round(rr, 4),
-            "hit_k"          : round(hit, 4),
-            "precision_k"    : round(precision, 4),
-            "relevance_flags": relevance_flags,
-            "top1_score"     : round(retrieved[0]["score"], 4) if retrieved else 0,
+            "query"          : query,
+            "rr"             : round(rr,   4),
+            "hit_k"          : hit,
+            "precision_k"    : round(prec, 4),
+            "top1_score"     : round(chunks[0]["score"], 4) if chunks else 0.0,
+            "relevance_flags": flags,
         })
 
     return {
-        "MRR"             : round(float(np.mean(mrr_scores)), 4),
-        f"Hit@{k}"        : round(float(np.mean(hit_scores)), 4),
-        f"Precision@{k}"  : round(float(np.mean(precision_scores)), 4),
-        "per_query"       : per_query_results,
+        "MRR"             : round(float(np.mean(mrr_scores)),  4),
+        f"Hit@{k}"        : round(float(np.mean(hit_scores)),  4),
+        f"Precision@{k}"  : round(float(np.mean(prec_scores)), 4),
         "k"               : k,
         "n_queries"       : len(ground_truth_list),
+        "per_query"       : per_query,
     }
 
 
 # ═════════════════════════════════════════════════════════════════
-# LLM FUNCTIONS — tanpa import llm.py (aman meski GEMINI_API_KEY tidak diset)
+# FACTORY: Ollama (LOW)
 # ═════════════════════════════════════════════════════════════════
-def _make_groq_func():
+def _make_ollama_func(model_name: str, label: str):
     """
-    Buat fungsi generator Groq tanpa mengimpor llm.py secara langsung.
-    llm.py memiliki raise ValueError() di level modul yang akan crash
-    jika GEMINI_API_KEY tidak diset di .env.
+    Buat generator Ollama untuk model lokal (Qwen 3B / Llama 70B).
+    Timeout 600s untuk mengakomodasi model 70B yang lambat.
+    Pastikan Ollama sudah running dan model sudah di-pull.
     """
-    from groq import Groq
-    api_key = os.environ.get("GROQ_API_KEY", "")
-    if not api_key:
-        raise EnvironmentError("GROQ_API_KEY belum diset di .env")
-    client = Groq(api_key=api_key)
+    import requests as _req
+
+    base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+
+    # Test koneksi Ollama saat inisialisasi
+    try:
+        r = _req.get(f"{base_url}/api/tags", timeout=5)
+        if r.status_code != 200:
+            raise ConnectionError(f"Ollama merespons {r.status_code}")
+        # Cek model tersedia
+        available = [m["name"] for m in r.json().get("models", [])]
+        if model_name not in available:
+            logger.warning(
+                f"Model '{model_name}' belum ada di Ollama. "
+                f"Jalankan: ollama pull {model_name}"
+            )
+    except _req.exceptions.ConnectionError:
+        raise ConnectionError(
+            f"Ollama tidak bisa diakses di {base_url}.\n"
+            f"Pastikan Ollama sudah berjalan: ollama serve"
+        )
 
     def fn(prompt: str) -> str:
-        resp = client.chat.completions.create(
-            model=GROQ_MODEL_NAME,
-            messages=[
+        payload = {
+            "model"   : model_name,
+            "messages": [
                 {"role": "system", "content": _SYSTEM_PROMPT},
                 {"role": "user",   "content": prompt},
             ],
-            temperature=0.7,
-            max_tokens=1024,
-        )
-        return resp.choices[0].message.content
+            "stream" : False,
+            "options": {"temperature": 0.7, "num_predict": 1024},
+        }
+        r = _req.post(f"{base_url}/api/chat", json=payload, timeout=600)
+        r.raise_for_status()
+        return r.json()["message"]["content"].strip()
 
-    return fn, f"Groq — {GROQ_MODEL_NAME}"
+    return fn, label
 
 
+# ═════════════════════════════════════════════════════════════════
+# FACTORY: Gemini (MEDIUM)
+# ═════════════════════════════════════════════════════════════════
 def _make_gemini_func():
-    """
-    Buat fungsi generator Gemini dengan fallback model list.
-    Mencoba kandidat model dari GEMINI_CANDIDATES secara urut.
-    """
-    import requests
+    """Buat generator Gemini 2.5 Flash (MEDIUM) dengan fallback model list."""
+    import requests as _req
 
     api_key = os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
         raise EnvironmentError("GEMINI_API_KEY belum diset di .env")
 
     _base   = "https://generativelanguage.googleapis.com"
-    _active = [None]   # mutable closure untuk menyimpan model yang berhasil
+    _active = [None]
 
     def fn(prompt: str) -> str:
-        # Urutkan: aktif duluan jika sudah pernah berhasil
-        if _active[0]:
-            ordered = [_active[0]] + [c for c in GEMINI_CANDIDATES if c != _active[0]]
-        else:
-            ordered = list(GEMINI_CANDIDATES)
+        ordered = [_active[0]] + [c for c in GEMINI_CANDIDATES if c != _active[0]] \
+                  if _active[0] else list(GEMINI_CANDIDATES)
 
         payload = {
             "systemInstruction": {"parts": [{"text": _SYSTEM_PROMPT}]},
-            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0.7, "maxOutputTokens": 1024},
+            "contents"         : [{"role": "user", "parts": [{"text": prompt}]}],
+            "generationConfig" : {"temperature": 0.7, "maxOutputTokens": 1024},
         }
 
         last_err = None
         for model, ver in ordered:
             url = f"{_base}/{ver}/models/{model}:generateContent?key={api_key}"
             for attempt in range(3):
-                resp = requests.post(url, json=payload, timeout=60)
+                resp = _req.post(url, json=payload, timeout=60)
                 if resp.status_code == 429:
                     wait = 15 * (attempt + 1)
                     logger.info(f"Gemini rate limit ({model}), tunggu {wait}s...")
@@ -494,38 +525,70 @@ def _make_gemini_func():
         raise RuntimeError(f"Semua model Gemini gagal. Error terakhir: {last_err}")
 
     active_name = GEMINI_CANDIDATES[0][0]
-    return fn, f"Gemini — {active_name}"
+    return fn, f"Gemini — {active_name} (MEDIUM)"
 
 
 # ═════════════════════════════════════════════════════════════════
-# GENERATOR EVALUATION — Cosine Similarity + Waktu + Faithfulness
+# FACTORY: Groq (HIGH)
 # ═════════════════════════════════════════════════════════════════
+def _make_groq_func():
+    """
+    Buat generator Groq untuk Llama 3.3-70B (HIGH).
+    Menggunakan OpenAI-compatible endpoint Groq.
+    Sangat cepat — Groq menggunakan LPU (Language Processing Unit).
+    """
+    import requests as _req
+
+    api_key = os.environ.get("GROQ_API_KEY", "")
+    if not api_key:
+        raise EnvironmentError("GROQ_API_KEY belum diset di .env")
+
+    _groq_url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type" : "application/json",
+    }
+
+    def fn(prompt: str) -> str:
+        payload = {
+            "model"      : LLM_HIGH_MODEL,
+            "messages"   : [
+                {"role": "system", "content": _SYSTEM_PROMPT},
+                {"role": "user",   "content": prompt},
+            ],
+            "temperature": 0.7,
+            "max_tokens" : 1024,
+        }
+        for attempt in range(3):
+            try:
+                r = _req.post(_groq_url, headers=headers, json=payload, timeout=60)
+                if r.status_code == 429:
+                    wait = 10 * (attempt + 1)
+                    logger.info(f"Groq rate limit, tunggu {wait}s...")
+                    time.sleep(wait)
+                    continue
+                r.raise_for_status()
+                return r.json()["choices"][0]["message"]["content"].strip()
+            except _req.exceptions.Timeout:
+                raise RuntimeError(f"Groq timeout (>60s) untuk model {LLM_HIGH_MODEL}")
+        raise RuntimeError("Groq gagal setelah 3 percobaan (rate limit)")
+
+    return fn, f"Groq — {LLM_HIGH_MODEL} (HIGH)"
 def evaluate_generator(
     ground_truth_list: list[dict],
     llm_func         : callable,
     llm_name         : str = "LLM",
     k                : int = 5,
 ) -> dict:
-    """
-    Evaluasi komponen generator (LLM) dalam RAG pipeline.
-
-    Args:
-        ground_truth_list: list skenario QA
-        llm_func         : callable(prompt: str) -> str
-        llm_name         : label LLM untuk output
-        k                : jumlah chunk yang diambil saat build_rag_prompt (sinkron dengan args.k)
-
-    Metrik:
-    - Cosine Similarity  : kemiripan semantik antara jawaban LLM dan ground truth
-    - Avg Generation Time: rata-rata waktu generate (detik)
-    - Faithfulness       : skor manual annotator 0-1 (opsional, diisi terpisah)
-    """
     from rag import build_rag_prompt
     from sentence_transformers import SentenceTransformer
 
-    embed_model  = SentenceTransformer(EMBEDDING_MODEL_NAME)
-    cosim_scores = []
-    time_scores  = []
+    embed_model   = SentenceTransformer(EMBEDDING_MODEL_NAME)
+    cosim_scores  = []
+    time_scores   = []
+    rouge1_scores = []
+    rouge2_scores = []
+    rougeL_scores = []
     per_query_res = []
 
     logger.info(f"Mengevaluasi generator: {llm_name} ({len(ground_truth_list)} query, k={k})...")
@@ -533,9 +596,7 @@ def evaluate_generator(
     for qa in ground_truth_list:
         disease      = qa["disease"]
         ground_truth = qa["ground_truth"]
-
-        # FIX: gunakan k dari args, bukan hardcode k=3
-        prompt, retrieved = build_rag_prompt(disease_name=disease, k=k)
+        prompt, _    = build_rag_prompt(disease_name=disease, k=k)
 
         try:
             t0     = time.perf_counter()
@@ -548,17 +609,24 @@ def evaluate_generator(
 
         time_scores.append(t_gen)
 
-        # Cosine similarity: jawaban LLM vs ground truth
         if answer:
             vecs = embed_model.encode(
                 [answer, ground_truth],
-                convert_to_numpy=True,
-                normalize_embeddings=True,
+                convert_to_numpy=True, normalize_embeddings=True,
             )
             cos_sim = cosine_similarity(vecs[0], vecs[1])
         else:
             cos_sim = 0.0
         cosim_scores.append(cos_sim)
+
+        rouge = compute_rouge(answer, ground_truth) if answer else {
+            "rouge1": {"fmeasure": 0.0},
+            "rouge2": {"fmeasure": 0.0},
+            "rougeL": {"fmeasure": 0.0},
+        }
+        rouge1_scores.append(rouge["rouge1"]["fmeasure"])
+        rouge2_scores.append(rouge["rouge2"]["fmeasure"])
+        rougeL_scores.append(rouge["rougeL"]["fmeasure"])
 
         per_query_res.append({
             "id"          : qa["id"],
@@ -567,14 +635,21 @@ def evaluate_generator(
             "generated"   : answer[:300] + "..." if len(answer) > 300 else answer,
             "ground_truth": ground_truth[:300] + "..." if len(ground_truth) > 300 else ground_truth,
             "cosine_sim"  : round(cos_sim, 4),
+            "rouge1_f"    : rouge["rouge1"]["fmeasure"],
+            "rouge2_f"    : rouge["rouge2"]["fmeasure"],
+            "rougeL_f"    : rouge["rougeL"]["fmeasure"],
+            "rouge_detail": rouge,
             "time_s"      : t_gen,
-            "faithfulness": None,  
+            "faithfulness": None,
         })
 
     return {
         "llm"                  : llm_name,
-        "avg_cosine_similarity": round(float(np.mean(cosim_scores)), 4),
-        "avg_generation_time_s": round(float(np.mean(time_scores)), 3),
+        "avg_cosine_similarity": round(float(np.mean(cosim_scores)),  4),
+        "avg_rouge1_f"         : round(float(np.mean(rouge1_scores)), 4),
+        "avg_rouge2_f"         : round(float(np.mean(rouge2_scores)), 4),
+        "avg_rougeL_f"         : round(float(np.mean(rougeL_scores)), 4),
+        "avg_generation_time_s": round(float(np.mean(time_scores)),   3),
         "faithfulness_note"    : "Diisi manual annotator (0=tidak akurat, 0.5=sebagian, 1=sangat akurat)",
         "per_query"            : per_query_res,
         "n_queries"            : len(ground_truth_list),
@@ -586,10 +661,6 @@ def evaluate_generator(
 # FAITHFULNESS MANUAL SCORING
 # ═════════════════════════════════════════════════════════════════
 def run_faithfulness_annotation(generator_results: dict) -> dict:
-    """
-    Tool interaktif untuk mengisi skor faithfulness secara manual.
-    Kamu membaca jawaban LLM vs ground truth, lalu beri skor 0, 0.5, atau 1.
-    """
     print("\n" + "="*65)
     print(f"ANOTASI FAITHFULNESS — {generator_results['llm']}")
     print("Skor: 0 = tidak akurat | 0.5 = sebagian akurat | 1 = sangat akurat")
@@ -630,13 +701,12 @@ def print_retriever_table(results: dict):
     print(f"  {f'Hit@{k}':<22} {results[f'Hit@{k}']:>10.4f}")
     print(f"  {f'Precision@{k}':<22} {results[f'Precision@{k}']:>10.4f}")
     print(f"{'='*65}")
-    print(f"\n  {'ID':<5} {'Penyakit':<30} {'RR':>6} {'Hit':>5} {'Prec':>6} {'Top1':>6} Flags")
-    print(f"  {'-'*70}")
+    print(f"\n  {'ID':<5} {'Penyakit':<30} {'RR':>6} {'Hit':>5} {'Prec':>6}")
+    print(f"  {'-'*55}")
     for pq in results["per_query"]:
-        flags_str = str(pq["relevance_flags"])
         print(
             f"  {pq['id']:<5} {pq['disease']:<30} {pq['rr']:>6.3f} "
-            f"{pq['hit_k']:>5.1f} {pq['precision_k']:>6.3f} {pq['top1_score']:>6.3f} {flags_str}"
+            f"{pq['hit_k']:>5.1f} {pq['precision_k']:>6.3f}"
         )
 
 
@@ -644,12 +714,23 @@ def print_generator_table(results: dict):
     print(f"\n{'='*65}")
     print(f"  HASIL EVALUASI GENERATOR: {results['llm']}")
     print(f"{'='*65}")
+    print(f"  Avg ROUGE-1 F1         : {results['avg_rouge1_f']:.4f}")
+    print(f"  Avg ROUGE-2 F1         : {results['avg_rouge2_f']:.4f}")
+    print(f"  Avg ROUGE-L F1         : {results['avg_rougeL_f']:.4f}")
     print(f"  Avg Cosine Similarity  : {results['avg_cosine_similarity']:.4f}")
     print(f"  Avg Generation Time    : {results['avg_generation_time_s']:.3f} detik")
     print(f"  k chunks dipakai       : {results.get('k_used', 'N/A')}")
     if "avg_faithfulness" in results:
         print(f"  Avg Faithfulness       : {results['avg_faithfulness']:.4f}")
     print(f"{'='*65}")
+    print(f"\n  {'ID':<5} {'Penyakit':<28} {'R1':>6} {'R2':>6} {'RL':>6} {'CosSim':>8} {'t(s)':>6}")
+    print(f"  {'-'*68}")
+    for pq in results["per_query"]:
+        print(
+            f"  {pq['id']:<5} {pq['disease']:<28} "
+            f"{pq['rouge1_f']:>6.3f} {pq['rouge2_f']:>6.3f} {pq['rougeL_f']:>6.3f} "
+            f"{pq['cosine_sim']:>8.4f} {pq['time_s']:>6.2f}"
+        )
 
 
 # ═════════════════════════════════════════════════════════════════
@@ -660,40 +741,77 @@ def save_retriever_csv(retriever_res: dict, output_path: str = "hasil_retriever.
     k = retriever_res["k"]
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow([
-            "ID", "Penyakit", "Query",
-            "RR", f"Hit@{k}", f"Precision@{k}",
-            "Top1_Score", "Relevant_Flags",
-        ])
+        writer.writerow(["ID", "Penyakit", "Query", "RR", f"Hit@{k}", f"Precision@{k}", "Top1_Score", "Relevant_Flags"])
         for pq in retriever_res["per_query"]:
-            writer.writerow([
-                pq["id"], pq["disease"], pq["query"],
-                pq["rr"], pq["hit_k"], pq["precision_k"],
-                pq["top1_score"],
-                str(pq["relevance_flags"]),
-            ])
+            writer.writerow([pq["id"], pq["disease"], pq["query"], pq["rr"],
+                             pq["hit_k"], pq["precision_k"], pq["top1_score"],
+                             str(pq["relevance_flags"])])
         writer.writerow([])
-        writer.writerow([
-            "RATA-RATA", "", "",
-            retriever_res["MRR"],
-            retriever_res[f"Hit@{k}"],
-            retriever_res[f"Precision@{k}"],
-            "", "",
-        ])
+        writer.writerow(["RATA-RATA", "", "", retriever_res["MRR"],
+                         retriever_res[f"Hit@{k}"], retriever_res[f"Precision@{k}"], "", ""])
     logger.info(f"CSV retriever disimpan: {output_path}")
 
 
+def save_generator_csv(generator_results: dict, output_path: str = "hasil_generator.csv"):
+    import csv
+    rows = []
+    for llm_name, gen_res in generator_results.items():
+        if "error" in str(gen_res):
+            continue
+        for pq in gen_res.get("per_query", []):
+            rows.append({
+                "LLM"         : llm_name,
+                "ID"          : pq["id"],
+                "Penyakit"    : pq["disease"],
+                "ROUGE-1 F1"  : pq.get("rouge1_f", ""),
+                "ROUGE-2 F1"  : pq.get("rouge2_f", ""),
+                "ROUGE-L F1"  : pq.get("rougeL_f", ""),
+                "Cosine Sim"  : pq.get("cosine_sim", ""),
+                "Waktu (s)"   : pq.get("time_s", ""),
+                "Faithfulness": pq.get("faithfulness", ""),
+            })
+    if rows:
+        with open(output_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+            writer.writeheader()
+            writer.writerows(rows)
+        with open(output_path, "a", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow([])
+            writer.writerow(["=== RATA-RATA PER LLM ==="])
+            writer.writerow(["LLM", "ROUGE-1 F1", "ROUGE-2 F1", "ROUGE-L F1",
+                             "Cosine Sim", "Avg Waktu (s)", "Avg Faithfulness"])
+            for llm_name, gen_res in generator_results.items():
+                if "error" in str(gen_res):
+                    continue
+                writer.writerow([
+                    llm_name,
+                    gen_res.get("avg_rouge1_f", ""),
+                    gen_res.get("avg_rouge2_f", ""),
+                    gen_res.get("avg_rougeL_f", ""),
+                    gen_res.get("avg_cosine_similarity", ""),
+                    gen_res.get("avg_generation_time_s", ""),
+                    gen_res.get("avg_faithfulness", ""),
+                ])
+    logger.info(f"CSV generator disimpan: {output_path}")
+
+
 def save_results(
-    retriever_res   : dict,
-    generator_results: dict,   # dict of {llm_name: gen_res} — bisa 1 atau 2 LLM
-    output_path     : str = "hasil_evaluasi_rag.json",
+    retriever_res    : dict,
+    generator_results: dict,
+    output_path      : str = "hasil_evaluasi_rag.json",
 ):
     output = {
         "metadata": {
-            "timestamp"       : time.strftime("%Y-%m-%d %H:%M:%S"),
-            "n_queries"       : retriever_res["n_queries"],
-            "k"               : retriever_res["k"],
-            "embedding_model" : EMBEDDING_MODEL_NAME,
+            "timestamp"      : time.strftime("%Y-%m-%d %H:%M:%S"),
+            "n_queries"      : retriever_res["n_queries"],
+            "k"              : retriever_res["k"],
+            "embedding_model": EMBEDDING_MODEL_NAME,
+            "llm_models": {
+                "low"   : f"Ollama — {LLM_LOW_MODEL} (lokal)",
+                "medium": f"Google — {LLM_MEDIUM_MODEL} (API)",
+                "high"  : f"Groq   — {LLM_HIGH_MODEL} (API)",
+            },
         },
         "retriever" : retriever_res,
         "generator" : generator_results,
@@ -708,39 +826,44 @@ def save_results(
 # ═════════════════════════════════════════════════════════════════
 def main():
     parser = argparse.ArgumentParser(
-        description="Evaluasi RAG Pipeline Penyakit Padi",
+        description="Evaluasi RAG Pipeline Penyakit Padi — 3 Tier LLM + ROUGE",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Contoh:
-  python evaluate_rag.py --k 3 --llm both --output hasil_evaluasi_rag.json
-  python evaluate_rag.py --k 5 --llm groq
+  python evaluate_rag.py --k 3 --llm all    --output hasil_evaluasi_rag.json
+  python evaluate_rag.py --k 5 --llm low
+  python evaluate_rag.py --k 5 --llm medium
+  python evaluate_rag.py --k 5 --llm high
   python evaluate_rag.py --k 5 --skip-llm
-  python evaluate_rag.py --k 3 --llm both --faithfulness
+  python evaluate_rag.py --k 3 --llm all --faithfulness
+
+Penjelasan tier LLM:
+  low    → Qwen2.5-3B              (Ollama lokal) — model kecil, sangat cepat
+  medium → Gemini 2.5 Flash        (Google API)   — seimbang, context 1M token
+  high   → Llama3.3-70B-versatile  (Groq API)     — model besar, cepat via cloud
+  all    → evaluasi ketiga tier sekaligus
+
+Prasyarat:
+  Ollama (untuk LOW): ollama serve && ollama pull qwen2.5:3b
+  .env harus berisi: GEMINI_API_KEY dan GROQ_API_KEY
         """,
     )
-    parser.add_argument("--k",           type=int, default=5,
-                        help="Jumlah chunk top-k untuk retriever (default: 5)")
-    parser.add_argument("--output",      type=str, default="hasil_evaluasi_rag.json",
-                        help="Path output JSON (default: hasil_evaluasi_rag.json)")
-    parser.add_argument("--csv",         type=str, default="hasil_retriever.csv",
-                        help="Path output CSV retriever (default: hasil_retriever.csv)")
-    parser.add_argument("--skip-llm",    action="store_true",
-                        help="Hanya evaluasi retriever, skip generator LLM")
-    parser.add_argument("--llm",         type=str, default="both",
-                        choices=["groq", "gemini", "both"],
-                        help="LLM yang dievaluasi (default: both)")
-    parser.add_argument("--faithfulness",action="store_true",
-                        help="Jalankan anotasi faithfulness manual setelah generator selesai")
+    parser.add_argument("--k",           type=int, default=5)
+    parser.add_argument("--output",      type=str, default="hasil_evaluasi_rag.json")
+    parser.add_argument("--csv",         type=str, default="hasil_retriever.csv")
+    parser.add_argument("--csv-gen",     type=str, default="hasil_generator.csv")
+    parser.add_argument("--skip-llm",    action="store_true")
+    parser.add_argument("--llm",         type=str, default="all",
+                        choices=["low", "medium", "high", "all"])
+    parser.add_argument("--faithfulness", action="store_true")
     args = parser.parse_args()
 
-    # ── Load .env ────────────────────────────────────────────────
     try:
         from dotenv import load_dotenv
         load_dotenv()
     except ImportError:
-        logger.warning("python-dotenv tidak terinstall; baca env dari OS langsung")
+        logger.warning("python-dotenv tidak terinstall")
 
-    # ── Pastikan RAG index sudah ada ────────────────────────────
     from rag import get_index_info, build_index
     if not Path("faiss_index.bin").exists():
         logger.info("Index belum ada, membangun index RAG dari knowledge_base/...")
@@ -749,73 +872,83 @@ Contoh:
     info = get_index_info()
     print("\n📚 RAG Index Info:")
     for k_info, v in info.items():
-        if k_info != "supported_classes":   # terlalu panjang, ringkas
+        if k_info != "supported_classes":
             print(f"   {k_info}: {v}")
     print(f"   supported_classes ({info['total_classes']}): {', '.join(info['supported_classes'])}")
 
-    # ── Evaluasi Retriever ───────────────────────────────────────
     print(f"\n🔍 Evaluasi Retriever (k={args.k}, {len(GROUND_TRUTH_QA)} query)...")
     retriever_res = evaluate_retriever(GROUND_TRUTH_QA, k=args.k)
     print_retriever_table(retriever_res)
     save_retriever_csv(retriever_res, args.csv)
 
-    # ── Evaluasi Generator (opsional) ────────────────────────────
     generator_results: dict = {}
     if not args.skip_llm:
         llms_to_eval = []
         errors       = []
 
-        if args.llm in ("groq", "both"):
-            try:
-                llms_to_eval.append(_make_groq_func())
-            except Exception as e:
-                logger.warning(f"Groq tidak bisa dimuat: {e}")
-                errors.append(f"Groq: {e}")
+        run_low    = args.llm in ("low",    "all")
+        run_medium = args.llm in ("medium", "all")
+        run_high   = args.llm in ("high",   "all")
 
-        if args.llm in ("gemini", "both"):
+        if run_low:
+            try:
+                llms_to_eval.append(
+                    _make_ollama_func(LLM_LOW_MODEL, f"Ollama — {LLM_LOW_MODEL} (LOW)")
+                )
+            except Exception as e:
+                logger.warning(f"LOW (Qwen 3B) tidak bisa dimuat: {e}")
+                errors.append(f"LOW: {e}")
+
+        if run_medium:
             try:
                 llms_to_eval.append(_make_gemini_func())
             except Exception as e:
-                logger.warning(f"Gemini tidak bisa dimuat: {e}")
-                errors.append(f"Gemini: {e}")
+                logger.warning(f"MEDIUM (Gemini) tidak bisa dimuat: {e}")
+                errors.append(f"MEDIUM: {e}")
+
+        if run_high:
+            try:
+                llms_to_eval.append(_make_groq_func())
+            except Exception as e:
+                logger.warning(f"HIGH (Llama 70B Groq) tidak bisa dimuat: {e}")
+                errors.append(f"HIGH: {e}")
 
         if not llms_to_eval:
-            logger.error("Tidak ada LLM yang bisa dijalankan. Cek .env file.")
+            logger.error("Tidak ada LLM yang bisa dijalankan. Cek .env & Ollama.")
             generator_results["errors"] = errors
         else:
             for llm_func, llm_name in llms_to_eval:
                 print(f"\n🤖 Evaluasi Generator: {llm_name}...")
                 try:
-                    gen_res = evaluate_generator(
-                        GROUND_TRUTH_QA, llm_func, llm_name, k=args.k
-                    )
+                    gen_res = evaluate_generator(GROUND_TRUTH_QA, llm_func, llm_name, k=args.k)
                     print_generator_table(gen_res)
-
                     if args.faithfulness:
                         gen_res = run_faithfulness_annotation(gen_res)
                         print_generator_table(gen_res)
-
                     generator_results[llm_name] = gen_res
                 except Exception as e:
                     logger.error(f"Generator {llm_name} gagal: {e}")
                     generator_results[llm_name] = {"error": str(e)}
 
-    # ── Simpan semua hasil ───────────────────────────────────────
     save_results(retriever_res, generator_results, args.output)
+    save_generator_csv(generator_results, args.csv_gen)
 
     print(f"\n✅ Selesai!")
-    print(f"   Hasil JSON : {args.output}")
-    print(f"   Hasil CSV  : {args.csv}")
-    print(f"   Salin angka dari CSV ke sheet 'Hasil Retriever RAG' di Excel Ground Truth.")
+    print(f"   JSON hasil    : {args.output}")
+    print(f"   CSV retriever : {args.csv}")
+    print(f"   CSV generator : {args.csv_gen}")
 
-    if generator_results and "errors" not in generator_results:
-        llm_keys = [k for k in generator_results if "error" not in str(generator_results[k])]
-        if llm_keys:
-            print(f"   Salin Cosine Sim + Waktu ke sheet 'Hasil Generator LLM+RAG'.")
-        if args.faithfulness and llm_keys:
-            print(f"   Faithfulness sudah diisi interaktif.")
-        elif llm_keys:
-            print(f"   Jalankan lagi dengan --faithfulness untuk mengisi skor Faithfulness secara manual.")
+    llm_keys = [k for k in generator_results if "error" not in str(generator_results.get(k, {}))]
+    if llm_keys:
+        print(f"\n📊 Ringkasan Generator:")
+        for lk in llm_keys:
+            r = generator_results[lk]
+            print(f"   [{lk}]")
+            print(f"     ROUGE-1 F1 : {r.get('avg_rouge1_f', 'N/A')}")
+            print(f"     ROUGE-2 F1 : {r.get('avg_rouge2_f', 'N/A')}")
+            print(f"     ROUGE-L F1 : {r.get('avg_rougeL_f', 'N/A')}")
+            print(f"     Cosine Sim : {r.get('avg_cosine_similarity', 'N/A')}")
+            print(f"     Avg Waktu  : {r.get('avg_generation_time_s', 'N/A')} detik")
 
 
 if __name__ == "__main__":

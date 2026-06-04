@@ -164,6 +164,9 @@ Kode: healthy
 DESKRIPSI:
 Tanaman padi yang sehat menunjukkan pertumbuhan optimal dengan warna daun hijau segar, batang tegak, dan perkembangan yang sesuai dengan fase pertumbuhannya. Kondisi sehat dicirikan oleh sistem perakaran yang baik, daun lebar dan mengkilap, serta tidak adanya gejala penyakit atau serangan hama.
 
+GEJALA:
+Tanaman sehat tidak menunjukkan gejala penyakit. Ciri-ciri visual yang terdeteksi kamera AI: daun berwarna hijau tua mengkilap tanpa bercak, lesi, atau perubahan warna abnormal. Batang kokoh dan tegak, tidak mudah rebah. Pertumbuhan seragam dan sesuai umur tanaman. Malai berisi penuh dengan gabah bernas pada fase generatif. Tidak ada eksudat, cairan abnormal, atau deformasi pada permukaan tanaman.
+
 CIRI-CIRI TANAMAN SEHAT:
 Daun berwarna hijau tua mengkilap tanpa bercak atau lesi. Batang kokoh dan tegak tidak mudah rebah. Pertumbuhan seragam dan sesuai umur tanaman. Akar putih dan sehat, tidak berbau busuk. Malai berisi penuh dengan gabah bernas pada fase generatif. Tidak ada eksudat atau cairan abnormal pada permukaan tanaman.
 
@@ -177,6 +180,13 @@ PEMELIHARAAN TANAMAN SEHAT:
 4. Pemantauan rutin setiap minggu untuk deteksi dini hama dan penyakit.
 5. Aplikasi pupuk organik untuk menjaga kesuburan tanah jangka panjang.
 6. Rotasi tanaman untuk memutus siklus hama dan penyakit.
+
+PENANGANAN DAN PENGENDALIAN:
+1. Lanjutkan pemupukan berimbang N-P-K sesuai umur dan kebutuhan varietas; tidak diperlukan pestisida apapun.
+2. Terapkan sistem irigasi berselang (intermittent irrigation) untuk menghemat air dan mencegah penyakit.
+3. Lakukan pemantauan rutin setiap 7-10 hari untuk deteksi dini hama dan penyakit.
+4. Pertahankan kebersihan lahan; singkirkan gulma dan sisa tanaman terinfeksi di sekitar petakan.
+5. Siapkan jadwal panen sesuai umur varietas dan konfirmasi dengan kondisi visual gabah di lapang.
 
 TINDAKAN SAAT TANAMAN SEHAT:
 Pertahankan kondisi optimal, lanjutkan program pemupukan dan pengairan sesuai jadwal, lakukan pemantauan preventif setiap 7-10 hari, dan persiapkan panen sesuai umur varietas.
@@ -454,6 +464,16 @@ Kode: harvest_stage
 
 DESKRIPSI:
 Fase Panen adalah tahap akhir budidaya padi yang menentukan kualitas dan kuantitas gabah yang dihasilkan. Ketepatan waktu panen sangat kritis: panen terlalu awal menghasilkan gabah hijau (chalk) dengan rendemen giling rendah, sedangkan panen terlalu lambat menyebabkan gabah rontok, retak, dan rentan serangan cendawan pasca panen. Berdasarkan IRRI (2022) dan BB Padi (2023), waktu panen optimal terjadi 28–35 hari setelah pembungaan 85% (days after heading/DAH), atau ketika 80–95% gabah pada satu malai telah menguning/matang.
+
+GEJALA:
+Fase panen bukan merupakan penyakit. Ciri-ciri yang terdeteksi kamera AI: 80–95% gabah pada malai telah berwarna kuning keemasan, malai menunduk akibat bobot gabah yang penuh, daun bendera dan daun atas mulai mengering dan berwarna kuning hingga coklat muda. Kadar air gabah berada pada kisaran 20–25%. Tidak terdapat lesi atau bercak penyakit yang mendominasi — fokus identifikasi adalah kematangan gabah, bukan penyakit aktif.
+
+PENANGANAN DAN PENGENDALIAN:
+1. Ukur kadar air gabah dengan moisture meter; jika sudah 20–25%, jadwalkan panen dalam 3–5 hari ke depan saat cuaca cerah.
+2. Panen pada pagi hari (06.00–10.00) atau sore hari (15.00–17.00) untuk mengurangi kerontokan dan panas berlebih.
+3. Rontokkan gabah dalam 24 jam setelah panen menggunakan power thresher 500–600 rpm untuk mencegah fermentasi.
+4. Keringkan gabah hingga kadar air ≤14%; gunakan mechanical dryer 40–43°C jika cuaca tidak mendukung penjemuran alami.
+5. Simpan dalam karung bersih atau silo dengan kelembaban gudang <70% dan suhu <25°C untuk mencegah aflatoksin.
 
 INDIKATOR KESIAPAN PANEN:
 1. Visual: 80–95% gabah pada malai telah berwarna kuning keemasan; daun bendera mulai mengering; malai menunduk akibat bobot gabah.

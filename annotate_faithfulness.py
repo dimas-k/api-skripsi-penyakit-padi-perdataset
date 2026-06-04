@@ -2,7 +2,12 @@
 annotate_faithfulness.py
 ========================
 Isi skor Faithfulness dari hasil_evaluasi_rag.json yang sudah ada.
-TIDAK memanggil API lagi — hemat quota Groq & Gemini.
+TIDAK memanggil API lagi — hemat quota Gemini & resource Ollama.
+
+3 Tier LLM yang dievaluasi:
+  LOW    : Qwen2.5-3B     (Ollama lokal)
+  MEDIUM : Gemini 2.5 Flash (Google API)
+  HIGH   : Llama3.3-70B   (Ollama lokal)
 
 Cara pakai:
   python annotate_faithfulness.py
@@ -26,13 +31,11 @@ def extract_generators(d: dict) -> list:
     """
     Handle dua format JSON yang mungkin:
       Format baru: {"generators": [ {llm: ..., per_query: ...}, ... ]}
-      Format lama: {"generator": { "Groq - xxx": {llm: ..., per_query: ...}, ... }}
+      Format lama: {"generator": { "Ollama — xxx": {llm: ..., per_query: ...}, ... }}
     """
-    # Format baru — list
     if "generators" in d and isinstance(d["generators"], list):
         return d["generators"]
 
-    # Format lama — dict
     if "generator" in d and isinstance(d["generator"], dict):
         result = []
         for llm_name, gen_data in d["generator"].items():
@@ -52,7 +55,7 @@ def annotate(input_path: str):
     if not generators:
         print("❌ Tidak ada data generator di file JSON.")
         print("   Pastikan kamu sudah menjalankan:")
-        print("   python evaluate_rag.py --k 3 --llm both --output hasil_evaluasi_rag.json")
+        print("   python evaluate_rag.py --k 3 --llm all --output hasil_evaluasi_rag.json")
         return
 
     print(PANDUAN)
@@ -67,7 +70,6 @@ def annotate(input_path: str):
         per_query = gen.get("per_query", [])
         scores    = []
 
-        # Cek apakah faithfulness sudah ada sebelumnya
         already_done = [pq for pq in per_query if pq.get("faithfulness") is not None]
         if already_done:
             print(f"\n⚠️  {llm_name}: sudah ada {len(already_done)} skor faithfulness.")
@@ -118,9 +120,8 @@ def annotate(input_path: str):
             gen["avg_faithfulness"] = avg
             print(f"\n  ✅ Avg Faithfulness {llm_name}: {avg}")
 
-    # Simpan kembali — pertahankan format asli (generator atau generators)
+    # Simpan kembali — pertahankan format asli
     if "generator" in d and isinstance(d["generator"], dict):
-        # Update format lama
         for gen in generators:
             llm_name = gen.get("llm")
             if llm_name and llm_name in d["generator"]:
@@ -146,17 +147,20 @@ def print_summary(d: dict, generators: list):
     print("  RINGKASAN HASIL — salin ke laporan skripsi")
     print(f"{'='*65}")
 
-    print(f"\n  [RETRIEVER] all-MiniLM-L6-v2 + FAISS | k={k} | n=15 query")
+    print(f"\n  [RETRIEVER] all-MiniLM-L6-v2 + FAISS | k={k} | n=18 query")
     print(f"  MRR            : {ret.get('MRR', 'N/A')}")
     print(f"  Recall@{k}       : {ret.get(f'Recall@{k}', 'N/A')}")
     print(f"  Precision@{k}    : {ret.get(f'Precision@{k}', 'N/A')}")
 
-    print(f"\n  [GENERATOR] max_tokens=2048 (sama untuk semua LLM)")
+    print(f"\n  [GENERATOR] max_tokens=1024 | 3 Tier LLM")
     for gen in generators:
         if "error" in gen:
             continue
         print(f"\n  {gen['llm']}")
         print(f"    Cosine Similarity : {gen.get('avg_cosine_similarity', 'N/A')}")
+        print(f"    ROUGE-1 F1        : {gen.get('avg_rouge1_f', 'N/A')}")
+        print(f"    ROUGE-2 F1        : {gen.get('avg_rouge2_f', 'N/A')}")
+        print(f"    ROUGE-L F1        : {gen.get('avg_rougeL_f', 'N/A')}")
         print(f"    Avg Time          : {gen.get('avg_generation_time_s', 'N/A')} detik")
         print(f"    Faithfulness      : {gen.get('avg_faithfulness', 'belum diisi')}")
     print(f"{'='*65}")
@@ -170,7 +174,7 @@ def main():
 
     if not Path(args.input).exists():
         print(f"❌ File tidak ditemukan: {args.input}")
-        print(f"   Pastikan file ada di folder yang sama dengan script ini.")
+        print(f"   Jalankan dulu: python evaluate_rag.py --k 3 --llm all")
         return
 
     annotate(args.input)
