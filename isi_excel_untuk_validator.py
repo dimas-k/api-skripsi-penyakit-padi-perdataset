@@ -26,7 +26,7 @@ JSON_PATH  = "hasil_evaluasi_rag.json"
 KB_PATH    = "knowledge_base/penyakit_padi.txt"
 OUTPUT     = "Penilaian_Faithfulness_untuk_Validator.xlsx"
 
-MAX_CHARS_GT = 600   # max karakter ground truth per kolom
+MAX_CHARS_GT = 1000  # max karakter ground truth per kolom
 
 TIER_KEYWORDS = {
     "LOW"   : ["LOW",  "low",  "qwen", "Qwen", "3b", "3B"],
@@ -78,8 +78,8 @@ def parse_kb(kb_path: str) -> dict[str, str]:
                 gejala = "Indikator: " + mg.group(1).strip()
         if gejala:
             gejala = re.sub(r"\s+", " ", gejala)
-            if len(gejala) > 280:
-                gejala = gejala[:280].rsplit(" ", 1)[0] + "..."
+            if len(gejala) > 500:
+                gejala = gejala[:500].rsplit(" ", 1)[0] + "..."
 
         # Ekstrak PENANGANAN
         penanganan = ""
@@ -93,8 +93,8 @@ def parse_kb(kb_path: str) -> dict[str, str]:
             raw = mp.group(1).strip()
             baris = re.findall(r"\d+\.\s+[^\n]+", raw)
             penanganan = " | ".join(b.strip() for b in baris[:3])
-            if len(penanganan) > 320:
-                penanganan = penanganan[:320].rsplit(" ", 1)[0] + "..."
+            if len(penanganan) > 500:
+                penanganan = penanganan[:500].rsplit(" ", 1)[0] + "..."
 
         if gejala or penanganan:
             header = f"{nama_id} ({kode})" if nama_id else kode
@@ -143,7 +143,7 @@ def make_border(style_type="thin"):
     return Border(left=s, right=s, top=s, bottom=s)
 
 
-def cell_style(cell, bold=False, fill_hex=None, size=11, wrap=True,
+def cell_style(cell, bold=False, fill_hex=None, size=12, wrap=True,
                halign="left", valign="top", color="000000"):
     cell.font      = Font(bold=bold, size=size, name="Arial Narrow", color=color)
     cell.alignment = Alignment(horizontal=halign, vertical=valign,
@@ -201,11 +201,11 @@ def build_excel(d: dict, kb_data: dict, output_path: str):
     col_widths = {
         COL_NO       : 4,
         COL_PYK      : 20,
-        COL_QRY      : 30,
-        COL_GT1      : 48,
-        COL_GT2      : 48,
-        COL_SKOR_GT1 : 12,
-        COL_SKOR_GT2 : 12,
+        COL_QRY      : 32,
+        COL_GT1      : 55,
+        COL_GT2      : 55,
+        COL_SKOR_GT1 : 14,
+        COL_SKOR_GT2 : 14,
     }
     for col, w in col_widths.items():
         ws.column_dimensions[get_column_letter(col)].width = w
@@ -227,7 +227,7 @@ def build_excel(d: dict, kb_data: dict, output_path: str):
         "1.0 = Sangat Lengkap & Akurat  |  0.8 = Akurat, kurang detail  |  "
         "0.5 = Sebagian benar  |  0.2 = Kurang akurat  |  0.0 = Tidak akurat / tidak relevan"
     )
-    cell_style(ws["A2"], fill_hex="E8F5E9", size=8,
+    cell_style(ws["A2"], fill_hex="E8F5E9", size=12,
                halign="center", valign="center", color="1B5E20")
     ws.row_dimensions[2].height = 24
 
@@ -242,7 +242,7 @@ def build_excel(d: dict, kb_data: dict, output_path: str):
     ]
     for col, label in headers_main:
         c = ws.cell(row=3, column=col, value=label)
-        cell_style(c, bold=True, fill_hex=header_dark, size=8,
+        cell_style(c, bold=True, fill_hex=header_dark, size=12,
                    halign="center", valign="center", color="FFFFFF")
 
     # Header kolom skor GT (kuning, mencolok)
@@ -252,7 +252,7 @@ def build_excel(d: dict, kb_data: dict, output_path: str):
     ]
     for col, label in skor_headers:
         c = ws.cell(row=3, column=col, value=label)
-        cell_style(c, bold=True, fill_hex="F57F17", size=8,
+        cell_style(c, bold=True, fill_hex="F57F17", size=12,
                    halign="center", valign="center", color="FFFFFF")
 
     ws.row_dimensions[3].height = 50
@@ -288,7 +288,7 @@ def build_excel(d: dict, kb_data: dict, output_path: str):
         ]
         for col, val, ha in data_cols:
             c = ws.cell(row=row, column=col, value=val)
-            cell_style(c, fill_hex=fill, size=11, halign=ha)
+            cell_style(c, fill_hex=fill, size=12, halign=ha)
 
         # Kolom skor GT-1 dan GT-2 — kuning, diisi validator
         for col in [COL_SKOR_GT1, COL_SKOR_GT2]:
@@ -296,21 +296,97 @@ def build_excel(d: dict, kb_data: dict, output_path: str):
             cell_style(c, fill_hex="FFF176", halign="center",
                        valign="center", size=12, bold=True)
 
-        # Tinggi baris dinamis
+        # Tinggi baris otomatis berdasarkan isi terpanjang
         def est_lines(text, col_width_chars):
             if not text:
                 return 1
-            chars_per_line = max(1, int(col_width_chars * 1.35))
+            chars_per_line = max(1, int(col_width_chars * 1.6))
             lines = str(text).splitlines()
             return sum(max(1, -(-len(ln) // chars_per_line)) for ln in lines)
 
         max_lines = max(
+            est_lines(pq_ref.get("query", ""), col_widths[COL_QRY]),
             est_lines(gt1, col_widths[COL_GT1]),
             est_lines(gt2, col_widths[COL_GT2]),
         )
-        ws.row_dimensions[row].height = max(80, min(max_lines * 15 + 10, 500))
+        ws.row_dimensions[row].height = max(60, min(max_lines * 14 + 8, 600))
 
-    ws.print_area = f"A1:{last_col}{len(first_gen)+3}"
+    # ════════════════════════════════════════════════════════════
+    # BAGIAN BAWAH: Catatan/Saran Tambahan + Tanda Tangan
+    # ════════════════════════════════════════════════════════════
+    last_data_row = len(first_gen) + 3
+
+    # ── Spacer ────────────────────────────────────────────────────
+    spacer_row = last_data_row + 1
+    ws.row_dimensions[spacer_row].height = 8
+
+    # ── Label catatan ─────────────────────────────────────────────
+    note_label_row = spacer_row + 1
+    ws.merge_cells(f"A{note_label_row}:{last_col}{note_label_row}")
+    c_lbl = ws[f"A{note_label_row}"]
+    c_lbl.value = "CATATAN / SARAN TAMBAHAN VALIDATOR:"
+    cell_style(c_lbl, bold=True, fill_hex="263238", size=12,
+               halign="left", valign="center", color="FFFFFF")
+    ws.row_dimensions[note_label_row].height = 22
+
+    # ── Area isi catatan (3 baris gabung, kosong untuk diisi) ─────
+    note_start = note_label_row + 1
+    note_end   = note_start + 2
+    ws.merge_cells(f"A{note_start}:{last_col}{note_end}")
+    c_note = ws[f"A{note_start}"]
+    c_note.value = (
+        "Tuliskan di sini jika ada kekurangan, informasi yang perlu ditambahkan, "
+        "atau saran perbaikan terhadap Ground Truth yang ada:\n\n"
+    )
+    cell_style(c_note, fill_hex="FAFAFA", size=12, halign="left", valign="top")
+    ws.row_dimensions[note_start].height = 90
+
+    # ── Spacer sebelum TTD ────────────────────────────────────────
+    ttd_spacer = note_end + 1
+    ws.row_dimensions[ttd_spacer].height = 14
+
+    # ── Baris 1: Kota & Tanggal (di atas tanda tangan, sisi kanan) ─
+    ttd_kota_row = ttd_spacer + 1
+    ws.merge_cells(f"E{ttd_kota_row}:{last_col}{ttd_kota_row}")
+    c_kota = ws[f"E{ttd_kota_row}"]
+    c_kota.value = "Indramayu, ……………………… 2026"
+    c_kota.font      = Font(bold=False, size=12, name="Arial Narrow")
+    c_kota.alignment = Alignment(horizontal="center", vertical="center")
+    ws.row_dimensions[ttd_kota_row].height = 20
+
+    # ── Baris 2: Label jabatan ────────────────────────────────────
+    ttd_label_row = ttd_kota_row + 1
+    ws.merge_cells(f"E{ttd_label_row}:{last_col}{ttd_label_row}")
+    c_ttd_lbl = ws[f"E{ttd_label_row}"]
+    c_ttd_lbl.value = "Validator / Petani,"
+    c_ttd_lbl.font      = Font(bold=False, size=12, name="Arial Narrow")
+    c_ttd_lbl.alignment = Alignment(horizontal="center", vertical="center")
+    ws.row_dimensions[ttd_label_row].height = 20
+
+    # ── Baris 3-5: Ruang tanda tangan ────────────────────────────
+    for r in [ttd_label_row + 1, ttd_label_row + 2, ttd_label_row + 3]:
+        ws.row_dimensions[r].height = 20
+
+    # ── Baris 6: Garis tanda tangan ──────────────────────────────
+    ttd_line_row = ttd_label_row + 3
+    ws.merge_cells(f"E{ttd_line_row}:{last_col}{ttd_line_row}")
+    c_line = ws[f"E{ttd_line_row}"]
+    c_line.value = "( ………………………………………………… )"
+    c_line.font      = Font(bold=False, size=12, name="Arial Narrow")
+    c_line.alignment = Alignment(horizontal="center", vertical="center")
+    ws.row_dimensions[ttd_line_row].height = 20
+
+    # ── Baris 7: Nama & Jabatan ───────────────────────────────────
+    ttd_name_row = ttd_line_row + 1
+    ws.merge_cells(f"E{ttd_name_row}:{last_col}{ttd_name_row}")
+    c_name = ws[f"E{ttd_name_row}"]
+    c_name.value = "Nama & Jabatan Petani"
+    c_name.font      = Font(bold=True, size=12, name="Arial Narrow", color="555555")
+    c_name.alignment = Alignment(horizontal="center", vertical="center")
+    ws.row_dimensions[ttd_name_row].height = 18
+
+    total_rows = ttd_name_row
+    ws.print_area = f"A1:{last_col}{total_rows}"
 
     # ════════════════════════════════════════════════════════════
     # SHEET 2: Panduan Validator
@@ -323,7 +399,7 @@ def build_excel(d: dict, kb_data: dict, output_path: str):
 
     ws2.merge_cells("A1:B1")
     ws2["A1"] = "PANDUAN PENGISIAN LEMBAR PENILAIAN FAITHFULNESS"
-    cell_style(ws2["A1"], bold=True, fill_hex="1B5E20", size=13,
+    cell_style(ws2["A1"], bold=True, fill_hex="1B5E20", size=12,
                halign="center", color="FFFFFF")
     ws2.row_dimensions[1].height = 26
 
@@ -402,17 +478,17 @@ def build_excel(d: dict, kb_data: dict, output_path: str):
 
         if k in ("APA YANG DINILAI?", "CARA MENGISI", "PANDUAN SKOR",
                  "CONTOH PENILAIAN", "CATATAN", "2 SUMBER\nGROUND TRUTH"):
-            cell_style(ck, bold=True, fill_hex="E8F5E9", color="1B5E20", size=10)
-            cell_style(cv, bold=True, fill_hex="E8F5E9", color="1B5E20", size=10)
+            cell_style(ck, bold=True, fill_hex="E8F5E9", color="1B5E20", size=12)
+            cell_style(cv, bold=True, fill_hex="E8F5E9", color="1B5E20", size=12)
         elif k.startswith("Langkah"):
-            cell_style(ck, bold=True, fill_hex="E3F2FD", size=9)
-            cell_style(cv, fill_hex="E3F2FD", size=9)
+            cell_style(ck, bold=True, fill_hex="E3F2FD", size=12)
+            cell_style(cv, fill_hex="E3F2FD", size=12)
         elif k in ("1.0", "0.8", "0.5", "0.2", "0.0"):
-            cell_style(ck, bold=True, fill_hex="FFF9C4", halign="center", size=10)
-            cell_style(cv, fill_hex="FFF9C4", size=9)
+            cell_style(ck, bold=True, fill_hex="FFF9C4", halign="center", size=12)
+            cell_style(cv, fill_hex="FFF9C4", size=12)
         elif k.startswith("Skor ") or k.startswith("Ground Truth") or k == "Faithfulness":
-            cell_style(ck, bold=True, fill_hex="F5F5F5", size=9)
-            cell_style(cv, fill_hex="F5F5F5", size=9)
+            cell_style(ck, bold=True, fill_hex="F5F5F5", size=12)
+            cell_style(cv, fill_hex="F5F5F5", size=12)
         else:
             ws2.row_dimensions[i].height = 5
             continue

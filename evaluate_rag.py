@@ -633,7 +633,7 @@ def evaluate_generator(
             "disease"     : disease,
             "query"       : qa["query"],
             "generated"   : answer[:300] + "..." if len(answer) > 300 else answer,
-            "ground_truth": ground_truth[:300] + "..." if len(ground_truth) > 300 else ground_truth,
+            "ground_truth": ground_truth[:1000] + "..." if len(ground_truth) > 1000 else ground_truth,
             "cosine_sim"  : round(cos_sim, 4),
             "rouge1_f"    : rouge["rouge1"]["fmeasure"],
             "rouge2_f"    : rouge["rouge2"]["fmeasure"],
