@@ -153,9 +153,11 @@ def read_validator_excel(excel_path: str) -> dict[str, dict]:
             "skor_gt1" : to_float(safe(col_sgt1)),
             "skor_gt2" : to_float(safe(col_sgt2)),
         }
-        # ID query dari kolom No (Q01, Q02, ...) atau generate dari urutan
+        # ID query dari kolom No (Q01, Q02, ...) — skip baris non-angka (footer, catatan, dsb)
         row_no_val = str(safe(col_no) or "").strip()
-        qid = f"Q{int(row_no_val):02d}" if row_no_val.isdigit() else row_no_val
+        if not row_no_val.isdigit():
+            continue
+        qid = f"Q{int(row_no_val):02d}"
         result[qid] = entry
 
     wb.close()
