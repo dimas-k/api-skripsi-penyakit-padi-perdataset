@@ -6,156 +6,120 @@ from collections import Counter
 from datetime import datetime
 from typing import Optional
 
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from schemas import (
-    PredictionResponse, SwingModelResult, ChatResponse, HistoryResponse, HistoryItem,
+    PredictionResponse, SwingModelResult, ChatResponse,
+    HistoryResponse, HistoryItem, ChatHistoryItem, ChatHistoryResponse,
     Pagination, SensorResponse, SensorStatus,
     CompareResponse, ModelCompareResult, DetectionTimeStats,
+    UserResponse,
 )
 from model import load_model, load_all_models, predict, ARCH_LABELS, DATASET_LABELS
 from llm import (
-    get_recommendation, get_recommendation_groq, get_recommendation_gemini,
     get_recommendation_groq_rag, get_recommendation_gemini_rag,
     get_chat_response_groq, get_chat_response_gemini,
     compare_llm_recommendation,
 )
+import database as db
 
 
 # ═════════════════════════════════════════════════════════════════
-# IN-MEMORY STORE
+# MODEL STORE
 # ═════════════════════════════════════════════════════════════════
-history_store: dict[str, list] = {}
-
-# ml_model  → model utama untuk /predict (Swin Base, Citra Daun Padi)
-# ml_models → semua 20 model untuk /compare dan /predict/{model_key}
 ml_model  = {}
 ml_models = {}
 
 
 # ═════════════════════════════════════════════════════════════════
-# HELPER — parse model_key menjadi arch + dataset
-# Key format dari load_all_models: "swin_base__Citra_Daun_Padi"
+# HELPER — resolve user_id dari device_id
+# Dipanggil di setiap endpoint yang butuh user_id
+# ═════════════════════════════════════════════════════════════════
+def _resolve_user(device_id: str, device_info: Optional[dict] = None) -> Optional[str]:
+    """
+    Ambil atau buat user berdasarkan device_id.
+    Return user UUID, atau None jika Supabase tidak terhubung.
+    """
+    if not device_id or device_id == "anonymous":
+        return None
+    try:
+        user = db.get_or_create_user(device_id, device_info)
+        return user.get("id")
+    except Exception as e:
+        print(f"⚠️  Gagal resolve user ({device_id}): {e}")
+        return None
+
+
+# ═════════════════════════════════════════════════════════════════
+# HELPER — weighted voting
 # ═════════════════════════════════════════════════════════════════
 def _weighted_vote(
-    predictions: list[tuple[str, float]],
-    min_confidence: float      = 60.0,
+    predictions       : list[tuple[str, float]],
+    min_confidence    : float = 60.0,
     high_conf_threshold: float = 85.0,
 ) -> tuple[str, dict, str]:
-    """
-    Voting cerdas dengan empat tahap:
-
-    Tahap 1 — Single high-confidence (>= 85%, tidak ada pesaing >= 85%):
-        Langsung pakai prediksi model tersebut.
-        Contoh: leaf_smut 91.6% satu-satunya >= 85% → menang.
-
-    Tahap 2 — Multiple high-confidence (>= 85%) berbeda kelas:
-        Tiebreaker HANYA antar model high-confidence itu saja.
-        Model < 85% TIDAK ikut tiebreaker ini.
-        Contoh: neck_blast 91.48% vs bacterial_panicle_blight 92.21%
-        → bacterial_panicle_blight menang. leaf_blast 61%+64% diabaikan.
-
-    Tahap 3 — Tidak ada yang >= 85%, weighted sum (>= 60%):
-        Jumlahkan confidence per kelas, hanya model >= 60% yang ikut.
-
-    Tahap 4 — Fallback:
-        Semua model di bawah 60% (gambar buram), weighted tanpa threshold.
-
-    Returns:
-        (winner_class, weight_detail, method_used)
-        weight_detail selalu berisi bobot semua kelas (untuk info di response)
-    """
     if not predictions:
         return "unknown", {}, "fallback_count"
 
-    # Hitung weight_map lengkap untuk info response (tidak dipakai sebagai penentu)
     weight_map: dict[str, float] = {}
     for cls, conf in predictions:
         weight_map[cls] = round(weight_map.get(cls, 0) + conf, 2)
 
-    # ── Tahap 1 & 2: High-confidence models (>= 85%) ─────────────
-    high_conf_preds = [
-        (cls, conf) for cls, conf in predictions
-        if conf >= high_conf_threshold
-    ]
-
+    high_conf_preds = [(cls, conf) for cls, conf in predictions if conf >= high_conf_threshold]
     if high_conf_preds:
-        # Tahap 1: Hanya ada satu kelas dominan di zona high-confidence
         high_classes = set(cls for cls, _ in high_conf_preds)
         if len(high_classes) == 1:
-            winner = high_conf_preds[0][0]
-            return winner, weight_map, "high_confidence_override"
-
-        # Tahap 2: Beberapa kelas bersaing di zona high-confidence
-        # → tiebreaker hanya antar mereka, model rendah TIDAK ikut
+            return high_conf_preds[0][0], weight_map, "high_confidence_override"
         high_weight: dict[str, float] = {}
         for cls, conf in high_conf_preds:
             high_weight[cls] = round(high_weight.get(cls, 0) + conf, 2)
-        winner = max(high_weight, key=lambda k: high_weight[k])
-        return winner, weight_map, "high_confidence_tiebreak"
+        return max(high_weight, key=lambda k: high_weight[k]), weight_map, "high_confidence_tiebreak"
 
-    # ── Tahap 3: Weighted sum model >= 60% ───────────────────────
     filtered = [(cls, conf) for cls, conf in predictions if conf >= min_confidence]
     if filtered:
         w: dict[str, float] = {}
         for cls, conf in filtered:
             w[cls] = round(w.get(cls, 0) + conf, 2)
-        winner = max(w, key=lambda k: w[k])
-        return winner, weight_map, "weighted"
+        return max(w, key=lambda k: w[k]), weight_map, "weighted"
 
-    # ── Tahap 4: Fallback weighted tanpa threshold ────────────────
-    winner = max(weight_map, key=lambda k: weight_map[k])
-    return winner, weight_map, "weighted_no_threshold"
+    return max(weight_map, key=lambda k: weight_map[k]), weight_map, "weighted_no_threshold"
 
 
 def _parse_model_key(model_key: str) -> tuple[str, str]:
-    """
-    Ekstrak arsitektur dan dataset dari model_key.
-    Contoh: 'swin_base__Citra_Daun_Padi' → ('swin_base', 'Citra_Daun_Padi')
-    """
     if "__" in model_key:
         arch, dataset = model_key.split("__", 1)
         return arch, dataset
-    # fallback jika tidak ada separator
     for arch in ARCH_LABELS:
         if model_key.startswith(arch + "_"):
-            dataset = model_key[len(arch) + 1:]
-            return arch, dataset
+            return arch, model_key[len(arch) + 1:]
     return model_key, "unknown"
 
 
 # ═════════════════════════════════════════════════════════════════
-# LIFECYCLE — startup & shutdown
+# LIFECYCLE
 # ═════════════════════════════════════════════════════════════════
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # ── 1. Model utama untuk /predict ─────────────────────────────
-    # Dibaca dari MODEL_PATH di .env (default: Swin Base Citra Daun Padi)
+    print("\n══ Mengecek koneksi Supabase ══")
+    db_status = db.test_connection()
+    print(f"{'✅' if db_status['status'] == 'connected' else '⚠️ '} {db_status['message']}")
+
     print("\n══ Loading model utama (/predict) ══")
     try:
-        ml_model["model"], ml_model["class_names"], ml_model["model_name"] = \
-            load_model()
+        ml_model["model"], ml_model["class_names"], ml_model["model_name"] = load_model()
         print(f"✅ Model utama siap: {ml_model['model_name']}")
     except FileNotFoundError as e:
         print(f"⚠️  Model utama tidak ditemukan: {e}")
 
-    # ── 2. Semua 20 model untuk /compare ──────────────────────────
-    # Swin (4)      → path dari .env (MODEL_swin_base_{dataset})
-    # Non-Swin (16) → path hardcode di model.py
     all_loaded = load_all_models()
-
     for model_key, meta in all_loaded.items():
         if meta["status"] == "loaded":
             ml_models[model_key] = meta
-
-    print(f"✅ Total model siap di ml_models: {len(ml_models)} / {len(all_loaded)}")
-    print(f"   Keys: {list(ml_models.keys())}\n")
+    print(f"✅ Total model siap: {len(ml_models)} / {len(all_loaded)}\n")
 
     yield
-
-    # ── Shutdown ───────────────────────────────────────────────────
     ml_model.clear()
     ml_models.clear()
 
@@ -167,26 +131,24 @@ app = FastAPI(
     title       = "Paddy Disease Detection API",
     description = (
         "API deteksi penyakit daun padi — 5 arsitektur × 4 dataset = 20 model. "
-        "Rekomendasi LLM: Groq (LLaMA 3.3 70B) & Gemini."
+        "Rekomendasi LLM: Groq (LLaMA 3.3 70B) & Gemini. "
+        "Database: Supabase (PostgreSQL) — 3 tabel: users, predictions, chat_messages."
     ),
-    version  = "3.1.0",
+    version  = "4.1.0",
     lifespan = lifespan,
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins     = ["*"],
-    allow_credentials = True,
-    allow_methods     = ["*"],
-    allow_headers     = ["*"],
+    allow_origins=["*"], allow_credentials=True,
+    allow_methods=["*"], allow_headers=["*"],
 )
 
 
 # ═════════════════════════════════════════════════════════════════
-# SENSOR — Dummy data lapangan sawah
+# SENSOR
 # ═════════════════════════════════════════════════════════════════
 def _generate_sensor_data() -> dict:
-    """Dummy sensor data realistis untuk sawah padi Indramayu."""
     return {
         "suhu_udara"        : round(random.uniform(28.0, 34.0), 1),
         "kelembaban_udara"  : round(random.uniform(70.0, 92.0), 1),
@@ -203,43 +165,40 @@ def _generate_sensor_data() -> dict:
 
 def _evaluate_sensor(data: dict) -> list[SensorStatus]:
     thresholds = {
-        "suhu_udara"        : {"satuan": "°C",      "min": 20,    "max": 35,    "label": "Suhu Udara"},
-        "kelembaban_udara"  : {"satuan": "%",        "min": 60,    "max": 90,    "label": "Kelembaban Udara"},
-        "suhu_tanah"        : {"satuan": "°C",      "min": 20,    "max": 30,    "label": "Suhu Tanah"},
-        "kelembaban_tanah"  : {"satuan": "%",        "min": 50,    "max": 80,    "label": "Kelembaban Tanah"},
-        "ph_tanah"          : {"satuan": "",         "min": 5.5,   "max": 7.0,   "label": "pH Tanah"},
-        "nitrogen"          : {"satuan": "mg/kg",   "min": 15,    "max": 45,    "label": "Nitrogen (N)"},
-        "fosfor"            : {"satuan": "mg/kg",   "min": 8,     "max": 25,    "label": "Fosfor (P)"},
-        "kalium"            : {"satuan": "mg/kg",   "min": 100,   "max": 180,   "label": "Kalium (K)"},
-        "intensitas_cahaya" : {"satuan": "lux",      "min": 20000, "max": 55000, "label": "Intensitas Cahaya"},
-        "curah_hujan"       : {"satuan": "mm/hari", "min": 0,     "max": 20,    "label": "Curah Hujan"},
+        "suhu_udara"        : {"satuan": "°C",     "min": 20,    "max": 35,    "label": "Suhu Udara"},
+        "kelembaban_udara"  : {"satuan": "%",       "min": 60,    "max": 90,    "label": "Kelembaban Udara"},
+        "suhu_tanah"        : {"satuan": "°C",     "min": 20,    "max": 30,    "label": "Suhu Tanah"},
+        "kelembaban_tanah"  : {"satuan": "%",       "min": 50,    "max": 80,    "label": "Kelembaban Tanah"},
+        "ph_tanah"          : {"satuan": "",        "min": 5.5,   "max": 7.0,   "label": "pH Tanah"},
+        "nitrogen"          : {"satuan": "mg/kg",  "min": 15,    "max": 45,    "label": "Nitrogen (N)"},
+        "fosfor"            : {"satuan": "mg/kg",  "min": 8,     "max": 25,    "label": "Fosfor (P)"},
+        "kalium"            : {"satuan": "mg/kg",  "min": 100,   "max": 180,   "label": "Kalium (K)"},
+        "intensitas_cahaya" : {"satuan": "lux",     "min": 20000, "max": 55000, "label": "Intensitas Cahaya"},
+        "curah_hujan"       : {"satuan": "mm/hari","min": 0,     "max": 20,    "label": "Curah Hujan"},
     }
     info_map = {
-        "suhu_udara"        : ("Mendukung fotosintesis optimal",      "Terlalu dingin, pertumbuhan lambat",      "Terlalu panas, stres tanaman"),
-        "kelembaban_udara"  : ("Kelembaban ideal",                    "Terlalu kering, rentan Blas",             "Terlalu lembab, rentan jamur"),
-        "suhu_tanah"        : ("Suhu tanah ideal",                    "Dingin, akar kurang aktif",               "Panas, ganggu penyerapan air"),
-        "kelembaban_tanah"  : ("Kelembaban tanah cukup",              "Kering, perlu pengairan",                 "Terlalu basah, rentan busuk akar"),
-        "ph_tanah"          : ("pH optimal untuk padi",               "Asam, hambat penyerapan unsur hara",      "Basa, hambat penyerapan Fe & Mn"),
-        "nitrogen"          : ("Nitrogen cukup",                      "Nitrogen rendah, daun menguning",         "Nitrogen berlebih, rentan Hawar"),
-        "fosfor"            : ("Fosfor cukup",                        "Fosfor rendah, akar lemah",               "Fosfor berlebih, ganggu penyerapan Zn"),
-        "kalium"            : ("Kalium cukup",                        "Kalium rendah, rentan penyakit",          "Kalium berlebih, hambat penyerapan Ca"),
-        "intensitas_cahaya" : ("Cahaya optimal",                      "Kurang cahaya, pertumbuhan lambat",       "Terlalu terik, stres panas"),
-        "curah_hujan"       : ("Curah hujan ideal",                   "Kering, perlu irigasi tambahan",          "Hujan berlebih, rentan Hawar & Blas"),
+        "suhu_udara"        : ("Mendukung fotosintesis optimal",   "Terlalu dingin, pertumbuhan lambat",  "Terlalu panas, stres tanaman"),
+        "kelembaban_udara"  : ("Kelembaban ideal",                 "Terlalu kering, rentan Blas",         "Terlalu lembab, rentan jamur"),
+        "suhu_tanah"        : ("Suhu tanah ideal",                 "Dingin, akar kurang aktif",           "Panas, ganggu penyerapan air"),
+        "kelembaban_tanah"  : ("Kelembaban tanah cukup",           "Kering, perlu pengairan",             "Terlalu basah, rentan busuk akar"),
+        "ph_tanah"          : ("pH optimal untuk padi",            "Asam, hambat penyerapan unsur hara",  "Basa, hambat penyerapan Fe & Mn"),
+        "nitrogen"          : ("Nitrogen cukup",                   "Nitrogen rendah, daun menguning",     "Nitrogen berlebih, rentan Hawar"),
+        "fosfor"            : ("Fosfor cukup",                     "Fosfor rendah, akar lemah",           "Fosfor berlebih, ganggu penyerapan Zn"),
+        "kalium"            : ("Kalium cukup",                     "Kalium rendah, rentan penyakit",      "Kalium berlebih, hambat penyerapan Ca"),
+        "intensitas_cahaya" : ("Cahaya optimal",                   "Kurang cahaya, pertumbuhan lambat",   "Terlalu terik, stres panas"),
+        "curah_hujan"       : ("Curah hujan ideal",                "Kering, perlu irigasi tambahan",      "Hujan berlebih, rentan Hawar & Blas"),
     }
     statuses = []
     for key, thresh in thresholds.items():
-        nilai    = data.get(key, 0)
-        mn, mx   = thresh["min"], thresh["max"]
+        nilai  = data.get(key, 0)
+        mn, mx = thresh["min"], thresh["max"]
         ok, lo, hi = info_map[key]
         if nilai < mn:   status, ket = "rendah", lo
         elif nilai > mx: status, ket = "tinggi", hi
         else:            status, ket = "normal", ok
         statuses.append(SensorStatus(
-            parameter  = thresh["label"],
-            nilai      = nilai,
-            satuan     = thresh["satuan"],
-            status     = status,
-            keterangan = ket,
+            parameter=thresh["label"], nilai=nilai,
+            satuan=thresh["satuan"], status=status, keterangan=ket,
         ))
     return statuses
 
@@ -249,57 +208,109 @@ def _evaluate_sensor(data: dict) -> list[SensorStatus]:
 # ═════════════════════════════════════════════════════════════════
 @app.get("/health", tags=["General"])
 async def health_check():
-    """Cek status API dan model yang tersedia."""
     by_arch = {}
     for key in ml_models:
         arch, _ = _parse_model_key(key)
         by_arch[arch] = by_arch.get(arch, 0) + 1
     return {
-        "status"         : "healthy",
-        "model_utama"    : ml_model.get("model_name", "belum_load"),
-        "total_model"    : len(ml_models),
-        "model_per_arch" : by_arch,
-        "llm_groq"       : "llama-3.3-70b-versatile",
-        "llm_gemini"     : "gemini-2.0-flash",
-        "num_classes"    : len(ml_model.get("class_names", [])),
+        "status"        : "healthy",
+        "version"       : "4.1.0",
+        "model_utama"   : ml_model.get("model_name", "belum_load"),
+        "total_model"   : len(ml_models),
+        "model_per_arch": by_arch,
+        "llm_groq"      : "llama-3.3-70b-versatile",
+        "llm_gemini"    : "gemini-2.0-flash",
+        "num_classes"   : len(ml_model.get("class_names", [])),
+        "database"      : db.test_connection(),
     }
 
 
 @app.get("/classes", tags=["General"])
 async def get_classes():
-    """Daftar kelas penyakit yang dikenali model."""
-    return {
-        "classes": ml_model.get("class_names", []),
-        "total"  : len(ml_model.get("class_names", [])),
-    }
+    return {"classes": ml_model.get("class_names", []), "total": len(ml_model.get("class_names", []))}
 
 
 @app.get("/models", tags=["General"])
 async def list_models():
-    """
-    Daftar semua model yang berhasil di-load.
-
-    Key format: "{arsitektur}__{dataset}"
-    - Swin  (4 model) : path dari .env
-    - Lainnya (16)    : path hardcode di model.py
-    """
     result = {}
     for key, meta in ml_models.items():
         result[key] = {
-            "arsitektur"   : meta["arch_label"],
-            "dataset"      : meta["dataset_label"],
-            "model_name"   : meta["model_name"],
-            "source"       : ".env" if meta["arch_key"] == "swin_base" else "hardcode",
+            "arsitektur": meta["arch_label"],
+            "dataset"   : meta["dataset_label"],
+            "model_name": meta["model_name"],
+            "source"    : ".env" if meta["arch_key"] == "swin_base" else "hardcode",
         }
-    return {
-        "total_model": len(result),
-        "models"     : result,
-    }
+    return {"total_model": len(result), "models": result}
 
 
 @app.get("/db-test", tags=["General"])
 async def db_test():
-    return {"status": "ok", "message": "In-memory mode active"}
+    result = db.test_connection()
+    if result["status"] != "connected":
+        raise HTTPException(status_code=503, detail=result["message"])
+    return result
+
+
+# ═════════════════════════════════════════════════════════════════
+# USERS
+# ═════════════════════════════════════════════════════════════════
+@app.post("/users/register", response_model=UserResponse, tags=["Users"])
+async def register_device(
+    x_user_id    : Optional[str] = Header(None),
+    x_device_info: Optional[str] = Header(None),
+):
+    """
+    Daftarkan perangkat ke database.
+    Dipanggil satu kali saat aplikasi pertama dibuka.
+    Jika device_id sudah terdaftar, data yang ada dikembalikan (tidak duplikat).
+
+    Header:
+    - x-user-id     : device UUID unik dari HP (wajib)
+    - x-device-info : info perangkat dalam format JSON string (opsional)
+    """
+    if not x_user_id:
+        raise HTTPException(status_code=400, detail="Header x-user-id wajib diisi")
+
+    import json
+    device_info = {}
+    if x_device_info:
+        try:
+            device_info = json.loads(x_device_info)
+        except Exception:
+            device_info = {"raw": x_device_info}
+
+    try:
+        user = db.get_or_create_user(x_user_id, device_info)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Gagal registrasi: {str(e)}")
+
+    return UserResponse(
+        user_id          = user["id"],
+        device_id        = user["device_id"],
+        total_predictions= user.get("total_predictions", 0),
+        first_seen       = user.get("first_seen", ""),
+        last_seen        = user.get("last_seen", ""),
+    )
+
+
+@app.get("/users/{device_id}", response_model=UserResponse, tags=["Users"])
+async def get_user_info(device_id: str):
+    """Ambil info user berdasarkan device_id."""
+    try:
+        user = db.get_user_by_device(device_id)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User tidak ditemukan")
+
+    return UserResponse(
+        user_id          = user["id"],
+        device_id        = user["device_id"],
+        total_predictions= user.get("total_predictions", 0),
+        first_seen       = user.get("first_seen", ""),
+        last_seen        = user.get("last_seen", ""),
+    )
 
 
 # ═════════════════════════════════════════════════════════════════
@@ -307,153 +318,113 @@ async def db_test():
 # ═════════════════════════════════════════════════════════════════
 @app.get("/sensor", response_model=SensorResponse, tags=["Sensor"])
 async def get_sensor_data():
-    """Kembalikan dummy data sensor sawah padi Indramayu."""
     data     = _generate_sensor_data()
     statuses = _evaluate_sensor(data)
     abnormal = [s for s in statuses if s.status != "normal"]
-    if not abnormal:
-        kesimpulan = "✅ Semua kondisi sensor dalam batas normal. Tanaman dalam kondisi baik."
-    else:
-        params     = ", ".join(s.parameter for s in abnormal)
-        kesimpulan = (
-            f"⚠️ {len(abnormal)} parameter di luar batas normal: {params}. "
-            "Perlu perhatian lebih lanjut."
-        )
+    kesimpulan = (
+        "✅ Semua kondisi sensor dalam batas normal. Tanaman dalam kondisi baik."
+        if not abnormal else
+        f"⚠️ {len(abnormal)} parameter di luar batas normal: "
+        + ", ".join(s.parameter for s in abnormal) + ". Perlu perhatian lebih lanjut."
+    )
     return SensorResponse(
-        lokasi        = "Sawah Demo — Indramayu, Jawa Barat",
-        timestamp     = datetime.now().isoformat(),
-        data          = data,
-        detail_status = statuses,
-        kesimpulan    = kesimpulan,
+        lokasi="Sawah Demo — Indramayu, Jawa Barat",
+        timestamp=datetime.now().isoformat(),
+        data=data, detail_status=statuses, kesimpulan=kesimpulan,
     )
 
 
 # ═════════════════════════════════════════════════════════════════
-# DETECTION — /predict  (semua 4 Swin Base + weighted voting)
+# DETECTION — /predict
 # ═════════════════════════════════════════════════════════════════
 @app.post("/predict", response_model=PredictionResponse, tags=["Detection"])
 async def predict_disease(
     file         : UploadFile    = File(...),
-    x_user_id    : Optional[str] = None,
-    x_device_info: Optional[str] = None,
+    x_user_id    : Optional[str] = Header(None),
+    x_device_info: Optional[str] = Header(None),
     use_sensor   : bool          = False,
     llm          : str           = "groq",
 ):
     """
-    Upload gambar → prediksi menggunakan **semua 4 Swin Transformer Base**
-    (Citra Daun Padi, Jenis Penyakit Padi, Paddy V3 Augmentasi,
-    Paddy Disease Classification) → confidence-weighted voting → rekomendasi LLM+RAG.
+    Upload gambar → prediksi 4 Swin Transformer → voting → rekomendasi LLM+RAG
+    → **simpan ke Supabase** (tabel users + predictions).
 
-    Flow:
-    1. Gambar diproses oleh ke-4 Swin secara sequential
-    2. Hasil voting (confidence-weighted) menentukan `predicted_class` akhir
-    3. Kelas pemenang dikirim ke LLM untuk rekomendasi berbasis RAG
-
-    - `use_sensor=true` → sertakan data sensor dummy dalam rekomendasi LLM
-    - `llm=groq`        → Groq / LLaMA 3.3 70B (default)
-    - `llm=gemini`      → Gemini
+    Header:
+    - x-user-id     : device UUID dari HP
+    - x-device-info : info perangkat (JSON string, opsional)
     """
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File harus berupa gambar")
-
     image_bytes = await file.read()
     if len(image_bytes) > 10 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Ukuran file maksimal 10MB")
 
-    # ── Ambil semua 4 Swin dari ml_models ────────────────────────
-    swin_models = {
-        key: meta for key, meta in ml_models.items()
-        if meta["arch_key"] == "swin_base"
-    }
+    # ── Resolve user ──────────────────────────────────────────────
+    import json
+    device_info = {}
+    if x_device_info:
+        try:
+            device_info = json.loads(x_device_info)
+        except Exception:
+            pass
+    user_id = _resolve_user(x_user_id or "anonymous", device_info)
 
-    # Fallback ke model utama tunggal jika ml_models belum terisi
+    # ── Ambil semua 4 Swin ────────────────────────────────────────
+    swin_models = {k: v for k, v in ml_models.items() if v["arch_key"] == "swin_base"}
     if not swin_models:
         if "model" not in ml_model:
-            raise HTTPException(
-                status_code = 503,
-                detail      = "Tidak ada model Swin yang tersedia",
-            )
-        swin_models = {
-            "swin_base__default": {
-                "model"        : ml_model["model"],
-                "class_names"  : ml_model["class_names"],
-                "model_name"   : ml_model["model_name"],
-                "arch_key"     : "swin_base",
-                "dataset_label": "Default (MODEL_PATH)",
-            }
-        }
+            raise HTTPException(status_code=503, detail="Tidak ada model Swin yang tersedia")
+        swin_models = {"swin_base__default": {
+            "model": ml_model["model"], "class_names": ml_model["class_names"],
+            "model_name": ml_model["model_name"], "arch_key": "swin_base",
+            "dataset_label": "Default (MODEL_PATH)",
+        }}
 
-    # ── Prediksi ke-4 Swin (sequential) ──────────────────────────
-    swin_results    : dict[str, SwingModelResult] = {}
-    pred_with_conf  : list[tuple[str, float]]     = []
-    total_time_ms   : float = 0.0
+    # ── Prediksi ──────────────────────────────────────────────────
+    swin_results   : dict[str, SwingModelResult] = {}
+    pred_with_conf : list[tuple[str, float]]     = []
+    total_time_ms  : float = 0.0
 
     for model_key, meta in swin_models.items():
         try:
             t0 = time.perf_counter()
             predicted_class_i, confidence_i = predict(
-                image_bytes = image_bytes,
-                model       = meta["model"],
-                class_names = meta["class_names"],
-                model_name  = meta["model_name"],
+                image_bytes=image_bytes, model=meta["model"],
+                class_names=meta["class_names"], model_name=meta["model_name"],
             )
-            elapsed_ms   = round((time.perf_counter() - t0) * 1000, 2)
+            elapsed_ms     = round((time.perf_counter() - t0) * 1000, 2)
             total_time_ms += elapsed_ms
-
             swin_results[model_key] = SwingModelResult(
-                dataset               = meta["dataset_label"],
-                predicted_class       = predicted_class_i,
-                confidence_percentage = confidence_i,
-                detection_time_ms     = elapsed_ms,
-                status                = "success",
+                dataset=meta["dataset_label"], predicted_class=predicted_class_i,
+                confidence_percentage=confidence_i, detection_time_ms=elapsed_ms, status="success",
             )
             pred_with_conf.append((predicted_class_i, confidence_i))
-
         except Exception as e:
             swin_results[model_key] = SwingModelResult(
-                dataset               = meta.get("dataset_label", model_key),
-                predicted_class       = None,
-                confidence_percentage = None,
-                detection_time_ms     = None,
-                status                = f"error: {str(e)}",
+                dataset=meta.get("dataset_label", model_key),
+                predicted_class=None, confidence_percentage=None,
+                detection_time_ms=None, status=f"error: {str(e)}",
             )
 
     if not pred_with_conf:
-        raise HTTPException(
-            status_code = 500,
-            detail      = "Semua model Swin gagal melakukan prediksi",
-        )
+        raise HTTPException(status_code=500, detail="Semua model Swin gagal")
 
-    # ── Confidence-weighted voting ────────────────────────────────
-    majority_class, weight_detail, vote_method = _weighted_vote(
-        pred_with_conf, min_confidence=60.0
-    )
+    # ── Voting ────────────────────────────────────────────────────
+    majority_class, weight_detail, vote_method = _weighted_vote(pred_with_conf)
     majority_count = sum(1 for cls, _ in pred_with_conf if cls == majority_class)
 
-    # ── Statistik 4 Swin ─────────────────────────────────────────
-    sukses = [v for v in swin_results.values() if v.status == "success"]
-
-    avg_confidence = round(
-        sum(v.confidence_percentage for v in sukses) / len(sukses), 2
-    )
-    avg_time_ms = round(
-        sum(v.detection_time_ms for v in sukses) / len(sukses), 2
-    )
-
-    # Model Swin dengan confidence tertinggi
-    best_swin_key = max(
+    sukses         = [v for v in swin_results.values() if v.status == "success"]
+    avg_confidence = round(sum(v.confidence_percentage for v in sukses) / len(sukses), 2)
+    avg_time_ms    = round(sum(v.detection_time_ms for v in sukses) / len(sukses), 2)
+    best_swin_key  = max(
         (k for k, v in swin_results.items() if v.status == "success"),
-        key     = lambda k: swin_results[k].confidence_percentage,
-        default = None,
+        key=lambda k: swin_results[k].confidence_percentage, default=None,
     )
     best_swin_detail = swin_results[best_swin_key] if best_swin_key else None
+    best_confidence  = best_swin_detail.confidence_percentage if best_swin_detail else avg_confidence
 
-    # confidence_percentage yang dikembalikan = confidence model Swin terbaik
-    best_confidence = best_swin_detail.confidence_percentage if best_swin_detail else avg_confidence
-
-    # ── Sensor & LLM (dengan RAG) ─────────────────────────────────
+    # ── Sensor & LLM ──────────────────────────────────────────────
     sensor_data = _generate_sensor_data() if use_sensor else None
-
     if llm == "gemini":
         recommendation, _ = get_recommendation_gemini_rag(majority_class, sensor_data)
         llm_used           = "gemini"
@@ -461,79 +432,57 @@ async def predict_disease(
         recommendation, _ = get_recommendation_groq_rag(majority_class, sensor_data)
         llm_used           = "groq"
 
-    # ── Simpan ke history ─────────────────────────────────────────
+    # ── Simpan ke Supabase ────────────────────────────────────────
     prediction_id = str(uuid.uuid4())
-    timestamp     = datetime.now().isoformat()
-    device_id     = x_user_id or "unknown"
+    saved_ok      = False
 
-    history_store.setdefault(device_id, []).insert(0, {
-        "prediction_id"    : prediction_id,
-        "predicted_class"  : majority_class,
-        "confidence"       : best_confidence,
-        "detection_time_ms": round(total_time_ms, 2),
-        "timestamp"        : timestamp,
-        "llm_used"         : llm_used,
-        "sensor_used"      : use_sensor,
-    })
+    if user_id:
+        try:
+            swin_dict = {k: v.model_dump() for k, v in swin_results.items()}
+            db.save_prediction(
+                prediction_id    = prediction_id,
+                user_id          = user_id,
+                predicted_class  = majority_class,
+                confidence       = best_confidence,
+                detection_time_ms= round(total_time_ms, 2),
+                recommendation   = recommendation,
+                llm_used         = llm_used,
+                sensor_used      = use_sensor,
+                sensor_data      = sensor_data,
+                swin_results     = swin_dict,
+                vote_method      = vote_method,
+                majority_count   = f"{majority_count} / {len(pred_with_conf)} model",
+            )
+            saved_ok = True
+        except Exception as e:
+            print(f"⚠️  Gagal simpan prediksi: {e}")
 
     return PredictionResponse(
-        # ── Hasil akhir ───────────────────────────────────────────
-        predicted_class       = majority_class,
-        confidence_percentage = best_confidence,
-        detection_time_ms     = round(total_time_ms, 2),
-        recommendation        = recommendation,
-        prediction_id         = prediction_id,
-        saved_to_database     = True,
-
-        # ── Detail 4 Swin ─────────────────────────────────────────
-        swin_results          = swin_results,
-        total_swin_models     = len(swin_models),
-        successful_models     = len(sukses),
-
-        # ── Voting ────────────────────────────────────────────────
-        vote_detail           = weight_detail,
-        vote_method           = vote_method,
-        majority_count        = f"{majority_count} / {len(pred_with_conf)} model pilih kelas ini",
-
-        # ── Statistik ─────────────────────────────────────────────
-        avg_confidence        = avg_confidence,
-        avg_detection_time_ms = avg_time_ms,
-        best_swin_model       = {
-            "model_key": best_swin_key,
-            "detail"   : best_swin_detail.model_dump() if best_swin_detail else None,
-        },
+        predicted_class=majority_class, confidence_percentage=best_confidence,
+        detection_time_ms=round(total_time_ms, 2), recommendation=recommendation,
+        prediction_id=prediction_id, saved_to_database=saved_ok,
+        swin_results=swin_results, total_swin_models=len(swin_models),
+        successful_models=len(sukses), vote_detail=weight_detail,
+        vote_method=vote_method,
+        majority_count=f"{majority_count} / {len(pred_with_conf)} model pilih kelas ini",
+        avg_confidence=avg_confidence, avg_detection_time_ms=avg_time_ms,
+        best_swin_model={"model_key": best_swin_key, "detail": best_swin_detail.model_dump() if best_swin_detail else None},
     )
 
 
 # ═════════════════════════════════════════════════════════════════
-# DETECTION — /predict/{model_key}  (model spesifik)
+# DETECTION — /predict/{model_key}
 # ═════════════════════════════════════════════════════════════════
 @app.post("/predict/{model_key}", tags=["Detection"])
 async def predict_with_model(
-    model_key : str,
-    file      : UploadFile = File(...),
-    use_sensor: bool       = False,
-    llm       : str        = "groq",
+    model_key  : str,
+    file       : UploadFile    = File(...),
+    use_sensor : bool          = False,
+    llm        : str           = "groq",
+    x_user_id  : Optional[str] = Header(None),
 ):
-    """
-    Upload gambar → prediksi dengan model spesifik (arsitektur + dataset).
-
-    **Format model_key**: `{arsitektur}__{dataset}`
-
-    Contoh:
-    - `swin_base__Citra_Daun_Padi`
-    - `vit__JENIS_PENYAKIT_PADI`
-    - `resnet50__Paddy_disease`
-
-    Lihat daftar lengkap di `GET /models`.
-    """
     if model_key not in ml_models:
-        available = list(ml_models.keys())
-        raise HTTPException(
-            status_code = 404,
-            detail      = f"Model '{model_key}' tidak tersedia. "
-                          f"Lihat GET /models. Tersedia: {available}",
-        )
+        raise HTTPException(status_code=404, detail=f"Model '{model_key}' tidak tersedia. Lihat GET /models.")
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File harus berupa gambar")
 
@@ -541,443 +490,238 @@ async def predict_with_model(
     if len(image_bytes) > 10 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Ukuran file maksimal 10MB")
 
-    m = ml_models[model_key]
-
-    # ── Prediksi ──────────────────────────────────────────────────
+    m  = ml_models[model_key]
     t0 = time.perf_counter()
     predicted_class, confidence = predict(
-        image_bytes = image_bytes,
-        model       = m["model"],
-        class_names = m["class_names"],
-        model_name  = m["model_name"],
+        image_bytes=image_bytes, model=m["model"],
+        class_names=m["class_names"], model_name=m["model_name"],
     )
     detection_time_ms = round((time.perf_counter() - t0) * 1000, 2)
 
-    # ── Sensor & LLM (dengan RAG) ─────────────────────────────────
     sensor_data = _generate_sensor_data() if use_sensor else None
-
     if llm == "gemini":
         recommendation, _ = get_recommendation_gemini_rag(predicted_class, sensor_data)
+        llm_used           = "gemini"
     else:
         recommendation, _ = get_recommendation_groq_rag(predicted_class, sensor_data)
+        llm_used           = "groq"
+
+    prediction_id = str(uuid.uuid4())
+    saved_ok      = False
+    user_id       = _resolve_user(x_user_id or "anonymous")
+
+    if user_id:
+        try:
+            db.save_prediction(
+                prediction_id=prediction_id, user_id=user_id,
+                predicted_class=predicted_class, confidence=confidence,
+                detection_time_ms=detection_time_ms, recommendation=recommendation,
+                llm_used=llm_used, sensor_used=use_sensor,
+                sensor_data=sensor_data, swin_results=None,
+                vote_method="single_model", majority_count="1 / 1",
+            )
+            saved_ok = True
+        except Exception as e:
+            print(f"⚠️  Gagal simpan prediksi: {e}")
 
     return {
-        "model_key"            : model_key,
-        "arsitektur"           : m["arch_label"],
-        "dataset"              : m["dataset_label"],
-        "source_path"          : ".env" if m["arch_key"] == "swin_base" else "hardcode",
-        "predicted_class"      : predicted_class,
-        "confidence_percentage": confidence,
-        "detection_time_ms"    : detection_time_ms,
-        "recommendation"       : recommendation,
-        "sensor_used"          : use_sensor,
-        "sensor_data"          : sensor_data,
+        "model_key": model_key, "arsitektur": m["arch_label"],
+        "dataset": m["dataset_label"],
+        "source_path": ".env" if m["arch_key"] == "swin_base" else "hardcode",
+        "predicted_class": predicted_class, "confidence_percentage": confidence,
+        "detection_time_ms": detection_time_ms, "recommendation": recommendation,
+        "prediction_id": prediction_id, "saved_to_database": saved_ok,
+        "sensor_used": use_sensor, "sensor_data": sensor_data,
     }
 
 
 # ═════════════════════════════════════════════════════════════════
-# DETECTION — /compare  (semua 20 model + statistik kecepatan)
+# DETECTION — /compare
 # ═════════════════════════════════════════════════════════════════
 @app.post("/compare", response_model=CompareResponse, tags=["Detection"])
-async def compare_all_models(
-    file      : UploadFile = File(...),
-    use_sensor: bool       = True,
-):
-    """
-    Upload 1 gambar → jalankan **semua 20 model** (5 arsitektur × 4 dataset).
-
-    Setiap model menghasilkan:
-    - `predicted_class` + `confidence_percentage`
-    - `detection_time_ms` — waktu inferensi model tersebut
-
-    Ringkasan mencakup:
-    - `majority_class`        — kelas paling banyak diprediksi (voting)
-    - `best_confidence_model` — model dengan confidence tertinggi
-    - `detection_time_stats`  — min/max/avg + rata-rata per arsitektur & dataset
-    - `recommendation`        — rekomendasi LLM untuk kelas mayoritas
-    - `sensor`                — data sensor dummy sawah (opsional via `use_sensor`)
-    """
+async def compare_all_models(file: UploadFile = File(...), use_sensor: bool = True):
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File harus berupa gambar")
-
     image_bytes = await file.read()
     if len(image_bytes) > 10 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Ukuran file maksimal 10MB")
-
     if not ml_models:
         raise HTTPException(status_code=503, detail="Tidak ada model yang tersedia")
 
-    # ── Sensor dummy ──────────────────────────────────────────────
     sensor_data     = _generate_sensor_data()
     sensor_statuses = _evaluate_sensor(sensor_data)
     abnormal        = [s for s in sensor_statuses if s.status != "normal"]
     sensor_info = {
-        "lokasi"    : "Sawah Demo — Indramayu, Jawa Barat",
-        "timestamp" : datetime.now().isoformat(),
-        "data"      : sensor_data,
-        "kesimpulan": (
-            "✅ Semua kondisi sensor dalam batas normal."
-            if not abnormal else
-            f"⚠️ {len(abnormal)} parameter di luar batas: "
-            + ", ".join(s.parameter for s in abnormal)
-        ),
+        "lokasi": "Sawah Demo — Indramayu, Jawa Barat",
+        "timestamp": datetime.now().isoformat(), "data": sensor_data,
+        "kesimpulan": "✅ Semua kondisi sensor dalam batas normal." if not abnormal
+            else f"⚠️ {len(abnormal)} parameter di luar batas: " + ", ".join(s.parameter for s in abnormal),
     }
 
-    # ── Prediksi semua model (sequential) ────────────────────────
     results: dict[str, ModelCompareResult] = {}
-
     for model_key, m in ml_models.items():
         try:
             t0 = time.perf_counter()
             predicted_class, confidence = predict(
-                image_bytes = image_bytes,
-                model       = m["model"],
-                class_names = m["class_names"],
-                model_name  = m["model_name"],
+                image_bytes=image_bytes, model=m["model"],
+                class_names=m["class_names"], model_name=m["model_name"],
             )
-            detection_time_ms = round((time.perf_counter() - t0) * 1000, 2)
-
             results[model_key] = ModelCompareResult(
-                arsitektur            = m["arch_label"],
-                dataset               = m["dataset_label"],
-                predicted_class       = predicted_class,
-                confidence_percentage = confidence,
-                detection_time_ms     = detection_time_ms,
-                status                = "success",
+                arsitektur=m["arch_label"], dataset=m["dataset_label"],
+                predicted_class=predicted_class, confidence_percentage=confidence,
+                detection_time_ms=round((time.perf_counter() - t0) * 1000, 2), status="success",
             )
-
         except Exception as e:
             results[model_key] = ModelCompareResult(
-                arsitektur            = m.get("arch_label", model_key),
-                dataset               = m.get("dataset_label", ""),
-                predicted_class       = None,
-                confidence_percentage = None,
-                detection_time_ms     = None,
-                status                = f"error: {str(e)}",
+                arsitektur=m.get("arch_label", model_key), dataset=m.get("dataset_label", ""),
+                predicted_class=None, confidence_percentage=None,
+                detection_time_ms=None, status=f"error: {str(e)}",
             )
 
-    # ── Pisahkan yang sukses ──────────────────────────────────────
-    successful = {
-        k: v for k, v in results.items()
-        if v.status == "success" and v.detection_time_ms is not None
-    }
+    successful = {k: v for k, v in results.items() if v.status == "success" and v.detection_time_ms}
+    pred_with_conf_all = [(v.predicted_class, v.confidence_percentage or 0) for v in successful.values() if v.predicted_class]
+    majority_class = _weighted_vote(pred_with_conf_all)[0] if pred_with_conf_all else None
 
-    # ── Majority voting ───────────────────────────────────────────
-    # Confidence-weighted voting — model confidence < 60% diabaikan
-    pred_with_conf_all = [
-        (v.predicted_class, v.confidence_percentage or 0)
-        for v in successful.values() if v.predicted_class
-    ]
-    if pred_with_conf_all:
-        majority_class, _, _ = _weighted_vote(pred_with_conf_all, min_confidence=60.0)
-    else:
-        majority_class = None
-
-    # ── Model terbaik berdasarkan confidence ─────────────────────
-    best_confidence_model = (
-        max(successful, key=lambda k: successful[k].confidence_percentage or 0)
-        if successful else None
-    )
-
-    # ── Statistik waktu deteksi ───────────────────────────────────
+    best_confidence_model = max(successful, key=lambda k: successful[k].confidence_percentage or 0) if successful else None
     all_times  = [v.detection_time_ms for v in successful.values()]
     arch_times : dict[str, list[float]] = {}
     ds_times   : dict[str, list[float]] = {}
-
     for model_key, v in successful.items():
-        m          = ml_models[model_key]
-        arch_label = m["arch_label"]
-        ds_label   = m["dataset_label"]
-        arch_times.setdefault(arch_label, []).append(v.detection_time_ms)
-        ds_times.setdefault(ds_label, []).append(v.detection_time_ms)
-
-    stats_per_arsitektur = {
-        k: round(sum(v) / len(v), 2) for k, v in arch_times.items()
-    }
-    stats_per_dataset = {
-        k: round(sum(v) / len(v), 2) for k, v in ds_times.items()
-    }
-
-    fastest_model = (
-        min(successful, key=lambda k: successful[k].detection_time_ms)
-        if successful else None
-    )
-    slowest_model = (
-        max(successful, key=lambda k: successful[k].detection_time_ms)
-        if successful else None
-    )
+        m = ml_models[model_key]
+        arch_times.setdefault(m["arch_label"], []).append(v.detection_time_ms)
+        ds_times.setdefault(m["dataset_label"], []).append(v.detection_time_ms)
 
     time_stats = DetectionTimeStats(
-        min_ms               = round(min(all_times), 2)               if all_times else None,
-        max_ms               = round(max(all_times), 2)               if all_times else None,
-        avg_ms               = round(sum(all_times) / len(all_times), 2) if all_times else None,
-        fastest_model        = fastest_model,
-        slowest_model        = slowest_model,
-        stats_per_arsitektur = stats_per_arsitektur,
-        stats_per_dataset    = stats_per_dataset,
+        min_ms=round(min(all_times), 2) if all_times else None,
+        max_ms=round(max(all_times), 2) if all_times else None,
+        avg_ms=round(sum(all_times)/len(all_times), 2) if all_times else None,
+        fastest_model=min(successful, key=lambda k: successful[k].detection_time_ms) if successful else None,
+        slowest_model=max(successful, key=lambda k: successful[k].detection_time_ms) if successful else None,
+        stats_per_arsitektur={k: round(sum(v)/len(v), 2) for k, v in arch_times.items()},
+        stats_per_dataset={k: round(sum(v)/len(v), 2) for k, v in ds_times.items()},
     )
 
-    # ── Rekomendasi LLM untuk kelas mayoritas (dengan RAG) ────────
     recommendation = None
     if majority_class:
         try:
-            sd                 = sensor_data if use_sensor else None
-            recommendation, _ = get_recommendation_groq_rag(majority_class, sd)
+            recommendation, _ = get_recommendation_groq_rag(majority_class, sensor_data if use_sensor else None)
         except Exception:
-            recommendation = None
+            pass
 
     return CompareResponse(
-        total_models          = len(ml_models),
-        successful_models     = len(successful),
-        majority_class        = majority_class,
-        best_confidence_model = best_confidence_model,
-        detection_time_stats  = time_stats,
-        recommendation        = recommendation,
-        sensor                = sensor_info if use_sensor else None,
-        results               = results,
+        total_models=len(ml_models), successful_models=len(successful),
+        majority_class=majority_class, best_confidence_model=best_confidence_model,
+        detection_time_stats=time_stats, recommendation=recommendation,
+        sensor=sensor_info if use_sensor else None, results=results,
     )
 
 
 # ═════════════════════════════════════════════════════════════════
-# DETECTION — /compare/by-arch  (dikelompokkan per arsitektur)
+# DETECTION — /compare/by-arch
 # ═════════════════════════════════════════════════════════════════
 @app.post("/compare/by-arch", tags=["Detection"])
 async def compare_by_architecture(file: UploadFile = File(...)):
-    """
-    Upload gambar → jalankan semua 20 model, hasil dikelompokkan per arsitektur.
-
-    Setiap arsitektur menampilkan:
-    - Hasil 4 dataset
-    - `avg_confidence`, `avg_time_ms`, `min_time_ms`, `max_time_ms`
-    - `majority_class` untuk arsitektur tersebut
-    """
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File harus berupa gambar")
-
     if not ml_models:
         raise HTTPException(status_code=503, detail="Tidak ada model yang tersedia")
-
     image_bytes = await file.read()
     if len(image_bytes) > 10 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Ukuran file maksimal 10MB")
 
     grouped: dict[str, list] = {arch: [] for arch in ARCH_LABELS}
-
     for model_key, m in ml_models.items():
-        arch_key = m["arch_key"]
         try:
             t0 = time.perf_counter()
             predicted_class, confidence = predict(
-                image_bytes = image_bytes,
-                model       = m["model"],
-                class_names = m["class_names"],
-                model_name  = m["model_name"],
+                image_bytes=image_bytes, model=m["model"],
+                class_names=m["class_names"], model_name=m["model_name"],
             )
-            detection_time_ms = round((time.perf_counter() - t0) * 1000, 2)
-
-            grouped.setdefault(arch_key, []).append({
-                "model_key"            : model_key,
-                "dataset"              : m["dataset_label"],
-                "predicted_class"      : predicted_class,
-                "confidence_percentage": confidence,
-                "detection_time_ms"    : detection_time_ms,
-                "status"               : "success",
+            grouped.setdefault(m["arch_key"], []).append({
+                "model_key": model_key, "dataset": m["dataset_label"],
+                "predicted_class": predicted_class, "confidence_percentage": confidence,
+                "detection_time_ms": round((time.perf_counter() - t0) * 1000, 2), "status": "success",
             })
         except Exception as e:
-            grouped.setdefault(arch_key, []).append({
-                "model_key": model_key,
-                "dataset"  : m.get("dataset_label", ""),
-                "status"   : f"error: {str(e)}",
-            })
+            grouped.setdefault(m["arch_key"], []).append({"model_key": model_key, "status": f"error: {str(e)}"})
 
     summary = {}
     for arch_key, entries in grouped.items():
         if not entries:
             continue
-        successful = [e for e in entries if e.get("status") == "success"]
-        if not successful:
-            summary[arch_key] = {
-                "label"  : ARCH_LABELS.get(arch_key, arch_key),
-                "results": entries,
-            }
-            continue
-
-        times = [e["detection_time_ms"] for e in successful]
-        confs = [e["confidence_percentage"] for e in successful]
-        preds = [e["predicted_class"] for e in successful]
-
+        ok    = [e for e in entries if e.get("status") == "success"]
+        times = [e["detection_time_ms"] for e in ok]
+        confs = [e["confidence_percentage"] for e in ok]
+        preds = [e["predicted_class"] for e in ok]
         summary[arch_key] = {
-            "label"          : ARCH_LABELS.get(arch_key, arch_key),
-            "avg_confidence" : round(sum(confs) / len(confs), 2),
-            "avg_time_ms"    : round(sum(times) / len(times), 2),
-            "min_time_ms"    : round(min(times), 2),
-            "max_time_ms"    : round(max(times), 2),
-            "majority_class" : Counter(preds).most_common(1)[0][0],
-            "results"        : entries,
+            "label": ARCH_LABELS.get(arch_key, arch_key),
+            **({"avg_confidence": round(sum(confs)/len(confs), 2),
+                "avg_time_ms": round(sum(times)/len(times), 2),
+                "min_time_ms": round(min(times), 2), "max_time_ms": round(max(times), 2),
+                "majority_class": Counter(preds).most_common(1)[0][0]} if ok else {}),
+            "results": entries,
         }
-
-    return {
-        "by_architecture" : summary,
-        "total_models_run": sum(len(v) for v in grouped.values()),
-    }
+    return {"by_architecture": summary, "total_models_run": sum(len(v) for v in grouped.values())}
 
 
 # ═════════════════════════════════════════════════════════════════
-# LLM — Groq vs Gemini
+# LLM
 # ═════════════════════════════════════════════════════════════════
 @app.post("/compare-llm", tags=["LLM"])
-async def compare_llm(
-    disease_name: str  = Form(...),
-    use_sensor  : bool = Form(True),
-):
-    """
-    Bandingkan rekomendasi Groq (LLaMA 3.3 70B) vs Gemini.
-    Sensor dummy disertakan secara default.
-    """
+async def compare_llm(disease_name: str = Form(...), use_sensor: bool = Form(True)):
     if not disease_name.strip():
         raise HTTPException(status_code=400, detail="disease_name tidak boleh kosong")
-
     sensor_data = _generate_sensor_data() if use_sensor else None
-    result      = compare_llm_recommendation(disease_name, sensor_data)
-    return result
+    return compare_llm_recommendation(disease_name, sensor_data)
 
 
 @app.post("/compare-llm/predict", tags=["LLM"])
-async def compare_llm_from_image(
-    file      : UploadFile = File(...),
-    use_sensor: bool       = True,
-):
-    """
-    Upload gambar → deteksi dengan **semua 4 Swin Transformer** (tiap dataset)
-    → majority voting → bandingkan rekomendasi Groq vs Gemini.
-
-    Flow:
-    1. Gambar diproses oleh 4 Swin (Citra Daun Padi, Jenis Penyakit Padi,
-       Paddy V3 Augmentasi, Paddy Disease Classification)
-    2. Hasil 4 prediksi di-voting → kelas mayoritas
-    3. Kelas mayoritas dikirim ke Groq & Gemini untuk rekomendasi
-    """
+async def compare_llm_from_image(file: UploadFile = File(...), use_sensor: bool = True):
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File harus berupa gambar")
-
     image_bytes = await file.read()
     if len(image_bytes) > 10 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Ukuran file maksimal 10MB")
 
-    # ── Ambil semua 4 Swin dari ml_models ────────────────────────
-    swin_models = {
-        key: meta for key, meta in ml_models.items()
-        if meta["arch_key"] == "swin_base"
-    }
-
-    # Fallback ke model utama jika Swin di ml_models belum terisi
+    swin_models = {k: v for k, v in ml_models.items() if v["arch_key"] == "swin_base"}
     if not swin_models:
         if "model" not in ml_model:
-            raise HTTPException(
-                status_code = 503,
-                detail      = "Tidak ada model Swin yang tersedia",
-            )
-        swin_models = {
-            "swin_base__default": {
-                "model"        : ml_model["model"],
-                "class_names"  : ml_model["class_names"],
-                "model_name"   : ml_model["model_name"],
-                "arch_key"     : "swin_base",
-                "dataset_label": "Default (MODEL_PATH)",
-            }
-        }
+            raise HTTPException(status_code=503, detail="Tidak ada model Swin")
+        swin_models = {"swin_base__default": {"model": ml_model["model"], "class_names": ml_model["class_names"],
+            "model_name": ml_model["model_name"], "arch_key": "swin_base", "dataset_label": "Default"}}
 
-    # ── Prediksi ke-4 Swin ────────────────────────────────────────
-    swin_results    : dict = {}
-    all_predictions : list = []
-
+    swin_results: dict = {}
+    pred_list   : list = []
     for model_key, meta in swin_models.items():
         try:
             t0 = time.perf_counter()
-            predicted_class, confidence = predict(
-                image_bytes = image_bytes,
-                model       = meta["model"],
-                class_names = meta["class_names"],
-                model_name  = meta["model_name"],
-            )
-            elapsed_ms = round((time.perf_counter() - t0) * 1000, 2)
-
-            swin_results[model_key] = {
-                "dataset"              : meta["dataset_label"],
-                "predicted_class"      : predicted_class,
-                "confidence_percentage": confidence,
-                "detection_time_ms"    : elapsed_ms,
-                "status"               : "success",
-            }
-            all_predictions.append(predicted_class)
-
+            pc, conf = predict(image_bytes=image_bytes, model=meta["model"],
+                class_names=meta["class_names"], model_name=meta["model_name"])
+            swin_results[model_key] = {"dataset": meta["dataset_label"], "predicted_class": pc,
+                "confidence_percentage": conf, "detection_time_ms": round((time.perf_counter()-t0)*1000,2), "status": "success"}
+            pred_list.append(pc)
         except Exception as e:
-            swin_results[model_key] = {
-                "dataset": meta.get("dataset_label", model_key),
-                "status" : f"error: {str(e)}",
-            }
+            swin_results[model_key] = {"dataset": meta.get("dataset_label", model_key), "status": f"error: {str(e)}"}
 
-    if not all_predictions:
-        raise HTTPException(
-            status_code = 500,
-            detail      = "Semua model Swin gagal melakukan prediksi",
-        )
+    if not pred_list:
+        raise HTTPException(status_code=500, detail="Semua model Swin gagal")
 
-    # ── Confidence-weighted voting dari 4 Swin ────────────────────
-    # Kumpulkan (kelas, confidence) hanya dari model yang sukses.
-    # Model dengan confidence < 60% diabaikan dari voting agar tidak
-    # "meracuni" hasil — misalnya dua model ragu (41%, 57%) mengalahkan
-    # satu model yang sangat yakin (92%).
-    pred_with_conf = [
-        (v["predicted_class"], v["confidence_percentage"])
-        for v in swin_results.values()
-        if v.get("status") == "success"
-    ]
-    majority_class, weight_detail, vote_method = _weighted_vote(
-        pred_with_conf, min_confidence=60.0
-    )
-    majority_count = sum(1 for cls, _ in pred_with_conf if cls == majority_class)
+    pred_with_conf = [(v["predicted_class"], v["confidence_percentage"]) for v in swin_results.values() if v.get("status") == "success"]
+    majority_class, weight_detail, vote_method = _weighted_vote(pred_with_conf)
+    sukses = [v for v in swin_results.values() if v.get("status") == "success"]
+    best_swin_key = max((k for k,v in swin_results.items() if v.get("status")=="success"), key=lambda k: swin_results[k]["confidence_percentage"], default=None)
 
-    # Swin dengan confidence tertinggi
-    best_swin_key = max(
-        (k for k, v in swin_results.items() if v.get("status") == "success"),
-        key = lambda k: swin_results[k]["confidence_percentage"],
-        default = None,
-    )
-    best_swin = swin_results[best_swin_key] if best_swin_key else None
-
-    # Rata-rata confidence & waktu dari yang sukses
-    sukses        = [v for v in swin_results.values() if v.get("status") == "success"]
-    avg_confidence = round(sum(v["confidence_percentage"] for v in sukses) / len(sukses), 2)
-    avg_time_ms    = round(sum(v["detection_time_ms"] for v in sukses) / len(sukses), 2)
-
-    # ── Sensor & LLM comparison ───────────────────────────────────
     sensor_data = _generate_sensor_data() if use_sensor else None
     llm_result  = compare_llm_recommendation(majority_class, sensor_data)
-
     return {
-        # ── Hasil tiap Swin ───────────────────────────────────────
-        "swin_results"         : swin_results,
-        "total_swin_models"    : len(swin_models),
-        "successful_models"    : len(sukses),
-
-        # ── Voting ────────────────────────────────────────────────
-        "majority_class"       : majority_class,
-        "vote_detail"          : weight_detail,
-        "vote_method"          : vote_method,
-        "majority_count"       : f"{majority_count} / {len(pred_with_conf)} model pilih kelas ini",
-
-        # ── Statistik Swin ────────────────────────────────────────
-        "avg_confidence"       : avg_confidence,
-        "avg_detection_time_ms": avg_time_ms,
-        "best_swin_model"      : {
-            "model_key": best_swin_key,
-            "detail"   : best_swin,
-        },
-
-        # ── Sensor & LLM ─────────────────────────────────────────
-        "sensor_data"          : sensor_data,
-        "llm_comparison"       : llm_result,
+        "swin_results": swin_results, "total_swin_models": len(swin_models),
+        "successful_models": len(sukses), "majority_class": majority_class,
+        "vote_detail": weight_detail, "vote_method": vote_method,
+        "majority_count": f"{sum(1 for cls,_ in pred_with_conf if cls==majority_class)} / {len(pred_with_conf)} model",
+        "avg_confidence": round(sum(v["confidence_percentage"] for v in sukses)/len(sukses),2),
+        "avg_detection_time_ms": round(sum(v["detection_time_ms"] for v in sukses)/len(sukses),2),
+        "best_swin_model": {"model_key": best_swin_key, "detail": swin_results.get(best_swin_key)},
+        "sensor_data": sensor_data, "llm_comparison": llm_result,
     }
 
 
@@ -990,9 +734,13 @@ async def chat(
     disease_context: str           = Form(...),
     llm            : str           = Form("groq"),
     prediction_id  : Optional[str] = Form(None),
-    x_user_id      : Optional[str] = None,
+    x_user_id      : Optional[str] = Header(None),
 ):
-    """Chatbot tanya jawab penyakit padi. `llm`: `groq` (default) atau `gemini`."""
+    """
+    Chatbot tanya jawab penyakit padi.
+    Pesan disimpan ke tabel `chat_messages` di Supabase.
+    Jika `prediction_id` diisi, chat akan terhubung ke prediksi tersebut.
+    """
     if not question.strip():
         raise HTTPException(status_code=400, detail="Pertanyaan tidak boleh kosong")
 
@@ -1003,35 +751,67 @@ async def chat(
         answer   = get_chat_response_groq(question, disease_context)
         llm_used = "groq"
 
+    user_id = _resolve_user(x_user_id or "anonymous")
+    if user_id:
+        try:
+            db.save_chat_message(
+                user_id=user_id, question=question, answer=answer,
+                disease_context=disease_context, llm_used=llm_used,
+                prediction_id=prediction_id,
+            )
+        except Exception as e:
+            print(f"⚠️  Gagal simpan chat: {e}")
+
     return ChatResponse(answer=answer, disease_context=disease_context, llm_used=llm_used)
 
 
 # ═════════════════════════════════════════════════════════════════
-# HISTORY
+# HISTORY — Predictions
 # ═════════════════════════════════════════════════════════════════
 @app.get("/history/{device_id}", response_model=HistoryResponse, tags=["History"])
 async def get_history(device_id: str, limit: int = 20, offset: int = 0):
-    """Ambil riwayat prediksi berdasarkan device_id."""
-    items     = history_store.get(device_id, [])
-    paginated = items[offset: offset + limit]
-    return HistoryResponse(
-        history    = [HistoryItem(**item) for item in paginated],
-        pagination = Pagination(total=len(items), limit=limit, offset=offset),
-    )
+    """Ambil riwayat prediksi berdasarkan device_id dari Supabase."""
+    user = db.get_user_by_device(device_id)
+    if not user:
+        return HistoryResponse(history=[], pagination=Pagination(total=0, limit=limit, offset=offset))
+
+    try:
+        rows, total = db.get_predictions(user["id"], limit=limit, offset=offset)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Gagal ambil riwayat: {str(e)}")
+
+    history_items = [
+        HistoryItem(
+            prediction_id=row["id"], predicted_class=row["predicted_class"],
+            confidence=row["confidence"], detection_time_ms=row.get("detection_time_ms"),
+            timestamp=row["created_at"], llm_used=row.get("llm_used"),
+            sensor_used=row.get("sensor_used"), recommendation=row.get("recommendation"),
+            vote_method=row.get("vote_method"),
+        )
+        for row in rows
+    ]
+    return HistoryResponse(history=history_items, pagination=Pagination(total=total, limit=limit, offset=offset))
+
+
+@app.get("/history/{device_id}/detail/{prediction_id}", tags=["History"])
+async def get_prediction_detail(device_id: str, prediction_id: str):
+    """Detail lengkap satu prediksi (termasuk swin_results dan sensor_data)."""
+    user = db.get_user_by_device(device_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User tidak ditemukan")
+    row = db.get_prediction_by_id(prediction_id)
+    if not row or row.get("user_id") != user["id"]:
+        raise HTTPException(status_code=404, detail="Prediksi tidak ditemukan")
+    return row
 
 
 @app.delete("/history/item/{prediction_id}", tags=["History"])
 async def delete_history_item(prediction_id: str):
-    """Hapus satu item riwayat berdasarkan prediction_id."""
-    deleted = False
-    for device_id, items in history_store.items():
-        before = len(items)
-        history_store[device_id] = [
-            i for i in items if i["prediction_id"] != prediction_id
-        ]
-        if len(history_store[device_id]) < before:
-            deleted = True
-            break
+    """Hapus satu item riwayat dari Supabase."""
+    try:
+        deleted = db.delete_prediction(prediction_id)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Gagal hapus: {str(e)}")
     return {"success": deleted, "prediction_id": prediction_id}
 
 
@@ -1041,12 +821,56 @@ async def get_prediction_image(prediction_id: str):
 
 
 # ═════════════════════════════════════════════════════════════════
+# HISTORY — Chat
+# ═════════════════════════════════════════════════════════════════
+@app.get("/chat/history/{device_id}", response_model=ChatHistoryResponse, tags=["History"])
+async def get_chat_history(device_id: str, limit: int = 50):
+    """Ambil riwayat chat berdasarkan device_id dari Supabase."""
+    user = db.get_user_by_device(device_id)
+    if not user:
+        return ChatHistoryResponse(history=[], total=0)
+    try:
+        rows = db.get_chat_messages(user["id"], limit=limit)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Gagal ambil chat: {str(e)}")
+    items = [
+        ChatHistoryItem(
+            id=row["id"], question=row["question"], answer=row["answer"],
+            disease_context=row.get("disease_context"), llm_used=row.get("llm_used"),
+            prediction_id=row.get("prediction_id"), timestamp=row["created_at"],
+        )
+        for row in rows
+    ]
+    return ChatHistoryResponse(history=items, total=len(items))
+
+
+@app.get("/chat/history/by-prediction/{prediction_id}", tags=["History"])
+async def get_chat_by_prediction(prediction_id: str):
+    try:
+        rows = db.get_chat_by_prediction(prediction_id)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Gagal ambil chat: {str(e)}")
+    return {"prediction_id": prediction_id, "messages": rows, "total": len(rows)}
+
+
+# ═════════════════════════════════════════════════════════════════
 # DEBUG
 # ═════════════════════════════════════════════════════════════════
 @app.get("/debug/user/{device_id}", tags=["Debug"])
 async def debug_user(device_id: str):
-    return {
-        "device_id"    : device_id,
-        "history_count": len(history_store.get(device_id, [])),
-        "status"       : "ok",
-    }
+    """Cek data user dan jumlah riwayat di Supabase."""
+    try:
+        user = db.get_user_by_device(device_id)
+        if not user:
+            return {"device_id": device_id, "status": "not_found"}
+        _, pred_count = db.get_predictions(user["id"], limit=1)
+        chat_rows     = db.get_chat_messages(user["id"], limit=1000)
+        return {
+            "device_id": device_id, "user_id": user["id"],
+            "total_predictions_db": user.get("total_predictions", 0),
+            "prediction_count": pred_count, "chat_count": len(chat_rows),
+            "first_seen": user.get("first_seen"), "last_seen": user.get("last_seen"),
+            "status": "ok",
+        }
+    except Exception as e:
+        return {"device_id": device_id, "status": "db_error", "error": str(e)}

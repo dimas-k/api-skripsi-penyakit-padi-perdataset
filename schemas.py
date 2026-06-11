@@ -2,9 +2,18 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
 
+# ── /users ────────────────────────────────────────────────────────
+class UserResponse(BaseModel):
+    """Info pengguna berdasarkan device_id (tanpa sistem login)."""
+    user_id          : str
+    device_id        : str
+    total_predictions: int  = 0
+    first_seen       : str
+    last_seen        : str
+
+
 # ── /predict (4 Swin + voting) ────────────────────────────────────
 class SwingModelResult(BaseModel):
-    """Hasil prediksi satu model Swin Transformer."""
     dataset               : str
     predicted_class       : Optional[str]
     confidence_percentage : Optional[float]
@@ -13,25 +22,18 @@ class SwingModelResult(BaseModel):
 
 
 class PredictionResponse(BaseModel):
-    # ── Hasil akhir (dari voting 4 Swin) ─────────────────────────
     predicted_class       : str
-    confidence_percentage : float          # confidence model Swin terbaik
-    detection_time_ms     : float          # total waktu inferensi 4 Swin (ms)
+    confidence_percentage : float
+    detection_time_ms     : float
     recommendation        : str
     prediction_id         : str
     saved_to_database     : bool = False
-
-    # ── Detail 4 Swin ─────────────────────────────────────────────
     swin_results          : Optional[Dict[str, SwingModelResult]] = None
     total_swin_models     : Optional[int]   = None
     successful_models     : Optional[int]   = None
-
-    # ── Voting ────────────────────────────────────────────────────
     vote_detail           : Optional[Dict[str, float]] = None
     vote_method           : Optional[str]  = None
     majority_count        : Optional[str]  = None
-
-    # ── Statistik 4 Swin ──────────────────────────────────────────
     avg_confidence        : Optional[float] = None
     avg_detection_time_ms : Optional[float] = None
     best_swin_model       : Optional[Dict[str, Any]] = None
@@ -41,7 +43,7 @@ class PredictionResponse(BaseModel):
 class ChatRequest(BaseModel):
     question       : str
     disease_context: str
-    llm            : Optional[str] = "groq"   # "groq" | "gemini"
+    llm            : Optional[str] = "groq"
 
 
 class ChatResponse(BaseModel):
@@ -54,7 +56,7 @@ class ChatResponse(BaseModel):
 class LLMResult(BaseModel):
     llm          : str
     answer       : Optional[str]
-    response_time: Optional[float]   # detik
+    response_time: Optional[float]
     status       : str
 
 
@@ -65,7 +67,7 @@ class LLMCompareResponse(BaseModel):
     sensor_used : bool
 
 
-# ── /compare (model vision) ───────────────────────────────────────
+# ── /compare ─────────────────────────────────────────────────────
 class ModelCompareResult(BaseModel):
     arsitektur            : str
     dataset               : str
@@ -101,7 +103,7 @@ class SensorStatus(BaseModel):
     parameter : str
     nilai     : float
     satuan    : str
-    status    : str        # "normal" | "rendah" | "tinggi"
+    status    : str
     keterangan: str
 
 
@@ -113,13 +115,17 @@ class SensorResponse(BaseModel):
     kesimpulan    : str
 
 
-# ── /history ─────────────────────────────────────────────────────
+# ── /history (predictions) ────────────────────────────────────────
 class HistoryItem(BaseModel):
     prediction_id    : str
     predicted_class  : str
     confidence       : float
     detection_time_ms: Optional[float] = None
     timestamp        : str
+    llm_used         : Optional[str]  = None
+    sensor_used      : Optional[bool] = None
+    recommendation   : Optional[str]  = None
+    vote_method      : Optional[str]  = None
 
 
 class Pagination(BaseModel):
@@ -131,3 +137,19 @@ class Pagination(BaseModel):
 class HistoryResponse(BaseModel):
     history   : List[HistoryItem]
     pagination: Pagination
+
+
+# ── /chat/history ────────────────────────────────────────────────
+class ChatHistoryItem(BaseModel):
+    id             : str
+    question       : str
+    answer         : str
+    disease_context: Optional[str] = None
+    llm_used       : Optional[str] = None
+    prediction_id  : Optional[str] = None
+    timestamp      : str
+
+
+class ChatHistoryResponse(BaseModel):
+    history: List[ChatHistoryItem]
+    total  : int
