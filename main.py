@@ -773,7 +773,11 @@ async def get_history(device_id: str, limit: int = 20, offset: int = 0):
     """Ambil riwayat prediksi berdasarkan device_id dari Supabase."""
     user = db.get_user_by_device(device_id)
     if not user:
-        return HistoryResponse(history=[], pagination=Pagination(total=0, limit=limit, offset=offset))
+        return HistoryResponse(
+            success=True,
+            history=[],
+            pagination=Pagination(total=0, limit=limit, offset=offset, has_more=False),
+        )
 
     try:
         rows, total = db.get_predictions(user["id"], limit=limit, offset=offset)
@@ -790,7 +794,16 @@ async def get_history(device_id: str, limit: int = 20, offset: int = 0):
         )
         for row in rows
     ]
-    return HistoryResponse(history=history_items, pagination=Pagination(total=total, limit=limit, offset=offset))
+    return HistoryResponse(
+        success=True,
+        history=history_items,
+        pagination=Pagination(
+            total=total,
+            limit=limit,
+            offset=offset,
+            has_more=(offset + limit) < total,
+        ),
+    )
 
 
 @app.get("/history/{device_id}/detail/{prediction_id}", tags=["History"])

@@ -121,6 +121,7 @@ class HistoryItem(BaseModel):
     predicted_class  : str
     confidence       : float
     detection_time_ms: Optional[float] = None
+    # FIX: 'timestamp' dipakai sebagai nama field (konsisten dengan Supabase created_at)
     timestamp        : str
     llm_used         : Optional[str]  = None
     sensor_used      : Optional[bool] = None
@@ -132,9 +133,13 @@ class Pagination(BaseModel):
     total : int
     limit : int
     offset: int
+    # FIX: tambah has_more agar Flutter bisa hitung pagination tanpa kalkulasi manual
+    has_more: bool = False
 
 
 class HistoryResponse(BaseModel):
+    # FIX: tambah field 'success' agar Flutter tidak perlu infer dari key 'history'
+    success   : bool = True
     history   : List[HistoryItem]
     pagination: Pagination
 
