@@ -1,0 +1,1929 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-02 11:48:25",
+    "n_queries": 18,
+    "k": 3,
+    "embedding_model": "all-MiniLM-L6-v2",
+    "llm_models": {
+      "low": "Ollama — qwen2.5:3b (lokal)",
+      "medium": "Google — gemini-2.5-flash (API)",
+      "high": "Groq   — llama-3.3-70b-versatile (API)"
+    }
+  },
+  "retriever": {
+    "MRR": 0.4352,
+    "Hit@3": 0.6667,
+    "Precision@3": 0.2778,
+    "k": 3,
+    "n_queries": 18,
+    "per_query": [
+      {
+        "id": "Q01",
+        "disease": "bacterial_leaf_blight",
+        "query": "Daun padi saya menguning mulai dari ujung dan tepi, lalu muncul eksudat kekuningan di pagi hari saat musim hujan, penyakit apa dan bagaimana penanganannya?",
+        "rr": 0.5,
+        "hit_k": 1.0,
+        "precision_k": 0.3333,
+        "top1_score": 0.6291,
+        "relevance_flags": [
+          0,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "Q02",
+        "disease": "leaf_blast",
+        "query": "Saya baru memupuk urea dengan dosis tinggi, beberapa hari kemudian muncul bercak abu-abu kecil di daun, apa risiko dan tindakan yang harus dilakukan?",
+        "rr": 0.0,
+        "hit_k": 0.0,
+        "precision_k": 0.0,
+        "top1_score": 0.6285,
+        "relevance_flags": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "Q03",
+        "disease": "neck_blast",
+        "query": "Padi saya hampir memasuki fase pembungaan, di sekitar sawah sudah ada laporan blas daun, apa langkah pencegahan blas leher malai yang tepat?",
+        "rr": 0.5,
+        "hit_k": 1.0,
+        "precision_k": 0.3333,
+        "top1_score": 0.5776,
+        "relevance_flags": [
+          0,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "Q04",
+        "disease": "sheath_blight",
+        "query": "Sawah saya tergenang air dalam waktu lama, tanam padi rapat, sekarang muncul bercak oval abu-abu di pelepah daun bawah dekat permukaan air, penyakit apa ini?",
+        "rr": 1.0,
+        "hit_k": 1.0,
+        "precision_k": 0.6667,
+        "top1_score": 0.6647,
+        "relevance_flags": [
+          1,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "Q05",
+        "disease": "tungro",
+        "query": "Di pertanaman padi saya mulai muncul beberapa rumpun yang agak kerdil dengan daun atas sedikit pucat menguning, ditemukan wereng hijau dalam jumlah sedang, apa yang harus dilakukan?",
+        "rr": 0.0,
+        "hit_k": 0.0,
+        "precision_k": 0.0,
+        "top1_score": 0.5778,
+        "relevance_flags": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "Q06",
+        "disease": "brown_spot",
+        "query": "Lahan saya kekurangan pupuk kalium, tanaman padi mulai banyak bercak oval coklat dengan pusat keabu-abuan di daun bawah, apa penyebab dan solusinya?",
+        "rr": 0.5,
+        "hit_k": 1.0,
+        "precision_k": 0.3333,
+        "top1_score": 0.6915,
+        "relevance_flags": [
+          0,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "Q07",
+        "disease": "dead_heart",
+        "query": "Padi saya umur 30 HST, banyak ngengat berwarna putih di sawah dan mulai ada beberapa anakan muda yang pucuknya mati dan bisa dicabut dengan mudah, hama apa ini?",
+        "rr": 0.3333,
+        "hit_k": 1.0,
+        "precision_k": 0.3333,
+        "top1_score": 0.5939,
+        "relevance_flags": [
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "Q08",
+        "disease": "hispa",
+        "query": "Ditemukan kumbang kecil berduri hitam keunguan di daun padi, lalu muncul goresan putih horizontal sejajar tulang daun disertai lubang-lubang kecil pada daun, hama apa ini dan kapan perlu disemprot?",
+        "rr": 0.0,
+        "hit_k": 0.0,
+        "precision_k": 0.0,
+        "top1_score": 0.6428,
+        "relevance_flags": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "Q09",
+        "disease": "bacterial_panicle_blight",
+        "query": "Padi saya saat fase pembungaan terkena cuaca panas dan suhu malam tinggi di atas 25°C, sekarang gabah banyak yang hampa berwarna coklat-keunguan dan mengeriput, penyakit apa ini?",
+        "rr": 0.0,
+        "hit_k": 0.0,
+        "precision_k": 0.0,
+        "top1_score": 0.6273,
+        "relevance_flags": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "Q10",
+        "disease": "leaf_smut",
+        "query": "Pada daun padi muncul bintik-bintik hitam kecil seperti titik-titik tersebar merata, tanaman tetap tumbuh normal, penyakit apa ini dan apakah perlu disemprot fungisida?",
+        "rr": 0.5,
+        "hit_k": 1.0,
+        "precision_k": 0.3333,
+        "top1_score": 0.6088,
+        "relevance_flags": [
+          0,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "Q11",
+        "disease": "downy_mildew",
+        "query": "Bibit padi di pesemaian saya kerdil, daun pucat dengan distorsi, dan ada lapisan putih halus di bawah daun, penyakit apa dan tindakannya?",
+        "rr": 0.0,
+        "hit_k": 0.0,
+        "precision_k": 0.0,
+        "top1_score": 0.4413,
+        "relevance_flags": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "Q12",
+        "disease": "healthy",
+        "query": "Tanaman padi saya umur 45 HST, anakan produktif banyak, daun hijau sehat, tidak ada gejala penyakit, langkah perawatan rutin apa yang harus dilakukan agar tetap sehat hingga panen?",
+        "rr": 1.0,
+        "hit_k": 1.0,
+        "precision_k": 0.3333,
+        "top1_score": 0.6205,
+        "relevance_flags": [
+          1,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "Q13",
+        "disease": "bacterial_leaf_streak",
+        "query": "Daun padi saya muncul lesi garis-garis sempit memanjang di antara tulang daun warna kuning kecoklatan dengan butiran eksudat kuning di sepanjang lesi, beda dari hawar daun bakteri biasa, penyakit apa ini?",
+        "rr": 1.0,
+        "hit_k": 1.0,
+        "precision_k": 0.3333,
+        "top1_score": 0.5846,
+        "relevance_flags": [
+          1,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "Q14",
+        "disease": "harvest_stage",
+        "query": "Padi saya sudah menunduk dan 90% gabah berwarna kuning keemasan, tapi cuaca terus hujan beberapa hari ke depan, kapan dan bagaimana cara panen yang aman?",
+        "rr": 1.0,
+        "hit_k": 1.0,
+        "precision_k": 0.3333,
+        "top1_score": 0.6478,
+        "relevance_flags": [
+          1,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "Q15",
+        "disease": "leaf_blast",
+        "query": "Bercak belah ketupat di daun padi yang awalnya kecil sekarang sudah menyatu menjadi besar dan daun banyak yang mengering, serangan sudah berat, apa tindakan darurat?",
+        "rr": 0.5,
+        "hit_k": 1.0,
+        "precision_k": 0.3333,
+        "top1_score": 0.6223,
+        "relevance_flags": [
+          0,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "Q16",
+        "disease": "sheath_blight",
+        "query": "Saya menanam padi dengan jarak rapat 20x20 cm dan kelembaban kanopi sangat tinggi, sekarang banyak bercak oval abu-abu di pelepah daun bawah, penyakit apa dan solusi strukturalnya?",
+        "rr": 0.5,
+        "hit_k": 1.0,
+        "precision_k": 0.6667,
+        "top1_score": 0.6918,
+        "relevance_flags": [
+          0,
+          1,
+          1
+        ]
+      },
+      {
+        "id": "Q17",
+        "disease": "tungro",
+        "query": "Sawah tetangga saya sudah terkena tungro dengan tanaman kerdil kuning-oranye, pertanaman padi saya bersebelahan dan belum bergejala, apa langkah pencegahan agar tidak tertular?",
+        "rr": 0.0,
+        "hit_k": 0.0,
+        "precision_k": 0.0,
+        "top1_score": 0.5997,
+        "relevance_flags": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "Q18",
+        "disease": "harvest_stage",
+        "query": "Padi saya malai sudah menunduk dan sebagian besar gabah kuning, tapi gabah bagian ujung malai masih lunak belum keras saat ditekan kuku, sebaiknya saya tunggu atau langsung panen?",
+        "rr": 0.5,
+        "hit_k": 1.0,
+        "precision_k": 0.6667,
+        "top1_score": 0.6273,
+        "relevance_flags": [
+          0,
+          1,
+          1
+        ]
+      }
+    ]
+  },
+  "generator": {
+    "Ollama — qwen2.5:3b (LOW)": {
+      "llm": "Ollama — qwen2.5:3b (LOW)",
+      "avg_cosine_similarity": 0.5747,
+      "avg_rouge1_f": 0.1584,
+      "avg_rouge2_f": 0.0146,
+      "avg_rougeL_f": 0.0978,
+      "avg_generation_time_s": 56.346,
+      "faithfulness_note": "Diisi manual annotator (0=tidak akurat, 0.5=sebagian, 1=sangat akurat)",
+      "per_query": [
+        {
+          "id": "Q01",
+          "disease": "bacterial_leaf_blight",
+          "query": "Daun padi saya menguning mulai dari ujung dan tepi, lalu muncul eksudat kekuningan di pagi hari saat musim hujan, penyakit apa dan bagaimana penanganannya?",
+          "generated": "Oke, biar kita segera atasi penyakit padi. Saya akan jelaskan apa penyakitnya dan bagaimana cara menyembuhkannya.\n\nHawar Daun Bakteri atau HDB adalah penyakit yang disebabkan oleh bakteri Xanthomonas oryzae pv. oryzae ini. Penyakit ini sering terjadi di tanaman padi, khususnya di Asia. Gejala utaman...",
+          "ground_truth": "Hawar Daun Bakteri (HDB) disebabkan Xanthomonas oryzae pv. oryzae, berkembang pesat pada suhu 25-35°C dan kelembaban >85% (umum di musim hujan). Gejala khas: daun menguning dari ujung dan tepi, eksudat kekuningan di pagi hari yang lembab. Penanganan: semprot bakterisida tembaga (Kocide 77 WP 2-3 g/L) atau Cupravit OB 21, kurangi pupuk nitrogen, perbaiki drainase sawah. Pencegahan: varietas tahan (Ciherang, Mekongga, IR64, Inpari 32 dengan gen Xa4/Xa7), tanam serempak, jajar legowo 25x25 cm, perlakuan benih air panas 52-54°C selama 10 menit.",
+          "cosine_sim": 0.5884,
+          "rouge1_f": 0.1636,
+          "rouge2_f": 0.0305,
+          "rougeL_f": 0.1212,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1111,
+              "recall": 0.3103,
+              "fmeasure": 0.1636
+            },
+            "rouge2": {
+              "precision": 0.0207,
+              "recall": 0.0581,
+              "fmeasure": 0.0305
+            },
+            "rougeL": {
+              "precision": 0.0823,
+              "recall": 0.2299,
+              "fmeasure": 0.1212
+            }
+          },
+          "time_s": 87.344,
+          "faithfulness": null
+        },
+        {
+          "id": "Q02",
+          "disease": "leaf_blast",
+          "query": "Saya baru memupuk urea dengan dosis tinggi, beberapa hari kemudian muncul bercak abu-abu kecil di daun, apa risiko dan tindakan yang harus dilakukan?",
+          "generated": "Berdasarkan informasi yang ada, saya akan berikan solusi untuk petani:\n\n**Penyakit Blas Daun**\nBlas daun adalah penyakit yang ditularkan oleh jamur Pyricularia oryzae. Gejala utamanya adalah lesi berbentuk seperti jarum dan belah ketupat pada batang daun. Lesinya biasanya coklat atau abu-abu, dengan...",
+          "ground_truth": "Gejala mengarah ke Blas Daun (Pyricularia oryzae) yang dipicu nitrogen berlebih membuat jaringan daun sukulen dan rentan infeksi jamur. Tindakan segera: hentikan pupuk nitrogen tambahan, semprot fungisida tricyclazole (Beam 75 WP 0.5-1 g/L) atau isoprothiolane (Fuji-One 40 EC). Tambahkan pupuk kalium (KCl 50-75 kg/ha) dan silika untuk memperkuat dinding sel daun. Pencegahan: dosis N ideal 90-120 kg N/ha dibagi 3 aplikasi (dasar 40%, anakan aktif 30%, primordia 30%), gunakan varietas tahan (Inpari 13, 19).",
+          "cosine_sim": 0.4849,
+          "rouge1_f": 0.1532,
+          "rouge2_f": 0.0163,
+          "rougeL_f": 0.0887,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1145,
+              "recall": 0.2317,
+              "fmeasure": 0.1532
+            },
+            "rouge2": {
+              "precision": 0.0121,
+              "recall": 0.0247,
+              "fmeasure": 0.0163
+            },
+            "rougeL": {
+              "precision": 0.0663,
+              "recall": 0.1341,
+              "fmeasure": 0.0887
+            }
+          },
+          "time_s": 55.834,
+          "faithfulness": null
+        },
+        {
+          "id": "Q03",
+          "disease": "neck_blast",
+          "query": "Padi saya hampir memasuki fase pembungaan, di sekitar sawah sudah ada laporan blas daun, apa langkah pencegahan blas leher malai yang tepat?",
+          "generated": "Baik temen-temen, kita bicara tentang Blas Leher Malai. Ini penyakit yang paling berbahaya bagi tanaman padi. Infeksi ini membuat leher malai atau pangkal batang menjadi hitam dan mati. Malai juga terasa tidak kuat, bisa jatuh ke bawah. Tanaman seperti itu tak akan panen sama sekali.\n\nSaat Blas Lehe...",
+          "ground_truth": "Blas Leher Malai (Pyricularia oryzae) menyerang pangkal malai saat heading dan menyebabkan gabah hampa total. Pencegahan preventif yang paling efektif: semprot fungisida 2 kali — (1) saat primordia malai (booting, ~7-10 hari sebelum keluar malai), dan (2) saat heading 50% (malai keluar 50%). Gunakan tricyclazole (Beam 75 WP 0.5-1 g/L) atau isoprothiolane. Hentikan pupuk nitrogen menjelang heading. Pencegahan struktural: gunakan varietas tahan blas (Inpari 13, 19) dan hindari nitrogen berlebih sejak fase vegetatif.",
+          "cosine_sim": 0.5514,
+          "rouge1_f": 0.1872,
+          "rouge2_f": 0.0398,
+          "rougeL_f": 0.1182,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1496,
+              "recall": 0.25,
+              "fmeasure": 0.1872
+            },
+            "rouge2": {
+              "precision": 0.0317,
+              "recall": 0.0533,
+              "fmeasure": 0.0398
+            },
+            "rougeL": {
+              "precision": 0.0945,
+              "recall": 0.1579,
+              "fmeasure": 0.1182
+            }
+          },
+          "time_s": 47.614,
+          "faithfulness": null
+        },
+        {
+          "id": "Q04",
+          "disease": "sheath_blight",
+          "query": "Sawah saya tergenang air dalam waktu lama, tanam padi rapat, sekarang muncul bercak oval abu-abu di pelepah daun bawah dekat permukaan air, penyakit apa ini?",
+          "generated": "Oke, mari kita bahas Blas Daun untuk petani. Ini penyakit yang menyerang daun padi.\n\nPenyebabnya adalah jamur Pyricularia oryzae (Magnaporthe oryzae). Gejalanya seperti ini:\n- Terdapat lesi berbentuk belah ketupat atau jarum di mana-mana.\n- Lesi berwarna putih dan hijau dengan tepi coklat gelap.\n- D...",
+          "ground_truth": "Busuk Pelepah disebabkan jamur Rhizoctonia solani yang berkembang pada kondisi tergenang terus-menerus, tanam rapat, dan kelembaban kanopi tinggi. Gejala: lesi oval abu-abu pada pelepah daun dekat permukaan air, lalu menyebar ke atas hingga daun. Penanganan: terapkan irigasi berselang (AWD — genangi 5-7 hari, biarkan kering hingga retak ringan, genangi lagi), semprot validamycin (Validacin 3L 1-2 ml/L) ke pangkal tanaman, kurangi nitrogen. Pencegahan: jajar legowo 2:1 atau 4:1 untuk sirkulasi udara, hancurkan sklerotia saat pengolahan tanah, gunakan varietas tahan (Inpari 30, 33).",
+          "cosine_sim": 0.5114,
+          "rouge1_f": 0.1901,
+          "rouge2_f": 0.0077,
+          "rougeL_f": 0.0989,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.142,
+              "recall": 0.2874,
+              "fmeasure": 0.1901
+            },
+            "rouge2": {
+              "precision": 0.0057,
+              "recall": 0.0116,
+              "fmeasure": 0.0077
+            },
+            "rougeL": {
+              "precision": 0.0739,
+              "recall": 0.1494,
+              "fmeasure": 0.0989
+            }
+          },
+          "time_s": 58.446,
+          "faithfulness": null
+        },
+        {
+          "id": "Q05",
+          "disease": "tungro",
+          "query": "Di pertanaman padi saya mulai muncul beberapa rumpun yang agak kerdil dengan daun atas sedikit pucat menguning, ditemukan wereng hijau dalam jumlah sedang, apa yang harus dilakukan?",
+          "generated": "Oke, mari kita bicarakan soal Blas Daun. Ini adalah penyakit yang sangat berbahaya bagi tanaman padi.\n\n### Penjelasan Singkat Penyakit Blas Daun:\nBlas daun ini disebabkan oleh jamur Pyricularia oryzae. Gejalanya yaitu terdapat lesi berbentuk kotak kecil pada daun, warnanya hijau abu-abu sampai putih...",
+          "ground_truth": "Gejala mengarah ke Tungro (virus RTBV + RTSV) yang ditularkan wereng hijau (Nephotettix virescens). Tidak ada obat langsung untuk virus, pengendalian fokus pada vektor. Tindakan: (1) cabut dan musnahkan rumpun bergejala sedini mungkin, (2) kendalikan vektor wereng hijau dengan insektisida selektif buprofezin atau pymetrozine (hindari organofosfat yang membunuh musuh alami), (3) monitor populasi mingguan dengan light trap. Pencegahan: gunakan varietas tahan tungro (Tukad Petanu, Tukad Balian, Inpari 7/9), tanam serempak satu hamparan, konservasi musuh alami (laba-laba, Cyrtorhinus lividipennis).",
+          "cosine_sim": 0.4891,
+          "rouge1_f": 0.0971,
+          "rouge2_f": 0.0065,
+          "rougeL_f": 0.0583,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.0652,
+              "recall": 0.1899,
+              "fmeasure": 0.0971
+            },
+            "rouge2": {
+              "precision": 0.0044,
+              "recall": 0.0128,
+              "fmeasure": 0.0065
+            },
+            "rougeL": {
+              "precision": 0.0391,
+              "recall": 0.1139,
+              "fmeasure": 0.0583
+            }
+          },
+          "time_s": 70.571,
+          "faithfulness": null
+        },
+        {
+          "id": "Q06",
+          "disease": "brown_spot",
+          "query": "Lahan saya kekurangan pupuk kalium, tanaman padi mulai banyak bercak oval coklat dengan pusat keabu-abuan di daun bawah, apa penyebab dan solusinya?",
+          "generated": "Berdasarkan informasi yang ada, kita akan membahas penyakit bercak coklat pada padi:\n\n1. Penyakit ini disebabkan oleh jamur Cochliobolus miyabeanus yang menempel di permukaan daun dan menghasilkan bercak-bercak coklat kecil. Bercak-bercak tersebut akan mengubah warna daun menjadi coklat, terutama pa...",
+          "ground_truth": "Bercak Coklat disebabkan jamur Cochliobolus miyabeanus, dikenal sebagai 'penyakit kelaparan' karena sangat terkait defisiensi hara terutama kalium (K) dan silika (Si). Gejala: bercak oval coklat dengan pusat abu-abu/putih, sering muncul pada lahan defisiensi K. Penanganan: tambahkan KCl 50-75 kg/ha dan pupuk silikat (terak baja atau abu sekam) 200-500 kg/ha, semprot fungisida mancozeb (Dithane M-45 2 g/L) atau propiconazole. Pencegahan: pemupukan berimbang N:P:K + organik, rotasi tanaman, tambahkan kompos atau abu sekam untuk memperbaiki struktur tanah.",
+          "cosine_sim": 0.5408,
+          "rouge1_f": 0.1439,
+          "rouge2_f": 0.0229,
+          "rougeL_f": 0.1136,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1056,
+              "recall": 0.2262,
+              "fmeasure": 0.1439
+            },
+            "rouge2": {
+              "precision": 0.0168,
+              "recall": 0.0361,
+              "fmeasure": 0.0229
+            },
+            "rougeL": {
+              "precision": 0.0833,
+              "recall": 0.1786,
+              "fmeasure": 0.1136
+            }
+          },
+          "time_s": 58.877,
+          "faithfulness": null
+        },
+        {
+          "id": "Q07",
+          "disease": "dead_heart",
+          "query": "Padi saya umur 30 HST, banyak ngengat berwarna putih di sawah dan mulai ada beberapa anakan muda yang pucuknya mati dan bisa dicabut dengan mudah, hama apa ini?",
+          "generated": "Kami perlu segera mengatasi penyakit batang mati pada padi, juga disebut atang bergaris. Gejala utamanya adalah pucuk tanaman muda menjadi mati berwarna kuning kecoklatan yang mudah dicabut. Batang bagian dalam telah dimakan oleh larva serangga. Daun tengah tampak layu dan mati sementara daun luar m...",
+          "ground_truth": "Gejala dead heart (sundep) disebabkan larva penggerek batang. Ngengat berwarna putih mengindikasikan Penggerek Batang Putih (Scirpophaga innotata), umum di lahan tadah hujan dan kering. Penanganan: pasang lampu perangkap untuk ngengat dewasa, lepaskan parasitoid telur Trichogramma japonicum 2-3 kali dengan interval 1 minggu, bila serangan >5% anakan terinfeksi semprot insektisida berbahan aktif fipronil, karbofuran, atau klorantraniliprol sesuai dosis label. Pencegahan: tanam serempak, varietas tahan, konservasi musuh alami, sanitasi sisa jerami pasca panen, rotasi tanaman.",
+          "cosine_sim": 0.4851,
+          "rouge1_f": 0.1158,
+          "rouge2_f": 0.0,
+          "rougeL_f": 0.0772,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.0811,
+              "recall": 0.2027,
+              "fmeasure": 0.1158
+            },
+            "rouge2": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "fmeasure": 0.0
+            },
+            "rougeL": {
+              "precision": 0.0541,
+              "recall": 0.1351,
+              "fmeasure": 0.0772
+            }
+          },
+          "time_s": 59.563,
+          "faithfulness": null
+        },
+        {
+          "id": "Q08",
+          "disease": "hispa",
+          "query": "Ditemukan kumbang kecil berduri hitam keunguan di daun padi, lalu muncul goresan putih horizontal sejajar tulang daun disertai lubang-lubang kecil pada daun, hama apa ini dan kapan perlu disemprot?",
+          "generated": "Kita akan membahas tentang penyakit Hispa Padi, gejalanya, cara mengatasinya sekarang, bagaimana cara mencegahnya agar tidak lagi datang, dan apakah kondisi saat ini memperparah atau mendukung penyebarannya.\n\nPenyakit Hispa Padi disebabkan oleh serangan kumbang hispa yang berduri. Lalu apa gejalanya...",
+          "ground_truth": "Kumbang Hispa (Dicladispa armigera) menyerang daun padi: kumbang dewasa membuat lubang/goresan, larva di dalam jaringan daun membuat goresan putih horizontal khas (mining) sejajar tulang daun. Ambang ekonomi untuk aplikasi insektisida: 1 ekor kumbang dewasa atau 1-2 larva per rumpun, atau kerusakan daun >25% pada fase vegetatif. Bila di bawah ambang: pengendalian mekanis dengan memotong ujung daun terinfeksi (3-5 cm) lalu dimusnahkan. Bila terlampaui: semprot insektisida fipronil, karbofuran, atau klorantraniliprol sesuai dosis label. Konservasi parasitoid Tetrastichus dan laba-laba.",
+          "cosine_sim": 0.543,
+          "rouge1_f": 0.1484,
+          "rouge2_f": 0.0142,
+          "rougeL_f": 0.0919,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.104,
+              "recall": 0.2593,
+              "fmeasure": 0.1484
+            },
+            "rouge2": {
+              "precision": 0.01,
+              "recall": 0.025,
+              "fmeasure": 0.0142
+            },
+            "rougeL": {
+              "precision": 0.0644,
+              "recall": 0.1605,
+              "fmeasure": 0.0919
+            }
+          },
+          "time_s": 60.682,
+          "faithfulness": null
+        },
+        {
+          "id": "Q09",
+          "disease": "bacterial_panicle_blight",
+          "query": "Padi saya saat fase pembungaan terkena cuaca panas dan suhu malam tinggi di atas 25°C, sekarang gabah banyak yang hampa berwarna coklat-keunguan dan mengeriput, penyakit apa ini?",
+          "generated": "Baik, saya akan jelaskan cara mengatasi penyakit ini kepada Anda. Lalu kita lakukan apa hari ini.\n\n**Penyakit: Hawar Malai Bakteri (Bacterial Panicle Blight)**\n\nHawar Malai Bakteri adalah penyakit yang disebabkan oleh bakteri Burkholderia glumae, yang menyerang malai padi. Penyakit ini membuat malai...",
+          "ground_truth": "Hawar Malai Bakteri disebabkan Burkholderia glumae, infektif pada fase pembungaan (anthesis), dipicu suhu tinggi (siang 30-35°C, malam >25°C) dan kelembaban >85%. Gejala: gabah hampa berwarna coklat-keunguan, biji mengeriput, malai terinfeksi tidak terisi penuh. Penanganan: semprot kasugamycin (Kasumin 2L 1-2 ml/L) atau oxolinic acid saat primordia malai dan awal pembungaan. Pencegahan: atur waktu tanam agar pembungaan tidak bertepatan dengan puncak suhu, perlakuan benih air panas 52-54°C selama 10 menit, hindari nitrogen berlebih, irigasi malam untuk menurunkan suhu kanopi.",
+          "cosine_sim": 0.6021,
+          "rouge1_f": 0.2007,
+          "rouge2_f": 0.0279,
+          "rougeL_f": 0.1315,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1422,
+              "recall": 0.3412,
+              "fmeasure": 0.2007
+            },
+            "rouge2": {
+              "precision": 0.0197,
+              "recall": 0.0476,
+              "fmeasure": 0.0279
+            },
+            "rougeL": {
+              "precision": 0.0931,
+              "recall": 0.2235,
+              "fmeasure": 0.1315
+            }
+          },
+          "time_s": 66.62,
+          "faithfulness": null
+        },
+        {
+          "id": "Q10",
+          "disease": "leaf_smut",
+          "query": "Pada daun padi muncul bintik-bintik hitam kecil seperti titik-titik tersebar merata, tanaman tetap tumbuh normal, penyakit apa ini dan apakah perlu disemprot fungisida?",
+          "generated": "Kita temukan penyakit Gosong Palsu Daun. Ini adalah penyakit yang membuat daun padi tampak hitam kecil berbentuk oval, seperti bulat-bulat kecil. Jika kondisi cuaca lembab dan suhu sedang 20-28 derajat celcius, jamur ini akan menyebar.\n\nLangkah pertama yang harus diambil: Cuci tangan dengan sabun se...",
+          "ground_truth": "Jamur Api Daun (Leaf Smut) disebabkan jamur Entyloma oryzae. Gejala: bintik-bintik hitam kecil tersebar merata di daun, tanaman umumnya tetap tumbuh normal. Penyakit ini dikategorikan minor disease karena kehilangan hasil rata-rata <5% dan jarang menyebabkan kerugian ekonomi signifikan. Pada serangan ringan (<30% daun): cukup monitoring, perbaiki pemupukan berimbang dan jarak tanam, tidak perlu fungisida. Pada serangan parah (>30% daun): semprot mancozeb atau propiconazole 1-2 kali. Pencegahan: gunakan benih bersih bersertifikat, sanitasi sisa tanaman, hindari kelembaban berlebih.",
+          "cosine_sim": 0.5775,
+          "rouge1_f": 0.1596,
+          "rouge2_f": 0.019,
+          "rougeL_f": 0.1033,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1269,
+              "recall": 0.2152,
+              "fmeasure": 0.1596
+            },
+            "rouge2": {
+              "precision": 0.015,
+              "recall": 0.0256,
+              "fmeasure": 0.019
+            },
+            "rougeL": {
+              "precision": 0.0821,
+              "recall": 0.1392,
+              "fmeasure": 0.1033
+            }
+          },
+          "time_s": 55.112,
+          "faithfulness": null
+        },
+        {
+          "id": "Q11",
+          "disease": "downy_mildew",
+          "query": "Bibit padi di pesemaian saya kerdil, daun pucat dengan distorsi, dan ada lapisan putih halus di bawah daun, penyakit apa dan tindakannya?",
+          "generated": "Kita punya masalah baru, Embun Bulu. Ini penyakit padi yang membuat daun padi rusak dan kusam. Penyebabnya adalah Sclerophthora macrospora.\n\n**Penanganan Sekarang:**\n1. Buang tanaman padi yang terkena penyakit. Jangan biarkan mereka di dalam lahan.\n2. Pastikan air irigasi tidak menyumbat lapisan ata...",
+          "ground_truth": "Downy Mildew pada padi disebabkan jamur Sclerophthora macrospora. Gejala: tanaman kerdil, daun pucat dengan distorsi, lapisan putih halus di bawah daun (sporulasi jamur), sering muncul pada pesemaian/tanaman muda dengan kelembaban tinggi. Penanganan: cabut bibit terinfeksi sedini mungkin dan musnahkan (jangan dijadikan kompos), perbaiki drainase pesemaian, aplikasi agen hayati Trichoderma harzianum 10 g/L, bila parah semprot fungisida metalaksil. Pencegahan: gunakan benih bersertifikat, varietas tahan, jarak tanam optimal, hindari pesemaian tergenang lama.",
+          "cosine_sim": 0.5212,
+          "rouge1_f": 0.1949,
+          "rouge2_f": 0.0104,
+          "rougeL_f": 0.1128,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1545,
+              "recall": 0.2639,
+              "fmeasure": 0.1949
+            },
+            "rouge2": {
+              "precision": 0.0082,
+              "recall": 0.0141,
+              "fmeasure": 0.0104
+            },
+            "rougeL": {
+              "precision": 0.0894,
+              "recall": 0.1528,
+              "fmeasure": 0.1128
+            }
+          },
+          "time_s": 46.467,
+          "faithfulness": null
+        },
+        {
+          "id": "Q12",
+          "disease": "healthy",
+          "query": "Tanaman padi saya umur 45 HST, anakan produktif banyak, daun hijau sehat, tidak ada gejala penyakit, langkah perawatan rutin apa yang harus dilakukan agar tetap sehat hingga panen?",
+          "generated": "Berikut solusinya:\n\n1. Penjelasan singkat tentang penyakit ini:\nHispa padi adalah penyakit yang disebabkan oleh serangga kumbang hispa. Kumbangnya gemar menyerang daun muda tanaman padi dan menggores permukaannya membentuk coreng putih.\n\n2. Langkah penanganan sekarang:\nJika sudah ada gejala, petani ...",
+          "ground_truth": "Tanaman sehat membutuhkan perawatan rutin berbasis PHT (Pengendalian Hama Terpadu) dan GAP (Good Agricultural Practice). Langkah rutin: (1) monitoring hama-penyakit mingguan dengan pengamatan visual + light trap, (2) pemupukan susulan sesuai fase (anakan aktif: N+K; primordia: P+K), (3) pengairan berselang (AWD) untuk efisiensi air dan menekan penyakit, (4) penyiangan gulma dengan landak atau herbisida selektif, (5) konservasi musuh alami (laba-laba, Cyrtorhinus, Trichogramma) dengan menghindari insektisida spektrum luas, (6) aplikasi pestisida selektif hanya bila ambang ekonomi terlampaui. Pemantauan dini gejala sangat penting untuk pencegahan.",
+          "cosine_sim": 0.6667,
+          "rouge1_f": 0.1308,
+          "rouge2_f": 0.0,
+          "rougeL_f": 0.0769,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.0977,
+              "recall": 0.1977,
+              "fmeasure": 0.1308
+            },
+            "rouge2": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "fmeasure": 0.0
+            },
+            "rougeL": {
+              "precision": 0.0575,
+              "recall": 0.1163,
+              "fmeasure": 0.0769
+            }
+          },
+          "time_s": 53.941,
+          "faithfulness": null
+        },
+        {
+          "id": "Q13",
+          "disease": "bacterial_leaf_streak",
+          "query": "Daun padi saya muncul lesi garis-garis sempit memanjang di antara tulang daun warna kuning kecoklatan dengan butiran eksudat kuning di sepanjang lesi, beda dari hawar daun bakteri biasa, penyakit apa ini?",
+          "generated": "Baik, mari kita bahas soalnya bersama.\n\n### Penyakit: Hawar Daun Bergaris Bakteri (Bacterial Leaf Streak)\n\n**Gejala:**\n- Gejala seperti luka berwarna coklat atau abu-abu di antara tulang daun. Daun bagian bawah terlebih dulu mengalami, kemudian menyebar ke atas.\n- Mungkin ada eksudat yang berwarna k...",
+          "ground_truth": "Bacterial Leaf Streak (BLS) disebabkan Xanthomonas oryzae pv. oryzicola — berbeda patovar dari HDB (X. o. pv. oryzae). Gejala khas: lesi sempit GARIS-GARIS di antara tulang daun (interveinal), panjang 1-30 cm, warna hijau gelap berubah menjadi kuning lalu coklat, dengan butiran eksudat kekuningan kecil di sepanjang lesi. Berbeda dari HDB yang membentuk hawar lebar dari ujung/tepi daun. Penanganan: semprot bismerthiazol (Xanthocide 20 WP 2 g/L) atau Cupravit OB 21 (2-3 g/L), kurangi nitrogen, perbaiki drainase. Pencegahan: rotasi tanaman, sanitasi alat dan benih, jarak tanam optimal untuk sirkulasi udara, gunakan varietas tahan.",
+          "cosine_sim": 0.7041,
+          "rouge1_f": 0.1957,
+          "rouge2_f": 0.0365,
+          "rougeL_f": 0.1377,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.15,
+              "recall": 0.2812,
+              "fmeasure": 0.1957
+            },
+            "rouge2": {
+              "precision": 0.0279,
+              "recall": 0.0526,
+              "fmeasure": 0.0365
+            },
+            "rougeL": {
+              "precision": 0.1056,
+              "recall": 0.1979,
+              "fmeasure": 0.1377
+            }
+          },
+          "time_s": 65.062,
+          "faithfulness": null
+        },
+        {
+          "id": "Q14",
+          "disease": "harvest_stage",
+          "query": "Padi saya sudah menunduk dan 90% gabah berwarna kuning keemasan, tapi cuaca terus hujan beberapa hari ke depan, kapan dan bagaimana cara panen yang aman?",
+          "generated": "Untuk menjawab pertanyaannya, mari kita urutkan langkah-langkahnya:\n\n1. Konfirmasi Apakah Tanaman Siap Dipanen:\n   - Petani harus lihat kondisi daunnya. Daun padi yang sehat berwarna hijau segar dan tidak ada bercak-bercak atau lesi.\n   - Batang tanamnya juga kokoh, tegak, tidak mudah rebah.\n\n2. Per...",
+          "ground_truth": "Padi siap panen ditandai malai merunduk + 80-90% gabah keemasan + gabah pangkal-tengah keras. Bila cuaca hujan terus, ada risiko rebah, beras pecah, dan tumbuhnya gabah di malai. Tindakan: bila prediksi hujan masih lama, panen segera meski sedikit lewat optimal (lebih baik daripada hasil rusak). Panen pagi setelah embun hilang. Pengeringan pasca panen: jangan jemur langsung di terik penuh karena beras pecah. Hamparkan 5-7 cm di lantai jemur, balik tiap 30-60 menit, target kadar air 14%. Atau gunakan flat-bed dryer suhu udara 40-43°C, laju penurunan kadar air <1%/jam. Setelah kering, dinginkan ke suhu ruang sebelum disimpan.",
+          "cosine_sim": 0.6282,
+          "rouge1_f": 0.1933,
+          "rouge2_f": 0.0134,
+          "rougeL_f": 0.0933,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1465,
+              "recall": 0.2843,
+              "fmeasure": 0.1933
+            },
+            "rouge2": {
+              "precision": 0.0102,
+              "recall": 0.0198,
+              "fmeasure": 0.0134
+            },
+            "rougeL": {
+              "precision": 0.0707,
+              "recall": 0.1373,
+              "fmeasure": 0.0933
+            }
+          },
+          "time_s": 63.718,
+          "faithfulness": null
+        },
+        {
+          "id": "Q15",
+          "disease": "leaf_blast",
+          "query": "Bercak belah ketupat di daun padi yang awalnya kecil sekarang sudah menyatu menjadi besar dan daun banyak yang mengering, serangan sudah berat, apa tindakan darurat?",
+          "generated": "Ya, mari kita bahas soalnya. Penyakit yang saya bicarakan disebut Blas Daun. Ini adalah penyakit yang ditularkan oleh jamur Pyricularia oryzae ke tanaman padi saat umurnya 1-4 hari.\n\nGejala dari Blas Daun:\n1. Daun akan berubah warna, mulai hijau kusam hingga abu-abu.\n2. Ada lesi atau bekas luka berb...",
+          "ground_truth": "Serangan berat Blas Daun (Pyricularia oryzae) dengan lesi menyatu dan daun mengering. Tindakan darurat 24-48 jam: (1) Semprot fungisida sistemik tricyclazole (Beam 75 WP 0.5-1 g/L) atau isoprothiolane (Fuji-One 40 EC), dapat diulang 7-10 hari kemudian. (2) Hentikan total pupuk nitrogen, tambahkan kalium (KCl 50-75 kg/ha) dan silika untuk memperkuat dinding sel daun. (3) Buang daun terparah dan musnahkan (jangan dijadikan mulsa). (4) Perbaiki sirkulasi udara dengan penyiangan gulma. Pencegahan jangka panjang: varietas tahan (Inpari 13, 19), pemupukan berimbang, jajar legowo 2:1 atau 4:1.",
+          "cosine_sim": 0.5638,
+          "rouge1_f": 0.1836,
+          "rouge2_f": 0.0132,
+          "rougeL_f": 0.1049,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1327,
+              "recall": 0.2979,
+              "fmeasure": 0.1836
+            },
+            "rouge2": {
+              "precision": 0.0095,
+              "recall": 0.0215,
+              "fmeasure": 0.0132
+            },
+            "rougeL": {
+              "precision": 0.0758,
+              "recall": 0.1702,
+              "fmeasure": 0.1049
+            }
+          },
+          "time_s": 40.074,
+          "faithfulness": null
+        },
+        {
+          "id": "Q16",
+          "disease": "sheath_blight",
+          "query": "Saya menanam padi dengan jarak rapat 20x20 cm dan kelembaban kanopi sangat tinggi, sekarang banyak bercak oval abu-abu di pelepah daun bawah, penyakit apa dan solusi strukturalnya?",
+          "generated": "Oke, mari kita bicara tentang Blas Daun ini. Ini adalah penyakit yang disebabkan oleh jamur Pyricularia oryzae. Biasanya muncul saat tanaman berumur 1-4 hari setelah tanam.\n\n**Gejala Penyakit:**\nLesi berbentuk belah ketupat atau jarum di bagian atas dan bawah daun, dengan warna putih pada pusat lesi...",
+          "ground_truth": "Busuk Pelepah (Rhizoctonia solani) yang dipicu tanam rapat dan kelembaban kanopi tinggi. Gejala: lesi oval abu-abu pada pelepah, berkembang ke atas hingga daun. Tindakan: semprot validamycin (Validacin 3L 1-2 ml/L) ke pangkal tanaman, kurangi nitrogen, terapkan irigasi berselang (AWD). Solusi struktural untuk musim tanam berikut: gunakan jajar legowo 2:1 (25x25 cm dengan lorong 50 cm) atau 4:1 untuk sirkulasi udara lebih baik, gunakan varietas tahan (Inpari 30, 33), sanitasi sklerotia saat pengolahan tanah.",
+          "cosine_sim": 0.5728,
+          "rouge1_f": 0.1333,
+          "rouge2_f": 0.0,
+          "rougeL_f": 0.0941,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.096,
+              "recall": 0.2179,
+              "fmeasure": 0.1333
+            },
+            "rouge2": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "fmeasure": 0.0
+            },
+            "rougeL": {
+              "precision": 0.0678,
+              "recall": 0.1538,
+              "fmeasure": 0.0941
+            }
+          },
+          "time_s": 34.283,
+          "faithfulness": null
+        },
+        {
+          "id": "Q17",
+          "disease": "tungro",
+          "query": "Sawah tetangga saya sudah terkena tungro dengan tanaman kerdil kuning-oranye, pertanaman padi saya bersebelahan dan belum bergejala, apa langkah pencegahan agar tidak tertular?",
+          "generated": "Berdasarkan informasi yang kamu berikan, penyakit yang kita hadapi adalah Blas Daun pada padi. Ini disebabkan oleh jamur Pyricularia oryzae atau Magnaporthe oryzae.\n\n### Penjelasan Singkat\nBlas Daun membuat daun tampak terbakar dan mengering dari bagian atas hingga bawah. Lesi berbentuk seperti cinc...",
+          "ground_truth": "Tungro menular cepat melalui vektor wereng hijau (Nephotettix virescens). Pencegahan pada lahan bersebelahan dengan area terinfeksi: (1) Monitoring populasi wereng hijau intensif (light trap + pengamatan visual setiap 3 hari), bila >2 ekor/rumpun semprot insektisida selektif buprofezin atau pymetrozine. (2) Pasang penghalang vegetasi (tanaman penjebak seperti jagung) di pinggir sawah. (3) Cabut tanaman bergejala sedini mungkin. (4) Konservasi musuh alami (laba-laba, Cyrtorhinus). Pencegahan struktural: tanam serempak satu hamparan, varietas tahan tungro (Tukad Petanu, Tukad Balian, Inpari 7/9), rotasi dengan palawija pasca panen.",
+          "cosine_sim": 0.6448,
+          "rouge1_f": 0.1063,
+          "rouge2_f": 0.0,
+          "rougeL_f": 0.075,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.072,
+              "recall": 0.2024,
+              "fmeasure": 0.1063
+            },
+            "rouge2": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "fmeasure": 0.0
+            },
+            "rougeL": {
+              "precision": 0.0508,
+              "recall": 0.1429,
+              "fmeasure": 0.075
+            }
+          },
+          "time_s": 42.739,
+          "faithfulness": null
+        },
+        {
+          "id": "Q18",
+          "disease": "harvest_stage",
+          "query": "Padi saya malai sudah menunduk dan sebagian besar gabah kuning, tapi gabah bagian ujung malai masih lunak belum keras saat ditekan kuku, sebaiknya saya tunggu atau langsung panen?",
+          "generated": "Baik, saya akan membantu kamu menjaga tanaman padi berikut beberapa langkah penting. Kita mulai dari tahap panen:\n\n1. Konfirmasi apakah tanaman sudah siap dipanen: Tanaman yang sehat dan siap dipanen biasanya memiliki daun hijau segar, batang kokoh, tidak ada serangan hama atau penyakit seperti Hisp...",
+          "ground_truth": "Padi siap panen optimal saat 80-90% gabah keras (gabah pangkal-tengah-ujung keras saat ditekan kuku). Gabah ujung yang masih lunak menandakan belum mencapai matang fisiologis penuh — bila dipanen sekarang, hasil giling akan banyak gabah hampa/menir dari ujung malai (penurunan rendemen). Rekomendasi: tunggu 3-7 hari lagi hingga gabah ujung keras, dengan syarat: (1) tanaman tidak rebah, (2) tidak ada hujan panjang yang membahayakan, (3) hama burung/tikus terkendali. Bila cuaca hujan datang sebelum gabah ujung matang, panen segera lalu lakukan pengeringan bertahap. Indikator tambahan kematangan: malai merunduk 30-45°, daun bendera kuning 60-80%, umur sesuai deskripsi varietas (110-140 HST).",
+          "cosine_sim": 0.6701,
+          "rouge1_f": 0.1538,
+          "rouge2_f": 0.0053,
+          "rougeL_f": 0.0637,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1062,
+              "recall": 0.2788,
+              "fmeasure": 0.1538
+            },
+            "rouge2": {
+              "precision": 0.0037,
+              "recall": 0.0097,
+              "fmeasure": 0.0053
+            },
+            "rougeL": {
+              "precision": 0.044,
+              "recall": 0.1154,
+              "fmeasure": 0.0637
+            }
+          },
+          "time_s": 47.288,
+          "faithfulness": null
+        }
+      ],
+      "n_queries": 18,
+      "k_used": 3
+    },
+    "Gemini — gemini-2.5-flash (MEDIUM)": {
+      "llm": "Gemini — gemini-2.5-flash (MEDIUM)",
+      "avg_cosine_similarity": 0.4403,
+      "avg_rouge1_f": 0.0944,
+      "avg_rouge2_f": 0.0156,
+      "avg_rougeL_f": 0.0691,
+      "avg_generation_time_s": 87.837,
+      "faithfulness_note": "Diisi manual annotator (0=tidak akurat, 0.5=sebagian, 1=sangat akurat)",
+      "per_query": [
+        {
+          "id": "Q01",
+          "disease": "bacterial_leaf_blight",
+          "query": "Daun padi saya menguning mulai dari ujung dan tepi, lalu muncul eksudat kekuningan di pagi hari saat musim hujan, penyakit apa dan bagaimana penanganannya?",
+          "generated": "Baik, Pak/Bu Tani! Mari kita bahas penyakit Hawar Daun Bakteri yang terdeteksi di sawah Anda.\n\n### 1. Penjelasan Singkat Penyak",
+          "ground_truth": "Hawar Daun Bakteri (HDB) disebabkan Xanthomonas oryzae pv. oryzae, berkembang pesat pada suhu 25-35°C dan kelembaban >85% (umum di musim hujan). Gejala khas: daun menguning dari ujung dan tepi, eksudat kekuningan di pagi hari yang lembab. Penanganan: semprot bakterisida tembaga (Kocide 77 WP 2-3 g/L) atau Cupravit OB 21, kurangi pupuk nitrogen, perbaiki drainase sawah. Pencegahan: varietas tahan (Ciherang, Mekongga, IR64, Inpari 32 dengan gen Xa4/Xa7), tanam serempak, jajar legowo 25x25 cm, perlakuan benih air panas 52-54°C selama 10 menit.",
+          "cosine_sim": 0.4265,
+          "rouge1_f": 0.1121,
+          "rouge2_f": 0.0381,
+          "rougeL_f": 0.0935,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.3,
+              "recall": 0.069,
+              "fmeasure": 0.1121
+            },
+            "rouge2": {
+              "precision": 0.1053,
+              "recall": 0.0233,
+              "fmeasure": 0.0381
+            },
+            "rougeL": {
+              "precision": 0.25,
+              "recall": 0.0575,
+              "fmeasure": 0.0935
+            }
+          },
+          "time_s": 92.161,
+          "faithfulness": null
+        },
+        {
+          "id": "Q02",
+          "disease": "leaf_blast",
+          "query": "Saya baru memupuk urea dengan dosis tinggi, beberapa hari kemudian muncul bercak abu-abu kecil di daun, apa risiko dan tindakan yang harus dilakukan?",
+          "generated": "Baik Pak/Bu Tani, mari kita langsung tangani masalah padi kita.\n\nKamera AI kita mendeteksi penyakit **Blas Daun**.\n\n1.  **Penjelasan Singkat Pen",
+          "ground_truth": "Gejala mengarah ke Blas Daun (Pyricularia oryzae) yang dipicu nitrogen berlebih membuat jaringan daun sukulen dan rentan infeksi jamur. Tindakan segera: hentikan pupuk nitrogen tambahan, semprot fungisida tricyclazole (Beam 75 WP 0.5-1 g/L) atau isoprothiolane (Fuji-One 40 EC). Tambahkan pupuk kalium (KCl 50-75 kg/ha) dan silika untuk memperkuat dinding sel daun. Pencegahan: dosis N ideal 90-120 kg N/ha dibagi 3 aplikasi (dasar 40%, anakan aktif 30%, primordia 30%), gunakan varietas tahan (Inpari 13, 19).",
+          "cosine_sim": 0.3615,
+          "rouge1_f": 0.0577,
+          "rouge2_f": 0.0196,
+          "rougeL_f": 0.0577,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1364,
+              "recall": 0.0366,
+              "fmeasure": 0.0577
+            },
+            "rouge2": {
+              "precision": 0.0476,
+              "recall": 0.0123,
+              "fmeasure": 0.0196
+            },
+            "rougeL": {
+              "precision": 0.1364,
+              "recall": 0.0366,
+              "fmeasure": 0.0577
+            }
+          },
+          "time_s": 113.563,
+          "faithfulness": null
+        },
+        {
+          "id": "Q03",
+          "disease": "neck_blast",
+          "query": "Padi saya hampir memasuki fase pembungaan, di sekitar sawah sudah ada laporan blas daun, apa langkah pencegahan blas leher malai yang tepat?",
+          "generated": "Baik, Pak/Bu Tani! Mari kita bahas penyakit Blas Leher Malai yang terdeteksi pada padi Bapak/Ibu.\n\n1.  **Penjelasan Singkat Penyakit Blas",
+          "ground_truth": "Blas Leher Malai (Pyricularia oryzae) menyerang pangkal malai saat heading dan menyebabkan gabah hampa total. Pencegahan preventif yang paling efektif: semprot fungisida 2 kali — (1) saat primordia malai (booting, ~7-10 hari sebelum keluar malai), dan (2) saat heading 50% (malai keluar 50%). Gunakan tricyclazole (Beam 75 WP 0.5-1 g/L) atau isoprothiolane. Hentikan pupuk nitrogen menjelang heading. Pencegahan struktural: gunakan varietas tahan blas (Inpari 13, 19) dan hindari nitrogen berlebih sejak fase vegetatif.",
+          "cosine_sim": 0.4422,
+          "rouge1_f": 0.1224,
+          "rouge2_f": 0.0417,
+          "rougeL_f": 0.1224,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.2727,
+              "recall": 0.0789,
+              "fmeasure": 0.1224
+            },
+            "rouge2": {
+              "precision": 0.0952,
+              "recall": 0.0267,
+              "fmeasure": 0.0417
+            },
+            "rougeL": {
+              "precision": 0.2727,
+              "recall": 0.0789,
+              "fmeasure": 0.1224
+            }
+          },
+          "time_s": 92.173,
+          "faithfulness": null
+        },
+        {
+          "id": "Q04",
+          "disease": "sheath_blight",
+          "query": "Sawah saya tergenang air dalam waktu lama, tanam padi rapat, sekarang muncul bercak oval abu-abu di pelepah daun bawah dekat permukaan air, penyakit apa ini?",
+          "generated": "Baik, Pak/Bu Tani! Kamera AI mendeteksi ada penyakit **Busuk Pelepah** di tanaman padi Bapak/Ibu.\n\nMohon maaf, informasi detail tentang penyakit Busuk",
+          "ground_truth": "Busuk Pelepah disebabkan jamur Rhizoctonia solani yang berkembang pada kondisi tergenang terus-menerus, tanam rapat, dan kelembaban kanopi tinggi. Gejala: lesi oval abu-abu pada pelepah daun dekat permukaan air, lalu menyebar ke atas hingga daun. Penanganan: terapkan irigasi berselang (AWD — genangi 5-7 hari, biarkan kering hingga retak ringan, genangi lagi), semprot validamycin (Validacin 3L 1-2 ml/L) ke pangkal tanaman, kurangi nitrogen. Pencegahan: jajar legowo 2:1 atau 4:1 untuk sirkulasi udara, hancurkan sklerotia saat pengolahan tanah, gunakan varietas tahan (Inpari 30, 33).",
+          "cosine_sim": 0.3631,
+          "rouge1_f": 0.0545,
+          "rouge2_f": 0.0185,
+          "rougeL_f": 0.0545,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1304,
+              "recall": 0.0345,
+              "fmeasure": 0.0545
+            },
+            "rouge2": {
+              "precision": 0.0455,
+              "recall": 0.0116,
+              "fmeasure": 0.0185
+            },
+            "rougeL": {
+              "precision": 0.1304,
+              "recall": 0.0345,
+              "fmeasure": 0.0545
+            }
+          },
+          "time_s": 93.042,
+          "faithfulness": null
+        },
+        {
+          "id": "Q05",
+          "disease": "tungro",
+          "query": "Di pertanaman padi saya mulai muncul beberapa rumpun yang agak kerdil dengan daun atas sedikit pucat menguning, ditemukan wereng hijau dalam jumlah sedang, apa yang harus dilakukan?",
+          "generated": "Halo Pak/Bu Petani,\n\nBerdasarkan hasil deteksi kamera AI, tanaman padi Bapak/Ibu terdeteksi penyakit **Tungro**.\n\nNamun, mohon maaf, informasi mengenai penyakit **Tungro** tidak tersedia dalam basis data pengetahuan yang saya miliki saat ini. Oleh karena itu, saya tidak bisa memberikan penjelasan de...",
+          "ground_truth": "Gejala mengarah ke Tungro (virus RTBV + RTSV) yang ditularkan wereng hijau (Nephotettix virescens). Tidak ada obat langsung untuk virus, pengendalian fokus pada vektor. Tindakan: (1) cabut dan musnahkan rumpun bergejala sedini mungkin, (2) kendalikan vektor wereng hijau dengan insektisida selektif buprofezin atau pymetrozine (hindari organofosfat yang membunuh musuh alami), (3) monitor populasi mingguan dengan light trap. Pencegahan: gunakan varietas tahan tungro (Tukad Petanu, Tukad Balian, Inpari 7/9), tanam serempak satu hamparan, konservasi musuh alami (laba-laba, Cyrtorhinus lividipennis).",
+          "cosine_sim": 0.5366,
+          "rouge1_f": 0.1061,
+          "rouge2_f": 0.0076,
+          "rougeL_f": 0.0833,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.0757,
+              "recall": 0.1772,
+              "fmeasure": 0.1061
+            },
+            "rouge2": {
+              "precision": 0.0054,
+              "recall": 0.0128,
+              "fmeasure": 0.0076
+            },
+            "rougeL": {
+              "precision": 0.0595,
+              "recall": 0.1392,
+              "fmeasure": 0.0833
+            }
+          },
+          "time_s": 90.831,
+          "faithfulness": null
+        },
+        {
+          "id": "Q06",
+          "disease": "brown_spot",
+          "query": "Lahan saya kekurangan pupuk kalium, tanaman padi mulai banyak bercak oval coklat dengan pusat keabu-abuan di daun bawah, apa penyebab dan solusinya?",
+          "generated": "Halo Pak/Bu Petani! Jangan khawatir, kita akan tangani penyakit Bercak Coklat ini.\n\nBerikut penjelasannya:\n\n1.  **Penjelasan Singkat Penyakit",
+          "ground_truth": "Bercak Coklat disebabkan jamur Cochliobolus miyabeanus, dikenal sebagai 'penyakit kelaparan' karena sangat terkait defisiensi hara terutama kalium (K) dan silika (Si). Gejala: bercak oval coklat dengan pusat abu-abu/putih, sering muncul pada lahan defisiensi K. Penanganan: tambahkan KCl 50-75 kg/ha dan pupuk silikat (terak baja atau abu sekam) 200-500 kg/ha, semprot fungisida mancozeb (Dithane M-45 2 g/L) atau propiconazole. Pencegahan: pemupukan berimbang N:P:K + organik, rotasi tanaman, tambahkan kompos atau abu sekam untuk memperbaiki struktur tanah.",
+          "cosine_sim": 0.3719,
+          "rouge1_f": 0.0583,
+          "rouge2_f": 0.0198,
+          "rougeL_f": 0.0583,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1579,
+              "recall": 0.0357,
+              "fmeasure": 0.0583
+            },
+            "rouge2": {
+              "precision": 0.0556,
+              "recall": 0.012,
+              "fmeasure": 0.0198
+            },
+            "rougeL": {
+              "precision": 0.1579,
+              "recall": 0.0357,
+              "fmeasure": 0.0583
+            }
+          },
+          "time_s": 90.52,
+          "faithfulness": null
+        },
+        {
+          "id": "Q07",
+          "disease": "dead_heart",
+          "query": "Padi saya umur 30 HST, banyak ngengat berwarna putih di sawah dan mulai ada beberapa anakan muda yang pucuknya mati dan bisa dicabut dengan mudah, hama apa ini?",
+          "generated": "Halo Pak/Bu Petani,\n\nKamera AI mendeteksi tanaman padi Bapak/Ibu terserang **Batang Mati (Sundep)**. Jangan khawatir, mari kita atasi bersama!\n\n---\n\n1.  **Penjelasan Singkat Penyakit Ini:**\n    *   **Gejala:** Tanaman Bapak/Ibu menunjukkan pucuk atau tunas muda yang mati, warnanya kuning kecoklatan,...",
+          "ground_truth": "Gejala dead heart (sundep) disebabkan larva penggerek batang. Ngengat berwarna putih mengindikasikan Penggerek Batang Putih (Scirpophaga innotata), umum di lahan tadah hujan dan kering. Penanganan: pasang lampu perangkap untuk ngengat dewasa, lepaskan parasitoid telur Trichogramma japonicum 2-3 kali dengan interval 1 minggu, bila serangan >5% anakan terinfeksi semprot insektisida berbahan aktif fipronil, karbofuran, atau klorantraniliprol sesuai dosis label. Pencegahan: tanam serempak, varietas tahan, konservasi musuh alami, sanitasi sisa jerami pasca panen, rotasi tanaman.",
+          "cosine_sim": 0.5498,
+          "rouge1_f": 0.1382,
+          "rouge2_f": 0.0082,
+          "rougeL_f": 0.0732,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.0988,
+              "recall": 0.2297,
+              "fmeasure": 0.1382
+            },
+            "rouge2": {
+              "precision": 0.0058,
+              "recall": 0.0137,
+              "fmeasure": 0.0082
+            },
+            "rougeL": {
+              "precision": 0.0523,
+              "recall": 0.1216,
+              "fmeasure": 0.0732
+            }
+          },
+          "time_s": 91.296,
+          "faithfulness": null
+        },
+        {
+          "id": "Q08",
+          "disease": "hispa",
+          "query": "Ditemukan kumbang kecil berduri hitam keunguan di daun padi, lalu muncul goresan putih horizontal sejajar tulang daun disertai lubang-lubang kecil pada daun, hama apa ini dan kapan perlu disemprot?",
+          "generated": "Halo Pak/Bu Petani,\n\nJangan khawatir, mari kita lihat apa yang bisa kita lakukan untuk tanaman padi Bapak/Ibu. Kamera AI mendeteksi adanya **Hispa Padi**.\n\nBerikut penjelasannya:\n\n1.  **Penjelasan Singkat Penyakit Hispa Padi:**\n    *   **Penyebab:** Penyakit ini disebabkan oleh serangan serangga kec...",
+          "ground_truth": "Kumbang Hispa (Dicladispa armigera) menyerang daun padi: kumbang dewasa membuat lubang/goresan, larva di dalam jaringan daun membuat goresan putih horizontal khas (mining) sejajar tulang daun. Ambang ekonomi untuk aplikasi insektisida: 1 ekor kumbang dewasa atau 1-2 larva per rumpun, atau kerusakan daun >25% pada fase vegetatif. Bila di bawah ambang: pengendalian mekanis dengan memotong ujung daun terinfeksi (3-5 cm) lalu dimusnahkan. Bila terlampaui: semprot insektisida fipronil, karbofuran, atau klorantraniliprol sesuai dosis label. Konservasi parasitoid Tetrastichus dan laba-laba.",
+          "cosine_sim": 0.5826,
+          "rouge1_f": 0.2292,
+          "rouge2_f": 0.0239,
+          "rougeL_f": 0.1265,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1686,
+              "recall": 0.358,
+              "fmeasure": 0.2292
+            },
+            "rouge2": {
+              "precision": 0.0175,
+              "recall": 0.0375,
+              "fmeasure": 0.0239
+            },
+            "rougeL": {
+              "precision": 0.093,
+              "recall": 0.1975,
+              "fmeasure": 0.1265
+            }
+          },
+          "time_s": 91.002,
+          "faithfulness": null
+        },
+        {
+          "id": "Q09",
+          "disease": "bacterial_panicle_blight",
+          "query": "Padi saya saat fase pembungaan terkena cuaca panas dan suhu malam tinggi di atas 25°C, sekarang gabah banyak yang hampa berwarna coklat-keunguan dan mengeriput, penyakit apa ini?",
+          "generated": "Halo Pak/Bu Petani!\n\nSaya bantu jelaskan tentang penyakit Hawar Malai Bakteri yang terdeteksi di sawah Bapak/Ibu, dan apa yang bisa kita lakukan.\n\n---",
+          "ground_truth": "Hawar Malai Bakteri disebabkan Burkholderia glumae, infektif pada fase pembungaan (anthesis), dipicu suhu tinggi (siang 30-35°C, malam >25°C) dan kelembaban >85%. Gejala: gabah hampa berwarna coklat-keunguan, biji mengeriput, malai terinfeksi tidak terisi penuh. Penanganan: semprot kasugamycin (Kasumin 2L 1-2 ml/L) atau oxolinic acid saat primordia malai dan awal pembungaan. Pencegahan: atur waktu tanam agar pembungaan tidak bertepatan dengan puncak suhu, perlakuan benih air panas 52-54°C selama 10 menit, hindari nitrogen berlebih, irigasi malam untuk menurunkan suhu kanopi.",
+          "cosine_sim": 0.3461,
+          "rouge1_f": 0.0734,
+          "rouge2_f": 0.0374,
+          "rougeL_f": 0.0734,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1667,
+              "recall": 0.0471,
+              "fmeasure": 0.0734
+            },
+            "rouge2": {
+              "precision": 0.087,
+              "recall": 0.0238,
+              "fmeasure": 0.0374
+            },
+            "rougeL": {
+              "precision": 0.1667,
+              "recall": 0.0471,
+              "fmeasure": 0.0734
+            }
+          },
+          "time_s": 91.36,
+          "faithfulness": null
+        },
+        {
+          "id": "Q10",
+          "disease": "leaf_smut",
+          "query": "Pada daun padi muncul bintik-bintik hitam kecil seperti titik-titik tersebar merata, tanaman tetap tumbuh normal, penyakit apa ini dan apakah perlu disemprot fungisida?",
+          "generated": "Baik Pak/Bu Tani, mari kita langsung tangani masalah Gosong Palsu Daun ini.\n\n---\n\n**1. Penjelasan Singkat Penyakit Ini:**\n\nP",
+          "ground_truth": "Jamur Api Daun (Leaf Smut) disebabkan jamur Entyloma oryzae. Gejala: bintik-bintik hitam kecil tersebar merata di daun, tanaman umumnya tetap tumbuh normal. Penyakit ini dikategorikan minor disease karena kehilangan hasil rata-rata <5% dan jarang menyebabkan kerugian ekonomi signifikan. Pada serangan ringan (<30% daun): cukup monitoring, perbaiki pemupukan berimbang dan jarak tanam, tidak perlu fungisida. Pada serangan parah (>30% daun): semprot mancozeb atau propiconazole 1-2 kali. Pencegahan: gunakan benih bersih bersertifikat, sanitasi sisa tanaman, hindari kelembaban berlebih.",
+          "cosine_sim": 0.4923,
+          "rouge1_f": 0.0816,
+          "rouge2_f": 0.0208,
+          "rougeL_f": 0.0612,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.2105,
+              "recall": 0.0506,
+              "fmeasure": 0.0816
+            },
+            "rouge2": {
+              "precision": 0.0556,
+              "recall": 0.0128,
+              "fmeasure": 0.0208
+            },
+            "rougeL": {
+              "precision": 0.1579,
+              "recall": 0.038,
+              "fmeasure": 0.0612
+            }
+          },
+          "time_s": 91.605,
+          "faithfulness": null
+        },
+        {
+          "id": "Q11",
+          "disease": "downy_mildew",
+          "query": "Bibit padi di pesemaian saya kerdil, daun pucat dengan distorsi, dan ada lapisan putih halus di bawah daun, penyakit apa dan tindakannya?",
+          "generated": "Baik, Pak/Bu Tani! Mari kita bahas penyakit Embun Bulu yang terdeteksi di sawah.\n\n1.  **Penjelasan Singkat Penyakit Embun Bul",
+          "ground_truth": "Downy Mildew pada padi disebabkan jamur Sclerophthora macrospora. Gejala: tanaman kerdil, daun pucat dengan distorsi, lapisan putih halus di bawah daun (sporulasi jamur), sering muncul pada pesemaian/tanaman muda dengan kelembaban tinggi. Penanganan: cabut bibit terinfeksi sedini mungkin dan musnahkan (jangan dijadikan kompos), perbaiki drainase pesemaian, aplikasi agen hayati Trichoderma harzianum 10 g/L, bila parah semprot fungisida metalaksil. Pencegahan: gunakan benih bersertifikat, varietas tahan, jarak tanam optimal, hindari pesemaian tergenang lama.",
+          "cosine_sim": 0.3562,
+          "rouge1_f": 0.0217,
+          "rouge2_f": 0.0,
+          "rougeL_f": 0.0217,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.05,
+              "recall": 0.0139,
+              "fmeasure": 0.0217
+            },
+            "rouge2": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "fmeasure": 0.0
+            },
+            "rougeL": {
+              "precision": 0.05,
+              "recall": 0.0139,
+              "fmeasure": 0.0217
+            }
+          },
+          "time_s": 92.07,
+          "faithfulness": null
+        },
+        {
+          "id": "Q12",
+          "disease": "healthy",
+          "query": "Tanaman padi saya umur 45 HST, anakan produktif banyak, daun hijau sehat, tidak ada gejala penyakit, langkah perawatan rutin apa yang harus dilakukan agar tetap sehat hingga panen?",
+          "generated": "Selamat siang, Bapak/Ibu Petani!\n\nKamera AI mendeteksi kondisi padi Anda adalah **Tanaman Sehat**. Ini kabar yang sangat baik, Pak/Bu! Padi Anda dalam kondisi prima.\n\nBerikut penjelasannya:",
+          "ground_truth": "Tanaman sehat membutuhkan perawatan rutin berbasis PHT (Pengendalian Hama Terpadu) dan GAP (Good Agricultural Practice). Langkah rutin: (1) monitoring hama-penyakit mingguan dengan pengamatan visual + light trap, (2) pemupukan susulan sesuai fase (anakan aktif: N+K; primordia: P+K), (3) pengairan berselang (AWD) untuk efisiensi air dan menekan penyakit, (4) penyiangan gulma dengan landak atau herbisida selektif, (5) konservasi musuh alami (laba-laba, Cyrtorhinus, Trichogramma) dengan menghindari insektisida spektrum luas, (6) aplikasi pestisida selektif hanya bila ambang ekonomi terlampaui. Pemantauan dini gejala sangat penting untuk pencegahan.",
+          "cosine_sim": 0.4525,
+          "rouge1_f": 0.0526,
+          "rouge2_f": 0.0179,
+          "rougeL_f": 0.0526,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1071,
+              "recall": 0.0349,
+              "fmeasure": 0.0526
+            },
+            "rouge2": {
+              "precision": 0.037,
+              "recall": 0.0118,
+              "fmeasure": 0.0179
+            },
+            "rougeL": {
+              "precision": 0.1071,
+              "recall": 0.0349,
+              "fmeasure": 0.0526
+            }
+          },
+          "time_s": 91.302,
+          "faithfulness": null
+        },
+        {
+          "id": "Q13",
+          "disease": "bacterial_leaf_streak",
+          "query": "Daun padi saya muncul lesi garis-garis sempit memanjang di antara tulang daun warna kuning kecoklatan dengan butiran eksudat kuning di sepanjang lesi, beda dari hawar daun bakteri biasa, penyakit apa ini?",
+          "generated": "Halo Pak/Bu Petani!\n\nKamera AI kita mendeteksi ada penyakit **Hawar Daun Bergaris Bakteri** di padi Bapak/Ibu. Jangan khawatir, mari kita",
+          "ground_truth": "Bacterial Leaf Streak (BLS) disebabkan Xanthomonas oryzae pv. oryzicola — berbeda patovar dari HDB (X. o. pv. oryzae). Gejala khas: lesi sempit GARIS-GARIS di antara tulang daun (interveinal), panjang 1-30 cm, warna hijau gelap berubah menjadi kuning lalu coklat, dengan butiran eksudat kekuningan kecil di sepanjang lesi. Berbeda dari HDB yang membentuk hawar lebar dari ujung/tepi daun. Penanganan: semprot bismerthiazol (Xanthocide 20 WP 2 g/L) atau Cupravit OB 21 (2-3 g/L), kurangi nitrogen, perbaiki drainase. Pencegahan: rotasi tanaman, sanitasi alat dan benih, jarak tanam optimal untuk sirkulasi udara, gunakan varietas tahan.",
+          "cosine_sim": 0.2468,
+          "rouge1_f": 0.0508,
+          "rouge2_f": 0.0,
+          "rougeL_f": 0.0339,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1364,
+              "recall": 0.0312,
+              "fmeasure": 0.0508
+            },
+            "rouge2": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "fmeasure": 0.0
+            },
+            "rougeL": {
+              "precision": 0.0909,
+              "recall": 0.0208,
+              "fmeasure": 0.0339
+            }
+          },
+          "time_s": 91.441,
+          "faithfulness": null
+        },
+        {
+          "id": "Q14",
+          "disease": "harvest_stage",
+          "query": "Padi saya sudah menunduk dan 90% gabah berwarna kuning keemasan, tapi cuaca terus hujan beberapa hari ke depan, kapan dan bagaimana cara panen yang aman?",
+          "generated": "Baik, Pak/Bu Tani! Kamera AI kita mendeteksi padi Bapak/Ibu sudah di **Fase Panen**. Ini kabar baik! Mari kita persiapkan dan laksanakan pan",
+          "ground_truth": "Padi siap panen ditandai malai merunduk + 80-90% gabah keemasan + gabah pangkal-tengah keras. Bila cuaca hujan terus, ada risiko rebah, beras pecah, dan tumbuhnya gabah di malai. Tindakan: bila prediksi hujan masih lama, panen segera meski sedikit lewat optimal (lebih baik daripada hasil rusak). Panen pagi setelah embun hilang. Pengeringan pasca panen: jangan jemur langsung di terik penuh karena beras pecah. Hamparkan 5-7 cm di lantai jemur, balik tiap 30-60 menit, target kadar air 14%. Atau gunakan flat-bed dryer suhu udara 40-43°C, laju penurunan kadar air <1%/jam. Setelah kering, dinginkan ke suhu ruang sebelum disimpan.",
+          "cosine_sim": 0.5514,
+          "rouge1_f": 0.0794,
+          "rouge2_f": 0.0,
+          "rougeL_f": 0.0635,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.2083,
+              "recall": 0.049,
+              "fmeasure": 0.0794
+            },
+            "rouge2": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "fmeasure": 0.0
+            },
+            "rougeL": {
+              "precision": 0.1667,
+              "recall": 0.0392,
+              "fmeasure": 0.0635
+            }
+          },
+          "time_s": 91.52,
+          "faithfulness": null
+        },
+        {
+          "id": "Q15",
+          "disease": "leaf_blast",
+          "query": "Bercak belah ketupat di daun padi yang awalnya kecil sekarang sudah menyatu menjadi besar dan daun banyak yang mengering, serangan sudah berat, apa tindakan darurat?",
+          "generated": "",
+          "ground_truth": "Serangan berat Blas Daun (Pyricularia oryzae) dengan lesi menyatu dan daun mengering. Tindakan darurat 24-48 jam: (1) Semprot fungisida sistemik tricyclazole (Beam 75 WP 0.5-1 g/L) atau isoprothiolane (Fuji-One 40 EC), dapat diulang 7-10 hari kemudian. (2) Hentikan total pupuk nitrogen, tambahkan kalium (KCl 50-75 kg/ha) dan silika untuk memperkuat dinding sel daun. (3) Buang daun terparah dan musnahkan (jangan dijadikan mulsa). (4) Perbaiki sirkulasi udara dengan penyiangan gulma. Pencegahan jangka panjang: varietas tahan (Inpari 13, 19), pemupukan berimbang, jajar legowo 2:1 atau 4:1.",
+          "cosine_sim": 0.0,
+          "rouge1_f": 0.0,
+          "rouge2_f": 0.0,
+          "rougeL_f": 0.0,
+          "rouge_detail": {
+            "rouge1": {
+              "fmeasure": 0.0
+            },
+            "rouge2": {
+              "fmeasure": 0.0
+            },
+            "rougeL": {
+              "fmeasure": 0.0
+            }
+          },
+          "time_s": 0.0,
+          "faithfulness": null
+        },
+        {
+          "id": "Q16",
+          "disease": "sheath_blight",
+          "query": "Saya menanam padi dengan jarak rapat 20x20 cm dan kelembaban kanopi sangat tinggi, sekarang banyak bercak oval abu-abu di pelepah daun bawah, penyakit apa dan solusi strukturalnya?",
+          "generated": "Selamat pagi, Bapak/Ibu Petani!\n\nKamera AI mendeteksi adanya penyakit **Busuk Pelepah (sheath_blight)** pada tanaman padi Bapak/Ibu.\n\nMohon maaf, berdasarkan informasi dari basis pengetahuan yang saya miliki saat ini, belum ada detail spesifik mengenai penyakit Busuk Pelepah (gejala, penyebab, penan...",
+          "ground_truth": "Busuk Pelepah (Rhizoctonia solani) yang dipicu tanam rapat dan kelembaban kanopi tinggi. Gejala: lesi oval abu-abu pada pelepah, berkembang ke atas hingga daun. Tindakan: semprot validamycin (Validacin 3L 1-2 ml/L) ke pangkal tanaman, kurangi nitrogen, terapkan irigasi berselang (AWD). Solusi struktural untuk musim tanam berikut: gunakan jajar legowo 2:1 (25x25 cm dengan lorong 50 cm) atau 4:1 untuk sirkulasi udara lebih baik, gunakan varietas tahan (Inpari 30, 33), sanitasi sklerotia saat pengolahan tanah.",
+          "cosine_sim": 0.4596,
+          "rouge1_f": 0.1278,
+          "rouge2_f": 0.0076,
+          "rougeL_f": 0.0752,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.0904,
+              "recall": 0.2179,
+              "fmeasure": 0.1278
+            },
+            "rouge2": {
+              "precision": 0.0053,
+              "recall": 0.013,
+              "fmeasure": 0.0076
+            },
+            "rougeL": {
+              "precision": 0.0532,
+              "recall": 0.1282,
+              "fmeasure": 0.0752
+            }
+          },
+          "time_s": 92.778,
+          "faithfulness": null
+        },
+        {
+          "id": "Q17",
+          "disease": "tungro",
+          "query": "Sawah tetangga saya sudah terkena tungro dengan tanaman kerdil kuning-oranye, pertanaman padi saya bersebelahan dan belum bergejala, apa langkah pencegahan agar tidak tertular?",
+          "generated": "Halo Pak/Bu Petani,\n\nKamera AI mendeteksi penyakit **Tungro** pada padi Bapak/Ibu.\n\nNamun, mohon maaf sekali, informasi mengenai penyakit **Tungro** tidak ada dalam catatan yang saya miliki saat ini.\n\nKarena itu, saya tidak bisa memberikan penjelasan gejala, penyebab, langkah penanganan, maupun penc...",
+          "ground_truth": "Tungro menular cepat melalui vektor wereng hijau (Nephotettix virescens). Pencegahan pada lahan bersebelahan dengan area terinfeksi: (1) Monitoring populasi wereng hijau intensif (light trap + pengamatan visual setiap 3 hari), bila >2 ekor/rumpun semprot insektisida selektif buprofezin atau pymetrozine. (2) Pasang penghalang vegetasi (tanaman penjebak seperti jagung) di pinggir sawah. (3) Cabut tanaman bergejala sedini mungkin. (4) Konservasi musuh alami (laba-laba, Cyrtorhinus). Pencegahan struktural: tanam serempak satu hamparan, varietas tahan tungro (Tukad Petanu, Tukad Balian, Inpari 7/9), rotasi dengan palawija pasca panen.",
+          "cosine_sim": 0.6699,
+          "rouge1_f": 0.1111,
+          "rouge2_f": 0.0,
+          "rougeL_f": 0.0714,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.0833,
+              "recall": 0.1667,
+              "fmeasure": 0.1111
+            },
+            "rouge2": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "fmeasure": 0.0
+            },
+            "rougeL": {
+              "precision": 0.0536,
+              "recall": 0.1071,
+              "fmeasure": 0.0714
+            }
+          },
+          "time_s": 90.374,
+          "faithfulness": null
+        },
+        {
+          "id": "Q18",
+          "disease": "harvest_stage",
+          "query": "Padi saya malai sudah menunduk dan sebagian besar gabah kuning, tapi gabah bagian ujung malai masih lunak belum keras saat ditekan kuku, sebaiknya saya tunggu atau langsung panen?",
+          "generated": "Baik Pak/Bu Tani, berdasarkan deteksi kamera AI bahwa tanaman padi Bapak/Ibu sudah di **Fase Panen**, mari kita lihat apa yang perlu dilakukan:\n\n1.  **Konfirmasi Tanaman Siap Panen (Ciri-ciri Visual):**\n    *   Ciri utama tanaman padi siap panen adalah **malai (tangkai gabah) sudah berisi penuh deng...",
+          "ground_truth": "Padi siap panen optimal saat 80-90% gabah keras (gabah pangkal-tengah-ujung keras saat ditekan kuku). Gabah ujung yang masih lunak menandakan belum mencapai matang fisiologis penuh — bila dipanen sekarang, hasil giling akan banyak gabah hampa/menir dari ujung malai (penurunan rendemen). Rekomendasi: tunggu 3-7 hari lagi hingga gabah ujung keras, dengan syarat: (1) tanaman tidak rebah, (2) tidak ada hujan panjang yang membahayakan, (3) hama burung/tikus terkendali. Bila cuaca hujan datang sebelum gabah ujung matang, panen segera lalu lakukan pengeringan bertahap. Indikator tambahan kematangan: malai merunduk 30-45°, daun bendera kuning 60-80%, umur sesuai deskripsi varietas (110-140 HST).",
+          "cosine_sim": 0.7163,
+          "rouge1_f": 0.2222,
+          "rouge2_f": 0.0204,
+          "rougeL_f": 0.1212,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.234,
+              "recall": 0.2115,
+              "fmeasure": 0.2222
+            },
+            "rouge2": {
+              "precision": 0.0215,
+              "recall": 0.0194,
+              "fmeasure": 0.0204
+            },
+            "rougeL": {
+              "precision": 0.1277,
+              "recall": 0.1154,
+              "fmeasure": 0.1212
+            }
+          },
+          "time_s": 94.033,
+          "faithfulness": null
+        }
+      ],
+      "n_queries": 18,
+      "k_used": 3
+    },
+    "Groq — llama-3.3-70b-versatile (HIGH)": {
+      "llm": "Groq — llama-3.3-70b-versatile (HIGH)",
+      "avg_cosine_similarity": 0.6048,
+      "avg_rouge1_f": 0.1826,
+      "avg_rouge2_f": 0.0288,
+      "avg_rougeL_f": 0.1106,
+      "avg_generation_time_s": 45.332,
+      "faithfulness_note": "Diisi manual annotator (0=tidak akurat, 0.5=sebagian, 1=sangat akurat)",
+      "per_query": [
+        {
+          "id": "Q01",
+          "disease": "bacterial_leaf_blight",
+          "query": "Daun padi saya menguning mulai dari ujung dan tepi, lalu muncul eksudat kekuningan di pagi hari saat musim hujan, penyakit apa dan bagaimana penanganannya?",
+          "generated": "Baik, mari kita tangani penyakit Hawar Daun Bakteri (HDB) pada padi ini.\n\n1. **Penjelasan Singkat Penyakit**: Hawar Daun Bakteri disebabkan oleh bakteri Xanthomonas oryzae pv. oryzae. Gejalanya adalah daun padi menjadi busuk dan berwarna kekuningan atau kecoklatan. Bakteri ini masuk ke dalam daun me...",
+          "ground_truth": "Hawar Daun Bakteri (HDB) disebabkan Xanthomonas oryzae pv. oryzae, berkembang pesat pada suhu 25-35°C dan kelembaban >85% (umum di musim hujan). Gejala khas: daun menguning dari ujung dan tepi, eksudat kekuningan di pagi hari yang lembab. Penanganan: semprot bakterisida tembaga (Kocide 77 WP 2-3 g/L) atau Cupravit OB 21, kurangi pupuk nitrogen, perbaiki drainase sawah. Pencegahan: varietas tahan (Ciherang, Mekongga, IR64, Inpari 32 dengan gen Xa4/Xa7), tanam serempak, jajar legowo 25x25 cm, perlakuan benih air panas 52-54°C selama 10 menit.",
+          "cosine_sim": 0.633,
+          "rouge1_f": 0.1794,
+          "rouge2_f": 0.0401,
+          "rougeL_f": 0.1196,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1262,
+              "recall": 0.3103,
+              "fmeasure": 0.1794
+            },
+            "rouge2": {
+              "precision": 0.0282,
+              "recall": 0.0698,
+              "fmeasure": 0.0401
+            },
+            "rougeL": {
+              "precision": 0.0841,
+              "recall": 0.2069,
+              "fmeasure": 0.1196
+            }
+          },
+          "time_s": 45.202,
+          "faithfulness": null
+        },
+        {
+          "id": "Q02",
+          "disease": "leaf_blast",
+          "query": "Saya baru memupuk urea dengan dosis tinggi, beberapa hari kemudian muncul bercak abu-abu kecil di daun, apa risiko dan tindakan yang harus dilakukan?",
+          "generated": "Baik, mari kita bahas tentang penyakit Blas Daun (Leaf Blast) yang terdeteksi oleh kamera AI.\n\n1. **Penjelasan Singkat Penyakit**: Blas Daun disebabkan oleh jamur Pyricularia oryzae. Gejala yang terlihat adalah lesi berbentuk belah ketupat pada daun dengan pusat lesi berwarna abu-abu atau putih dan ...",
+          "ground_truth": "Gejala mengarah ke Blas Daun (Pyricularia oryzae) yang dipicu nitrogen berlebih membuat jaringan daun sukulen dan rentan infeksi jamur. Tindakan segera: hentikan pupuk nitrogen tambahan, semprot fungisida tricyclazole (Beam 75 WP 0.5-1 g/L) atau isoprothiolane (Fuji-One 40 EC). Tambahkan pupuk kalium (KCl 50-75 kg/ha) dan silika untuk memperkuat dinding sel daun. Pencegahan: dosis N ideal 90-120 kg N/ha dibagi 3 aplikasi (dasar 40%, anakan aktif 30%, primordia 30%), gunakan varietas tahan (Inpari 13, 19).",
+          "cosine_sim": 0.5351,
+          "rouge1_f": 0.1467,
+          "rouge2_f": 0.0201,
+          "rougeL_f": 0.0867,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1009,
+              "recall": 0.2683,
+              "fmeasure": 0.1467
+            },
+            "rouge2": {
+              "precision": 0.0138,
+              "recall": 0.037,
+              "fmeasure": 0.0201
+            },
+            "rougeL": {
+              "precision": 0.0596,
+              "recall": 0.1585,
+              "fmeasure": 0.0867
+            }
+          },
+          "time_s": 45.42,
+          "faithfulness": null
+        },
+        {
+          "id": "Q03",
+          "disease": "neck_blast",
+          "query": "Padi saya hampir memasuki fase pembungaan, di sekitar sawah sudah ada laporan blas daun, apa langkah pencegahan blas leher malai yang tepat?",
+          "generated": "Baik, saya akan membantu petani dengan informasi yang jelas dan mudah dipahami.\n\n**1. Penjelasan singkat penyakit ini (gejala dan penyebab)**\nPenyakit Blas Leher Malai disebabkan oleh jamur Pyricularia oryzae. Gejala yang terlihat adalah lesi berwarna coklat gelap hingga hitam pada leher malai, yang...",
+          "ground_truth": "Blas Leher Malai (Pyricularia oryzae) menyerang pangkal malai saat heading dan menyebabkan gabah hampa total. Pencegahan preventif yang paling efektif: semprot fungisida 2 kali — (1) saat primordia malai (booting, ~7-10 hari sebelum keluar malai), dan (2) saat heading 50% (malai keluar 50%). Gunakan tricyclazole (Beam 75 WP 0.5-1 g/L) atau isoprothiolane. Hentikan pupuk nitrogen menjelang heading. Pencegahan struktural: gunakan varietas tahan blas (Inpari 13, 19) dan hindari nitrogen berlebih sejak fase vegetatif.",
+          "cosine_sim": 0.4773,
+          "rouge1_f": 0.1757,
+          "rouge2_f": 0.034,
+          "rougeL_f": 0.1216,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1182,
+              "recall": 0.3421,
+              "fmeasure": 0.1757
+            },
+            "rouge2": {
+              "precision": 0.0228,
+              "recall": 0.0667,
+              "fmeasure": 0.034
+            },
+            "rougeL": {
+              "precision": 0.0818,
+              "recall": 0.2368,
+              "fmeasure": 0.1216
+            }
+          },
+          "time_s": 44.957,
+          "faithfulness": null
+        },
+        {
+          "id": "Q04",
+          "disease": "sheath_blight",
+          "query": "Sawah saya tergenang air dalam waktu lama, tanam padi rapat, sekarang muncul bercak oval abu-abu di pelepah daun bawah dekat permukaan air, penyakit apa ini?",
+          "generated": "Baik, saya akan membantu petani dengan informasi tentang penyakit Busuk Pelepah (sheath_blight) yang terdeteksi oleh kamera AI.\n\n1. **Penjelasan singkat penyakit**: Busuk Pelepah disebabkan oleh jamur Rhizoctonia solani. Gejala yang tampak adalah bercak-bercak kecil berwarna abu-abu atau coklat pada...",
+          "ground_truth": "Busuk Pelepah disebabkan jamur Rhizoctonia solani yang berkembang pada kondisi tergenang terus-menerus, tanam rapat, dan kelembaban kanopi tinggi. Gejala: lesi oval abu-abu pada pelepah daun dekat permukaan air, lalu menyebar ke atas hingga daun. Penanganan: terapkan irigasi berselang (AWD — genangi 5-7 hari, biarkan kering hingga retak ringan, genangi lagi), semprot validamycin (Validacin 3L 1-2 ml/L) ke pangkal tanaman, kurangi nitrogen. Pencegahan: jajar legowo 2:1 atau 4:1 untuk sirkulasi udara, hancurkan sklerotia saat pengolahan tanah, gunakan varietas tahan (Inpari 30, 33).",
+          "cosine_sim": 0.4651,
+          "rouge1_f": 0.2268,
+          "rouge2_f": 0.0484,
+          "rougeL_f": 0.1237,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1618,
+              "recall": 0.3793,
+              "fmeasure": 0.2268
+            },
+            "rouge2": {
+              "precision": 0.0345,
+              "recall": 0.0814,
+              "fmeasure": 0.0484
+            },
+            "rougeL": {
+              "precision": 0.0882,
+              "recall": 0.2069,
+              "fmeasure": 0.1237
+            }
+          },
+          "time_s": 44.704,
+          "faithfulness": null
+        },
+        {
+          "id": "Q05",
+          "disease": "tungro",
+          "query": "Di pertanaman padi saya mulai muncul beberapa rumpun yang agak kerdil dengan daun atas sedikit pucat menguning, ditemukan wereng hijau dalam jumlah sedang, apa yang harus dilakukan?",
+          "generated": "Baik, saya akan membantu petani dengan informasi yang jelas dan mudah dipahami.\n\n1. **Penjelasan Singkat Penyakit Tungro**: Sayangnya, informasi tentang penyakit Tungro tidak ada dalam basis pengetahuan yang diberikan. Namun, secara umum, Tungro adalah penyakit yang disebabkan oleh virus dan ditular...",
+          "ground_truth": "Gejala mengarah ke Tungro (virus RTBV + RTSV) yang ditularkan wereng hijau (Nephotettix virescens). Tidak ada obat langsung untuk virus, pengendalian fokus pada vektor. Tindakan: (1) cabut dan musnahkan rumpun bergejala sedini mungkin, (2) kendalikan vektor wereng hijau dengan insektisida selektif buprofezin atau pymetrozine (hindari organofosfat yang membunuh musuh alami), (3) monitor populasi mingguan dengan light trap. Pencegahan: gunakan varietas tahan tungro (Tukad Petanu, Tukad Balian, Inpari 7/9), tanam serempak satu hamparan, konservasi musuh alami (laba-laba, Cyrtorhinus lividipennis).",
+          "cosine_sim": 0.6365,
+          "rouge1_f": 0.1574,
+          "rouge2_f": 0.0066,
+          "rougeL_f": 0.0852,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1062,
+              "recall": 0.3038,
+              "fmeasure": 0.1574
+            },
+            "rouge2": {
+              "precision": 0.0044,
+              "recall": 0.0128,
+              "fmeasure": 0.0066
+            },
+            "rougeL": {
+              "precision": 0.0575,
+              "recall": 0.1646,
+              "fmeasure": 0.0852
+            }
+          },
+          "time_s": 45.556,
+          "faithfulness": null
+        },
+        {
+          "id": "Q06",
+          "disease": "brown_spot",
+          "query": "Lahan saya kekurangan pupuk kalium, tanaman padi mulai banyak bercak oval coklat dengan pusat keabu-abuan di daun bawah, apa penyebab dan solusinya?",
+          "generated": "Baik, saya akan membantu Anda dengan informasi tentang penyakit Bercak Coklat (brown_spot) pada padi.\n\n1. **Penjelasan Singkat Penyakit**: Bercak Coklat disebabkan oleh jamur Cochliobolus miyabeanus. Gejala utamanya adalah munculnya bercak-bercak coklat pada daun padi. Penyakit ini dapat menyebabkan...",
+          "ground_truth": "Bercak Coklat disebabkan jamur Cochliobolus miyabeanus, dikenal sebagai 'penyakit kelaparan' karena sangat terkait defisiensi hara terutama kalium (K) dan silika (Si). Gejala: bercak oval coklat dengan pusat abu-abu/putih, sering muncul pada lahan defisiensi K. Penanganan: tambahkan KCl 50-75 kg/ha dan pupuk silikat (terak baja atau abu sekam) 200-500 kg/ha, semprot fungisida mancozeb (Dithane M-45 2 g/L) atau propiconazole. Pencegahan: pemupukan berimbang N:P:K + organik, rotasi tanaman, tambahkan kompos atau abu sekam untuk memperbaiki struktur tanah.",
+          "cosine_sim": 0.6031,
+          "rouge1_f": 0.1758,
+          "rouge2_f": 0.0369,
+          "rougeL_f": 0.1172,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.127,
+              "recall": 0.2857,
+              "fmeasure": 0.1758
+            },
+            "rouge2": {
+              "precision": 0.0266,
+              "recall": 0.0602,
+              "fmeasure": 0.0369
+            },
+            "rougeL": {
+              "precision": 0.0847,
+              "recall": 0.1905,
+              "fmeasure": 0.1172
+            }
+          },
+          "time_s": 45.783,
+          "faithfulness": null
+        },
+        {
+          "id": "Q07",
+          "disease": "dead_heart",
+          "query": "Padi saya umur 30 HST, banyak ngengat berwarna putih di sawah dan mulai ada beberapa anakan muda yang pucuknya mati dan bisa dicabut dengan mudah, hama apa ini?",
+          "generated": "Baik, mari kita bahas tentang penyakit Batang Mati (Sundep) atau dead heart ini.\n\n1. **Penjelasan Singkat**: Penyakit Batang Mati disebabkan oleh serangan larva penggerek batang. Gejala yang terlihat adalah pucuk tanaman muda yang mati berwarna kuning kecoklatan, dan daun tengah tanaman muda layu se...",
+          "ground_truth": "Gejala dead heart (sundep) disebabkan larva penggerek batang. Ngengat berwarna putih mengindikasikan Penggerek Batang Putih (Scirpophaga innotata), umum di lahan tadah hujan dan kering. Penanganan: pasang lampu perangkap untuk ngengat dewasa, lepaskan parasitoid telur Trichogramma japonicum 2-3 kali dengan interval 1 minggu, bila serangan >5% anakan terinfeksi semprot insektisida berbahan aktif fipronil, karbofuran, atau klorantraniliprol sesuai dosis label. Pencegahan: tanam serempak, varietas tahan, konservasi musuh alami, sanitasi sisa jerami pasca panen, rotasi tanaman.",
+          "cosine_sim": 0.7048,
+          "rouge1_f": 0.1785,
+          "rouge2_f": 0.0248,
+          "rougeL_f": 0.1169,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1155,
+              "recall": 0.3919,
+              "fmeasure": 0.1785
+            },
+            "rouge2": {
+              "precision": 0.016,
+              "recall": 0.0548,
+              "fmeasure": 0.0248
+            },
+            "rougeL": {
+              "precision": 0.0757,
+              "recall": 0.2568,
+              "fmeasure": 0.1169
+            }
+          },
+          "time_s": 45.386,
+          "faithfulness": null
+        },
+        {
+          "id": "Q08",
+          "disease": "hispa",
+          "query": "Ditemukan kumbang kecil berduri hitam keunguan di daun padi, lalu muncul goresan putih horizontal sejajar tulang daun disertai lubang-lubang kecil pada daun, hama apa ini dan kapan perlu disemprot?",
+          "generated": "Baik, mari kita tangani penyakit Hispa Padi (hispa) ini bersama.\n\n1. **Penjelasan singkat penyakit Hispa Padi**: Penyakit ini disebabkan oleh serangga Dicladispa armigera (kumbang hispa). Gejalanya adalah adanya corengan putih pada daun karena serangga ini menggores permukaan daun. Larva kumbang his...",
+          "ground_truth": "Kumbang Hispa (Dicladispa armigera) menyerang daun padi: kumbang dewasa membuat lubang/goresan, larva di dalam jaringan daun membuat goresan putih horizontal khas (mining) sejajar tulang daun. Ambang ekonomi untuk aplikasi insektisida: 1 ekor kumbang dewasa atau 1-2 larva per rumpun, atau kerusakan daun >25% pada fase vegetatif. Bila di bawah ambang: pengendalian mekanis dengan memotong ujung daun terinfeksi (3-5 cm) lalu dimusnahkan. Bila terlampaui: semprot insektisida fipronil, karbofuran, atau klorantraniliprol sesuai dosis label. Konservasi parasitoid Tetrastichus dan laba-laba.",
+          "cosine_sim": 0.4775,
+          "rouge1_f": 0.1623,
+          "rouge2_f": 0.0131,
+          "rougeL_f": 0.0779,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1101,
+              "recall": 0.3086,
+              "fmeasure": 0.1623
+            },
+            "rouge2": {
+              "precision": 0.0088,
+              "recall": 0.025,
+              "fmeasure": 0.0131
+            },
+            "rougeL": {
+              "precision": 0.0529,
+              "recall": 0.1481,
+              "fmeasure": 0.0779
+            }
+          },
+          "time_s": 45.584,
+          "faithfulness": null
+        },
+        {
+          "id": "Q09",
+          "disease": "bacterial_panicle_blight",
+          "query": "Padi saya saat fase pembungaan terkena cuaca panas dan suhu malam tinggi di atas 25°C, sekarang gabah banyak yang hampa berwarna coklat-keunguan dan mengeriput, penyakit apa ini?",
+          "generated": "Baik, mari kita bahas tentang Hawar Malai Bakteri yang terdeteksi oleh kamera AI.\n\n1. **Penjelasan Singkat**: Hawar Malai Bakteri disebabkan oleh bakteri Burkholderia glumae. Gejala utamanya adalah malai padi yang berdiri tegak karena gabahnya hampa dan berwarna coklat hingga abu-abu. Ini terjadi ka...",
+          "ground_truth": "Hawar Malai Bakteri disebabkan Burkholderia glumae, infektif pada fase pembungaan (anthesis), dipicu suhu tinggi (siang 30-35°C, malam >25°C) dan kelembaban >85%. Gejala: gabah hampa berwarna coklat-keunguan, biji mengeriput, malai terinfeksi tidak terisi penuh. Penanganan: semprot kasugamycin (Kasumin 2L 1-2 ml/L) atau oxolinic acid saat primordia malai dan awal pembungaan. Pencegahan: atur waktu tanam agar pembungaan tidak bertepatan dengan puncak suhu, perlakuan benih air panas 52-54°C selama 10 menit, hindari nitrogen berlebih, irigasi malam untuk menurunkan suhu kanopi.",
+          "cosine_sim": 0.5582,
+          "rouge1_f": 0.215,
+          "rouge2_f": 0.0459,
+          "rougeL_f": 0.1368,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1486,
+              "recall": 0.3882,
+              "fmeasure": 0.215
+            },
+            "rouge2": {
+              "precision": 0.0317,
+              "recall": 0.0833,
+              "fmeasure": 0.0459
+            },
+            "rougeL": {
+              "precision": 0.0946,
+              "recall": 0.2471,
+              "fmeasure": 0.1368
+            }
+          },
+          "time_s": 45.728,
+          "faithfulness": null
+        },
+        {
+          "id": "Q10",
+          "disease": "leaf_smut",
+          "query": "Pada daun padi muncul bintik-bintik hitam kecil seperti titik-titik tersebar merata, tanaman tetap tumbuh normal, penyakit apa ini dan apakah perlu disemprot fungisida?",
+          "generated": "Baik, saya akan membantu Anda dengan informasi tentang penyakit Gosong Palsu Daun (leaf_smut) pada padi.\n\n1. **Penjelasan Singkat Penyakit**: Gosong Palsu Daun disebabkan oleh jamur Entyloma oryzae. Gejala utamanya adalah bercak-bercak kecil berwarna hitam atau abu-abu gelap yang tersebar di daun pa...",
+          "ground_truth": "Jamur Api Daun (Leaf Smut) disebabkan jamur Entyloma oryzae. Gejala: bintik-bintik hitam kecil tersebar merata di daun, tanaman umumnya tetap tumbuh normal. Penyakit ini dikategorikan minor disease karena kehilangan hasil rata-rata <5% dan jarang menyebabkan kerugian ekonomi signifikan. Pada serangan ringan (<30% daun): cukup monitoring, perbaiki pemupukan berimbang dan jarak tanam, tidak perlu fungisida. Pada serangan parah (>30% daun): semprot mancozeb atau propiconazole 1-2 kali. Pencegahan: gunakan benih bersih bersertifikat, sanitasi sisa tanaman, hindari kelembaban berlebih.",
+          "cosine_sim": 0.673,
+          "rouge1_f": 0.2303,
+          "rouge2_f": 0.053,
+          "rougeL_f": 0.1513,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1556,
+              "recall": 0.443,
+              "fmeasure": 0.2303
+            },
+            "rouge2": {
+              "precision": 0.0357,
+              "recall": 0.1026,
+              "fmeasure": 0.053
+            },
+            "rougeL": {
+              "precision": 0.1022,
+              "recall": 0.2911,
+              "fmeasure": 0.1513
+            }
+          },
+          "time_s": 46.231,
+          "faithfulness": null
+        },
+        {
+          "id": "Q11",
+          "disease": "downy_mildew",
+          "query": "Bibit padi di pesemaian saya kerdil, daun pucat dengan distorsi, dan ada lapisan putih halus di bawah daun, penyakit apa dan tindakannya?",
+          "generated": "Baik, mari kita bahas tentang penyakit Embun Bulu (Downy Mildew) yang terdeteksi oleh kamera AI.\n\n1. **Penjelasan Singkat Penyakit**: Embun Bulu disebabkan oleh jamur Sclerophthora macrospora. Gejalanya termasuk malformasi tanaman, yang juga dikenal sebagai \"penyakit semai gila\". Penyakit ini berkem...",
+          "ground_truth": "Downy Mildew pada padi disebabkan jamur Sclerophthora macrospora. Gejala: tanaman kerdil, daun pucat dengan distorsi, lapisan putih halus di bawah daun (sporulasi jamur), sering muncul pada pesemaian/tanaman muda dengan kelembaban tinggi. Penanganan: cabut bibit terinfeksi sedini mungkin dan musnahkan (jangan dijadikan kompos), perbaiki drainase pesemaian, aplikasi agen hayati Trichoderma harzianum 10 g/L, bila parah semprot fungisida metalaksil. Pencegahan: gunakan benih bersertifikat, varietas tahan, jarak tanam optimal, hindari pesemaian tergenang lama.",
+          "cosine_sim": 0.5749,
+          "rouge1_f": 0.1654,
+          "rouge2_f": 0.0227,
+          "rougeL_f": 0.1053,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1134,
+              "recall": 0.3056,
+              "fmeasure": 0.1654
+            },
+            "rouge2": {
+              "precision": 0.0155,
+              "recall": 0.0423,
+              "fmeasure": 0.0227
+            },
+            "rougeL": {
+              "precision": 0.0722,
+              "recall": 0.1944,
+              "fmeasure": 0.1053
+            }
+          },
+          "time_s": 44.683,
+          "faithfulness": null
+        },
+        {
+          "id": "Q12",
+          "disease": "healthy",
+          "query": "Tanaman padi saya umur 45 HST, anakan produktif banyak, daun hijau sehat, tidak ada gejala penyakit, langkah perawatan rutin apa yang harus dilakukan agar tetap sehat hingga panen?",
+          "generated": "Baik, mari kita bahas tentang kondisi tanaman padi yang sehat (healthy) berdasarkan deteksi kamera AI.\n\n1. **Penjelasan Singkat**: Tanaman padi yang sehat memiliki ciri-ciri seperti daun berwarna hijau tua mengkilap tanpa bercak atau lesi, batang kokoh dan tegak, pertumbuhan seragam, akar putih dan ...",
+          "ground_truth": "Tanaman sehat membutuhkan perawatan rutin berbasis PHT (Pengendalian Hama Terpadu) dan GAP (Good Agricultural Practice). Langkah rutin: (1) monitoring hama-penyakit mingguan dengan pengamatan visual + light trap, (2) pemupukan susulan sesuai fase (anakan aktif: N+K; primordia: P+K), (3) pengairan berselang (AWD) untuk efisiensi air dan menekan penyakit, (4) penyiangan gulma dengan landak atau herbisida selektif, (5) konservasi musuh alami (laba-laba, Cyrtorhinus, Trichogramma) dengan menghindari insektisida spektrum luas, (6) aplikasi pestisida selektif hanya bila ambang ekonomi terlampaui. Pemantauan dini gejala sangat penting untuk pencegahan.",
+          "cosine_sim": 0.6136,
+          "rouge1_f": 0.1807,
+          "rouge2_f": 0.0061,
+          "rougeL_f": 0.0964,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.122,
+              "recall": 0.3488,
+              "fmeasure": 0.1807
+            },
+            "rouge2": {
+              "precision": 0.0041,
+              "recall": 0.0118,
+              "fmeasure": 0.0061
+            },
+            "rougeL": {
+              "precision": 0.065,
+              "recall": 0.186,
+              "fmeasure": 0.0964
+            }
+          },
+          "time_s": 44.675,
+          "faithfulness": null
+        },
+        {
+          "id": "Q13",
+          "disease": "bacterial_leaf_streak",
+          "query": "Daun padi saya muncul lesi garis-garis sempit memanjang di antara tulang daun warna kuning kecoklatan dengan butiran eksudat kuning di sepanjang lesi, beda dari hawar daun bakteri biasa, penyakit apa ini?",
+          "generated": "Baik, mari kita bahas tentang Hawar Daun Bergaris Bakteri (bacterial_leaf_streak) yang terdeteksi oleh kamera AI.\n\n1. **Penjelasan Singkat**: Hawar Daun Bergaris Bakteri disebabkan oleh bakteri Xanthomonas oryzae pv. oryzicola. Gejala penyakit ini adalah lesi basah berwarna hijau gelap hingga kuning...",
+          "ground_truth": "Bacterial Leaf Streak (BLS) disebabkan Xanthomonas oryzae pv. oryzicola — berbeda patovar dari HDB (X. o. pv. oryzae). Gejala khas: lesi sempit GARIS-GARIS di antara tulang daun (interveinal), panjang 1-30 cm, warna hijau gelap berubah menjadi kuning lalu coklat, dengan butiran eksudat kekuningan kecil di sepanjang lesi. Berbeda dari HDB yang membentuk hawar lebar dari ujung/tepi daun. Penanganan: semprot bismerthiazol (Xanthocide 20 WP 2 g/L) atau Cupravit OB 21 (2-3 g/L), kurangi nitrogen, perbaiki drainase. Pencegahan: rotasi tanaman, sanitasi alat dan benih, jarak tanam optimal untuk sirkulasi udara, gunakan varietas tahan.",
+          "cosine_sim": 0.7435,
+          "rouge1_f": 0.2961,
+          "rouge2_f": 0.0795,
+          "rougeL_f": 0.1908,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.2163,
+              "recall": 0.4688,
+              "fmeasure": 0.2961
+            },
+            "rouge2": {
+              "precision": 0.058,
+              "recall": 0.1263,
+              "fmeasure": 0.0795
+            },
+            "rougeL": {
+              "precision": 0.1394,
+              "recall": 0.3021,
+              "fmeasure": 0.1908
+            }
+          },
+          "time_s": 45.886,
+          "faithfulness": null
+        },
+        {
+          "id": "Q14",
+          "disease": "harvest_stage",
+          "query": "Padi saya sudah menunduk dan 90% gabah berwarna kuning keemasan, tapi cuaca terus hujan beberapa hari ke depan, kapan dan bagaimana cara panen yang aman?",
+          "generated": "Baik, mari kita lihat satu per satu:\n\n1. **Konfirmasi apakah tanaman siap dipanen**: Tanaman padi siap dipanen jika sudah mencapai umur yang tepat dan memiliki ciri-ciri seperti malai berisi penuh dengan gabah bernas, warna daun hijau tua mengkilap, dan batang kokoh. Jika tanaman Anda menunjukkan ci...",
+          "ground_truth": "Padi siap panen ditandai malai merunduk + 80-90% gabah keemasan + gabah pangkal-tengah keras. Bila cuaca hujan terus, ada risiko rebah, beras pecah, dan tumbuhnya gabah di malai. Tindakan: bila prediksi hujan masih lama, panen segera meski sedikit lewat optimal (lebih baik daripada hasil rusak). Panen pagi setelah embun hilang. Pengeringan pasca panen: jangan jemur langsung di terik penuh karena beras pecah. Hamparkan 5-7 cm di lantai jemur, balik tiap 30-60 menit, target kadar air 14%. Atau gunakan flat-bed dryer suhu udara 40-43°C, laju penurunan kadar air <1%/jam. Setelah kering, dinginkan ke suhu ruang sebelum disimpan.",
+          "cosine_sim": 0.6297,
+          "rouge1_f": 0.1797,
+          "rouge2_f": 0.0175,
+          "rougeL_f": 0.0986,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1276,
+              "recall": 0.3039,
+              "fmeasure": 0.1797
+            },
+            "rouge2": {
+              "precision": 0.0124,
+              "recall": 0.0297,
+              "fmeasure": 0.0175
+            },
+            "rougeL": {
+              "precision": 0.07,
+              "recall": 0.1667,
+              "fmeasure": 0.0986
+            }
+          },
+          "time_s": 44.735,
+          "faithfulness": null
+        },
+        {
+          "id": "Q15",
+          "disease": "leaf_blast",
+          "query": "Bercak belah ketupat di daun padi yang awalnya kecil sekarang sudah menyatu menjadi besar dan daun banyak yang mengering, serangan sudah berat, apa tindakan darurat?",
+          "generated": "Baik, saya akan membantu Anda dengan informasi tentang penyakit Blas Daun (leaf_blast) yang terdeteksi oleh kamera AI.\n\n1. **Penjelasan Singkat Penyakit**: Blas Daun disebabkan oleh jamur Pyricularia oryzae. Gejala yang terlihat adalah lesi berbentuk belah ketupat atau jarum pada daun dengan ujung r...",
+          "ground_truth": "Serangan berat Blas Daun (Pyricularia oryzae) dengan lesi menyatu dan daun mengering. Tindakan darurat 24-48 jam: (1) Semprot fungisida sistemik tricyclazole (Beam 75 WP 0.5-1 g/L) atau isoprothiolane (Fuji-One 40 EC), dapat diulang 7-10 hari kemudian. (2) Hentikan total pupuk nitrogen, tambahkan kalium (KCl 50-75 kg/ha) dan silika untuk memperkuat dinding sel daun. (3) Buang daun terparah dan musnahkan (jangan dijadikan mulsa). (4) Perbaiki sirkulasi udara dengan penyiangan gulma. Pencegahan jangka panjang: varietas tahan (Inpari 13, 19), pemupukan berimbang, jajar legowo 2:1 atau 4:1.",
+          "cosine_sim": 0.6462,
+          "rouge1_f": 0.1502,
+          "rouge2_f": 0.0242,
+          "rougeL_f": 0.0961,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1046,
+              "recall": 0.266,
+              "fmeasure": 0.1502
+            },
+            "rouge2": {
+              "precision": 0.0168,
+              "recall": 0.043,
+              "fmeasure": 0.0242
+            },
+            "rougeL": {
+              "precision": 0.0669,
+              "recall": 0.1702,
+              "fmeasure": 0.0961
+            }
+          },
+          "time_s": 46.309,
+          "faithfulness": null
+        },
+        {
+          "id": "Q16",
+          "disease": "sheath_blight",
+          "query": "Saya menanam padi dengan jarak rapat 20x20 cm dan kelembaban kanopi sangat tinggi, sekarang banyak bercak oval abu-abu di pelepah daun bawah, penyakit apa dan solusi strukturalnya?",
+          "generated": "Baik, saya akan membantu petani dengan informasi yang jelas dan mudah dipahami.\n\n1. **Penjelasan singkat penyakit**: Sayangnya, informasi tentang \"Busuk Pelepah (sheath_blight)\" tidak ada dalam teks yang disediakan. Namun, secara umum, Busuk Pelepah disebabkan oleh jamur yang menyerang pelepah atau ...",
+          "ground_truth": "Busuk Pelepah (Rhizoctonia solani) yang dipicu tanam rapat dan kelembaban kanopi tinggi. Gejala: lesi oval abu-abu pada pelepah, berkembang ke atas hingga daun. Tindakan: semprot validamycin (Validacin 3L 1-2 ml/L) ke pangkal tanaman, kurangi nitrogen, terapkan irigasi berselang (AWD). Solusi struktural untuk musim tanam berikut: gunakan jajar legowo 2:1 (25x25 cm dengan lorong 50 cm) atau 4:1 untuk sirkulasi udara lebih baik, gunakan varietas tahan (Inpari 30, 33), sanitasi sklerotia saat pengolahan tanah.",
+          "cosine_sim": 0.4933,
+          "rouge1_f": 0.1625,
+          "rouge2_f": 0.0189,
+          "rougeL_f": 0.1063,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1074,
+              "recall": 0.3333,
+              "fmeasure": 0.1625
+            },
+            "rouge2": {
+              "precision": 0.0124,
+              "recall": 0.039,
+              "fmeasure": 0.0189
+            },
+            "rougeL": {
+              "precision": 0.0702,
+              "recall": 0.2179,
+              "fmeasure": 0.1063
+            }
+          },
+          "time_s": 45.285,
+          "faithfulness": null
+        },
+        {
+          "id": "Q17",
+          "disease": "tungro",
+          "query": "Sawah tetangga saya sudah terkena tungro dengan tanaman kerdil kuning-oranye, pertanaman padi saya bersebelahan dan belum bergejala, apa langkah pencegahan agar tidak tertular?",
+          "generated": "Baik, mari kita bahas tentang penyakit Tungro yang terdeteksi oleh kamera AI.\n\n1. **Penjelasan Singkat Penyakit Tungro**: Tungro adalah penyakit yang disebabkan oleh virus dan ditularkan oleh wereng. Gejala penyakit Tungro antara lain daun menguning, pertumbuhan tanaman terhambat, dan produksi gabah...",
+          "ground_truth": "Tungro menular cepat melalui vektor wereng hijau (Nephotettix virescens). Pencegahan pada lahan bersebelahan dengan area terinfeksi: (1) Monitoring populasi wereng hijau intensif (light trap + pengamatan visual setiap 3 hari), bila >2 ekor/rumpun semprot insektisida selektif buprofezin atau pymetrozine. (2) Pasang penghalang vegetasi (tanaman penjebak seperti jagung) di pinggir sawah. (3) Cabut tanaman bergejala sedini mungkin. (4) Konservasi musuh alami (laba-laba, Cyrtorhinus). Pencegahan struktural: tanam serempak satu hamparan, varietas tahan tungro (Tukad Petanu, Tukad Balian, Inpari 7/9), rotasi dengan palawija pasca panen.",
+          "cosine_sim": 0.6965,
+          "rouge1_f": 0.1469,
+          "rouge2_f": 0.0211,
+          "rougeL_f": 0.0839,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.104,
+              "recall": 0.25,
+              "fmeasure": 0.1469
+            },
+            "rouge2": {
+              "precision": 0.0149,
+              "recall": 0.0361,
+              "fmeasure": 0.0211
+            },
+            "rougeL": {
+              "precision": 0.0594,
+              "recall": 0.1429,
+              "fmeasure": 0.0839
+            }
+          },
+          "time_s": 44.632,
+          "faithfulness": null
+        },
+        {
+          "id": "Q18",
+          "disease": "harvest_stage",
+          "query": "Padi saya malai sudah menunduk dan sebagian besar gabah kuning, tapi gabah bagian ujung malai masih lunak belum keras saat ditekan kuku, sebaiknya saya tunggu atau langsung panen?",
+          "generated": "Petani, saya dengan senang hati membantu Anda!\n\n1. **Konfirmasi siap panen**: Tanaman padi Anda sudah berada di fase panen, artinya gabah sudah matang dan siap dipanen. Ciri-cirinya adalah malai sudah berisi penuh dengan gabah bernas, dan warna gabah sudah berubah menjadi kekuningan atau kecoklatan....",
+          "ground_truth": "Padi siap panen optimal saat 80-90% gabah keras (gabah pangkal-tengah-ujung keras saat ditekan kuku). Gabah ujung yang masih lunak menandakan belum mencapai matang fisiologis penuh — bila dipanen sekarang, hasil giling akan banyak gabah hampa/menir dari ujung malai (penurunan rendemen). Rekomendasi: tunggu 3-7 hari lagi hingga gabah ujung keras, dengan syarat: (1) tanaman tidak rebah, (2) tidak ada hujan panjang yang membahayakan, (3) hama burung/tikus terkendali. Bila cuaca hujan datang sebelum gabah ujung matang, panen segera lalu lakukan pengeringan bertahap. Indikator tambahan kematangan: malai merunduk 30-45°, daun bendera kuning 60-80%, umur sesuai deskripsi varietas (110-140 HST).",
+          "cosine_sim": 0.7247,
+          "rouge1_f": 0.157,
+          "rouge2_f": 0.0051,
+          "rougeL_f": 0.0759,
+          "rouge_detail": {
+            "rouge1": {
+              "precision": 0.1065,
+              "recall": 0.2981,
+              "fmeasure": 0.157
+            },
+            "rouge2": {
+              "precision": 0.0034,
+              "recall": 0.0097,
+              "fmeasure": 0.0051
+            },
+            "rougeL": {
+              "precision": 0.0515,
+              "recall": 0.1442,
+              "fmeasure": 0.0759
+            }
+          },
+          "time_s": 45.216,
+          "faithfulness": null
+        }
+      ],
+      "n_queries": 18,
+      "k_used": 3
+    }
+  }
+}

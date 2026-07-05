@@ -1,0 +1,21 @@
+ID,Penyakit,Query,RR,Hit@3,Precision@3,Top1_Score,Relevant_Flags
+Q01,bacterial_leaf_blight,"Daun padi saya menguning mulai dari ujung dan tepi, lalu muncul eksudat kekuningan di pagi hari saat musim hujan, penyakit apa dan bagaimana penanganannya?",0.5,1.0,0.3333,0.6291,"[0, 1, 0]"
+Q02,leaf_blast,"Saya baru memupuk urea dengan dosis tinggi, beberapa hari kemudian muncul bercak abu-abu kecil di daun, apa risiko dan tindakan yang harus dilakukan?",0.0,0.0,0.0,0.6285,"[0, 0, 0]"
+Q03,neck_blast,"Padi saya hampir memasuki fase pembungaan, di sekitar sawah sudah ada laporan blas daun, apa langkah pencegahan blas leher malai yang tepat?",0.5,1.0,0.3333,0.5776,"[0, 1, 0]"
+Q04,sheath_blight,"Sawah saya tergenang air dalam waktu lama, tanam padi rapat, sekarang muncul bercak oval abu-abu di pelepah daun bawah dekat permukaan air, penyakit apa ini?",1.0,1.0,0.6667,0.6647,"[1, 0, 1]"
+Q05,tungro,"Di pertanaman padi saya mulai muncul beberapa rumpun yang agak kerdil dengan daun atas sedikit pucat menguning, ditemukan wereng hijau dalam jumlah sedang, apa yang harus dilakukan?",0.0,0.0,0.0,0.5778,"[0, 0, 0]"
+Q06,brown_spot,"Lahan saya kekurangan pupuk kalium, tanaman padi mulai banyak bercak oval coklat dengan pusat keabu-abuan di daun bawah, apa penyebab dan solusinya?",0.5,1.0,0.3333,0.6915,"[0, 1, 0]"
+Q07,dead_heart,"Padi saya umur 30 HST, banyak ngengat berwarna putih di sawah dan mulai ada beberapa anakan muda yang pucuknya mati dan bisa dicabut dengan mudah, hama apa ini?",0.3333,1.0,0.3333,0.5939,"[0, 0, 1]"
+Q08,hispa,"Ditemukan kumbang kecil berduri hitam keunguan di daun padi, lalu muncul goresan putih horizontal sejajar tulang daun disertai lubang-lubang kecil pada daun, hama apa ini dan kapan perlu disemprot?",0.0,0.0,0.0,0.6428,"[0, 0, 0]"
+Q09,bacterial_panicle_blight,"Padi saya saat fase pembungaan terkena cuaca panas dan suhu malam tinggi di atas 25°C, sekarang gabah banyak yang hampa berwarna coklat-keunguan dan mengeriput, penyakit apa ini?",0.0,0.0,0.0,0.6273,"[0, 0, 0]"
+Q10,leaf_smut,"Pada daun padi muncul bintik-bintik hitam kecil seperti titik-titik tersebar merata, tanaman tetap tumbuh normal, penyakit apa ini dan apakah perlu disemprot fungisida?",0.5,1.0,0.3333,0.6088,"[0, 1, 0]"
+Q11,downy_mildew,"Bibit padi di pesemaian saya kerdil, daun pucat dengan distorsi, dan ada lapisan putih halus di bawah daun, penyakit apa dan tindakannya?",0.0,0.0,0.0,0.4413,"[0, 0, 0]"
+Q12,healthy,"Tanaman padi saya umur 45 HST, anakan produktif banyak, daun hijau sehat, tidak ada gejala penyakit, langkah perawatan rutin apa yang harus dilakukan agar tetap sehat hingga panen?",1.0,1.0,0.3333,0.6205,"[1, 0, 0]"
+Q13,bacterial_leaf_streak,"Daun padi saya muncul lesi garis-garis sempit memanjang di antara tulang daun warna kuning kecoklatan dengan butiran eksudat kuning di sepanjang lesi, beda dari hawar daun bakteri biasa, penyakit apa ini?",1.0,1.0,0.3333,0.5846,"[1, 0, 0]"
+Q14,harvest_stage,"Padi saya sudah menunduk dan 90% gabah berwarna kuning keemasan, tapi cuaca terus hujan beberapa hari ke depan, kapan dan bagaimana cara panen yang aman?",1.0,1.0,0.3333,0.6478,"[1, 0, 0]"
+Q15,leaf_blast,"Bercak belah ketupat di daun padi yang awalnya kecil sekarang sudah menyatu menjadi besar dan daun banyak yang mengering, serangan sudah berat, apa tindakan darurat?",0.5,1.0,0.3333,0.6223,"[0, 1, 0]"
+Q16,sheath_blight,"Saya menanam padi dengan jarak rapat 20x20 cm dan kelembaban kanopi sangat tinggi, sekarang banyak bercak oval abu-abu di pelepah daun bawah, penyakit apa dan solusi strukturalnya?",0.5,1.0,0.6667,0.6918,"[0, 1, 1]"
+Q17,tungro,"Sawah tetangga saya sudah terkena tungro dengan tanaman kerdil kuning-oranye, pertanaman padi saya bersebelahan dan belum bergejala, apa langkah pencegahan agar tidak tertular?",0.0,0.0,0.0,0.5997,"[0, 0, 0]"
+Q18,harvest_stage,"Padi saya malai sudah menunduk dan sebagian besar gabah kuning, tapi gabah bagian ujung malai masih lunak belum keras saat ditekan kuku, sebaiknya saya tunggu atau langsung panen?",0.5,1.0,0.6667,0.6273,"[0, 1, 1]"
+
+RATA-RATA,,,0.4352,0.6667,0.2778,,
