@@ -53,16 +53,16 @@ SWIN_DATASET_LIST = [
 # ─────────────────────────────────────────────────────────────────
 HARDCODED_MODEL_PATHS = {
     # ── EfficientNet-B0 ──────────────────────────────────────────
-    "efficientnet_b0__Citra_Daun_Padi"    : "models/efficientnet_b0_Citra_Daun_Padi_best.h5",
-    "efficientnet_b0__JENIS_PENYAKIT_PADI": "models/efficientnet_b0_JENIS_PENYAKIT_PADI_best.h5",
-    "efficientnet_b0__paddy_dataset_v3"   : "models/efficientnet_b0_paddy-dataset-v3-augmentasi_best.h5",
-    "efficientnet_b0__Paddy_disease"      : "models/efficientnet_b0_Paddy-disease-classification_best.h5",
+    "efficientnet_b0__Citra_Daun_Padi"    : "models_perdataset/efficientnet_b0_Citra_Daun_Padi_best.h5",
+    "efficientnet_b0__JENIS_PENYAKIT_PADI": "models_perdataset/efficientnet_b0_JENIS_PENYAKIT_PADI_best.h5",
+    "efficientnet_b0__paddy_dataset_v3"   : "models_perdataset/efficientnet_b0_paddy-dataset-v3-augmentasi_best.h5",
+    "efficientnet_b0__Paddy_disease"      : "models_perdataset/efficientnet_b0_Paddy-disease-classification_best.h5",
 
     # ── InceptionV3 ──────────────────────────────────────────────
-    "inception_v3__Citra_Daun_Padi"       : "models/inception_v3_Citra_Daun_Padi_best.h5",
-    "inception_v3__JENIS_PENYAKIT_PADI"   : "models/inception_v3_JENIS_PENYAKIT_PADI_best.h5",
-    "inception_v3__paddy_dataset_v3"      : "models/inception_v3_paddy-dataset-v3-augmentasi_best.h5",
-    "inception_v3__Paddy_disease"         : "models/inception_v3_Paddy-disease-classification_best.h5",
+    "inception_v3__Citra_Daun_Padi"       : "models_perdataset/inception_v3_Citra_Daun_Padi_best.h5",
+    "inception_v3__JENIS_PENYAKIT_PADI"   : "models_perdataset/inception_v3_JENIS_PENYAKIT_PADI_best.h5",
+    "inception_v3__paddy_dataset_v3"      : "models_perdataset/inception_v3_paddy-dataset-v3-augmentasi_best.h5",
+    "inception_v3__Paddy_disease"         : "models_perdataset/inception_v3_Paddy-disease-classification_best.h5",
 
     # ── ResNet-50 ─────────────────────────────────────────────────
     "resnet50__Citra_Daun_Padi"           : "models_perdataset/resnet50_Citra_Daun_Padi_best.h5",
@@ -71,10 +71,10 @@ HARDCODED_MODEL_PATHS = {
     "resnet50__Paddy_disease"             : "models_perdataset/resnet50_Paddy-disease-classification_best.h5",
 
     # ── ViT-Base/16 ───────────────────────────────────────────────
-    "vit__Citra_Daun_Padi"                : "models/vit_Citra_Daun_Padi_best.h5",
-    "vit__JENIS_PENYAKIT_PADI"            : "models/vit_JENIS_PENYAKIT_PADI_best.h5",
-    "vit__paddy_dataset_v3"               : "models/vit_paddy-dataset-v3-augmentasi_best.h5",
-    "vit__Paddy_disease"                  : "models/vit_Paddy-disease-classification_best.h5",
+    "vit__Citra_Daun_Padi"                : "models_perdataset/vit_Citra_Daun_Padi_best.h5",
+    "vit__JENIS_PENYAKIT_PADI"            : "models_perdataset/vit_JENIS_PENYAKIT_PADI_best.h5",
+    "vit__paddy_dataset_v3"               : "models_perdataset/vit_paddy-dataset-v3-augmentasi_best.h5",
+    "vit__Paddy_disease"                  : "models_perdataset/vit_Paddy-disease-classification_best.h5",
 }
 
 

@@ -106,7 +106,7 @@ async def lifespan(app: FastAPI):
     db_status = db.test_connection()
     print(f"{'✅' if db_status['status'] == 'connected' else '⚠️ '} {db_status['message']}")
 
-    print("\n══ Loading model utama (/predict) ══")
+    print("\n══ Loading model GABUNGAN utama (/predict) ══")
     try:
         ml_model["model"], ml_model["class_names"], ml_model["model_name"] = load_model()
         print(f"✅ Model utama siap: {ml_model['model_name']}")
@@ -238,7 +238,7 @@ async def list_models():
             "arsitektur": meta["arch_label"],
             "dataset"   : meta["dataset_label"],
             "model_name": meta["model_name"],
-            "source"    : ".env" if meta["arch_key"] == "swin_base" else "hardcode",
+            "path"      : meta.get("path"),
         }
     return {"total_model": len(result), "models": result}
 
@@ -346,7 +346,7 @@ async def predict_disease(
     llm          : str           = "groq",
 ):
     """
-    Upload gambar → prediksi 4 Swin Transformer → voting → rekomendasi LLM+RAG
+    Upload gambar → prediksi MODEL GABUNGAN (Swin-B, 14 kelas) → rekomendasi LLM+RAG
     → **simpan ke Supabase** (tabel users + predictions).
 
     Header:
@@ -369,16 +369,14 @@ async def predict_disease(
             pass
     user_id = _resolve_user(x_user_id or "anonymous", device_info)
 
-    # ── Ambil semua 4 Swin ────────────────────────────────────────
-    swin_models = {k: v for k, v in ml_models.items() if v["arch_key"] == "swin_base"}
-    if not swin_models:
-        if "model" not in ml_model:
-            raise HTTPException(status_code=503, detail="Tidak ada model Swin yang tersedia")
-        swin_models = {"swin_base__default": {
-            "model": ml_model["model"], "class_names": ml_model["class_names"],
-            "model_name": ml_model["model_name"], "arch_key": "swin_base",
-            "dataset_label": "Default (MODEL_PATH)",
-        }}
+    # ── Gunakan MODEL GABUNGAN (deployment: 1 model, 14 kelas) ────
+    if "model" not in ml_model:
+        raise HTTPException(status_code=503, detail="Model gabungan belum siap")
+    swin_models = {"swin_base__gabungan": {
+        "model": ml_model["model"], "class_names": ml_model["class_names"],
+        "model_name": ml_model["model_name"], "arch_key": "swin_base",
+        "dataset_label": "Dataset Gabungan (14 kelas)",
+    }}
 
     # ── Prediksi ──────────────────────────────────────────────────
     swin_results   : dict[str, SwingModelResult] = {}
@@ -527,7 +525,7 @@ async def predict_with_model(
     return {
         "model_key": model_key, "arsitektur": m["arch_label"],
         "dataset": m["dataset_label"],
-        "source_path": ".env" if m["arch_key"] == "swin_base" else "hardcode",
+        "source_path": m.get("path"),
         "predicted_class": predicted_class, "confidence_percentage": confidence,
         "detection_time_ms": detection_time_ms, "recommendation": recommendation,
         "prediction_id": prediction_id, "saved_to_database": saved_ok,
@@ -771,7 +769,14 @@ async def chat(
 @app.get("/history/{device_id}", response_model=HistoryResponse, tags=["History"])
 async def get_history(device_id: str, limit: int = 20, offset: int = 0):
     """Ambil riwayat prediksi berdasarkan device_id dari Supabase."""
-    user = db.get_user_by_device(device_id)
+    try:
+        user = db.get_user_by_device(device_id)
+    except Exception as e:
+        # DB/Supabase tidak tersedia atau env belum diisi.
+        raise HTTPException(
+            status_code=503,
+            detail=f"Database tidak tersedia (cek SUPABASE_URL/SUPABASE_KEY): {str(e)}",
+        )
     if not user:
         return HistoryResponse(
             success=True,

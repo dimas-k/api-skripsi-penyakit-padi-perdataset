@@ -1,6 +1,0 @@
-dataset,tipe,model,n_kelas_model,n_test,accuracy,precision_macro,recall_macro,f1_macro,waktu_per_gambar_ms,ukuran_mb
-paddy-v3-augmentasi,Gabungan,swin_base_best.h5,14,1844,0.9355,0.9909,0.9346,0.9535,230.47,331.08
-paddy-v3-augmentasi,Satuan,swin_base_paddy-dataset-v3-augmentasi_best.h5,9,1844,0.9935,0.9935,0.9936,0.9935,261.19,331.07
-paddy-v3-augmentasi,Satuan-Citra_Daun_Padi (lintas),swin_base_Citra_Daun_Padi_best.h5,3,1844,0.1518,0.0691,0.1547,0.0835,249.18,331.04
-paddy-v3-augmentasi,Satuan-JENIS_PENYAKIT_PADI (lintas),swin_base_JENIS_PENYAKIT_PADI_best.h5,3,1844,0.1318,0.0463,0.1338,0.0608,226.72,331.04
-paddy-v3-augmentasi,Satuan-Paddy_disease (lintas),swin_base_Paddy-disease-classification_best.h5,11,1844,0.3335,0.3792,0.3179,0.3122,226.85,331.08
