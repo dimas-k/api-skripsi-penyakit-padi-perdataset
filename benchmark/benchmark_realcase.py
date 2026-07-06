@@ -1,35 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-benchmark_realcase.py — Uji REAL-CASE: GABUNGAN vs SEMUA SATUAN (swin_base)
-================================================================================
-Untuk data KECIL (1-3 gambar per kelas). Ini STUDI KASUS / DEMONSTRASI lapangan,
-BUKAN akurasi statistik test-set penuh.
-
-Model yang diuji (semua swin_base, sama seperti benchmark_model.py):
-  - Gabungan            (14 kelas)
-  - Satuan paddy_v3     (9 kelas)
-  - Satuan Citra_Daun_Padi        (3 kelas)   ← lintas
-  - Satuan JENIS_PENYAKIT_PADI    (3 kelas)   ← lintas
-  - Satuan Paddy_disease          (11 kelas)  ← lintas
-
-Output (sesuai data kecil):
-  - Tabel prediksi PER-GAMBAR per model (aktual vs prediksi + confidence)
-  - Ringkasan "benar X dari Y" per model + PLAFON (kelas yang dikenali model)
-  - Tabel perbandingan antar-model
-  (F1/precision/recall macro sengaja tidak ditonjolkan: tak bermakna pd 1-3 sampel.)
-
-Struktur folder (per kelas):
-  train model/
-    ├── bacterial_leaf_blight/ *.jpg
-    ├── leaf_blast/ *.jpg
-    └── ... (14 kelas)
-
-Jalankan (dari folder API, sejajar benchmark_model.py):
-  python benchmark_realcase.py
-  python benchmark_realcase.py --dir "PATH/ke/folder"
-"""
-
 import os
 import argparse
 

@@ -1,23 +1,3 @@
-"""
-isi_excel_untuk_validator.py  (v4 — Penilaian Ground Truth oleh PAKAR)
-=====================================================================
-Perubahan dari v3:
-  - Sasaran validator: PAKAR / Dosen Pertanian (bukan lagi "petani"/"validator" umum)
-  - Sheet 1 diberi label Dataset: "Penilaian Faithfulness B"
-  - TAMBAH kolom ke-8 (BIRU): "Validasi Pakar" — pakar menuliskan jawaban
-    referensi versi mereka sendiri; jawaban ini menjadi Ground Truth ke-3 (GT-3)
-  - Blok bawah diganti "PERNYATAAN VALIDATOR PAKAR"
-    (Nama & Gelar, NIDN/Jabatan, Bidang Keahlian, Instansi, Tanggal, TTD)
-  - Sheet 2 "Panduan untuk Pakar" ditulis ulang untuk konteks validator pakar
-  - Layout: A4 Landscape, 8 kolom
-    No | Penyakit | Query | GT-1 | GT-2 | Skor GT-1 | Skor GT-2 | Validasi Pakar (GT-3)
-
-Cara pakai:
-  python isi_excel_untuk_validator.py
-  python isi_excel_untuk_validator.py --input hasil_evaluasi_rag.json --kb knowledge_base/penyakit_padi.txt
-  python isi_excel_untuk_validator.py --dataset B --output Penilaian_Faithfulness_Pakar.xlsx
-"""
-
 import json, re, argparse
 from pathlib import Path
 from openpyxl import Workbook

@@ -1,11 +1,4 @@
-"""
-database.py — Supabase client & semua operasi database
 
-Tabel:
-  - users         : identitas perangkat pengguna (device_id based, no login)
-  - predictions   : riwayat setiap deteksi penyakit
-  - chat_messages : riwayat percakapan chatbot
-"""
 
 import os
 from typing import Optional

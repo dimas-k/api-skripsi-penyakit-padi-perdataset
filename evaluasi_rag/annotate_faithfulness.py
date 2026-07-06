@@ -1,19 +1,3 @@
-"""
-annotate_faithfulness.py
-========================
-Isi skor Faithfulness dari hasil_evaluasi_rag.json yang sudah ada.
-TIDAK memanggil API lagi — hemat quota Gemini & resource Ollama.
-
-3 Tier LLM yang dievaluasi:
-  LOW    : Qwen2.5-3B     (Ollama lokal)
-  MEDIUM : Gemini 2.5 Flash (Google API)
-  HIGH   : Llama3.3-70B   (Ollama lokal)
-
-Cara pakai:
-  python annotate_faithfulness.py
-  python annotate_faithfulness.py --input hasil_evaluasi_rag.json
-"""
-
 import json, argparse, numpy as np
 from pathlib import Path
 

@@ -1,26 +1,3 @@
-"""
-hitung_metrik_setelah_validasi.py  (v2 - dukung Validasi Pakar / GT-3)
-=====================================================================
-Jalankan SETELAH pakar mengisi skor GT-1, GT-2, dan (opsional) menuliskan
-VALIDASI PAKAR (Ground Truth ke-3) di Excel.
-
-Alur:
-  1. Baca Excel pakar (kolom Skor GT-1, Skor GT-2, dan Validasi Pakar / GT-3)
-  2. Tentukan Ground Truth per query (GT-3 = PELENGKAP, bukan pengganti):
-       - Jika minimal satu GT dinilai SEMPURNA (skor == 1.0) -> pakai GT itu
-         (GT-3 tidak diperlukan karena referensi sudah lengkap).
-       - Jika TIDAK ada GT yang sempurna (semua skor < 1.0) DAN GT-3 terisi ->
-         lengkapi GT berskor tertinggi dengan GT-3 (digabung sebagai pelengkap).
-       - Jika GT-3 kosong -> fallback: pakai GT skor tertinggi / gabungan GT-1+2.
-  3. Hitung ROUGE-1 / ROUGE-2 / ROUGE-L / BLEU / METEOR
-     antara GT terpilih vs jawaban LLM (LOW / MEDIUM / HIGH)
-  4. Simpan hasil ke Excel (per query + ringkasan rata-rata per tier + GT dipakai)
-
-Cara pakai:
-  python hitung_metrik_setelah_validasi.py
-  python hitung_metrik_setelah_validasi.py --excel Penilaian_Faithfulness_Pakar.xlsx --json hasil_evaluasi_rag.json --output hasil_metrik_final.xlsx
-"""
-
 import json, re, argparse, math
 from pathlib import Path
 from openpyxl import load_workbook, Workbook

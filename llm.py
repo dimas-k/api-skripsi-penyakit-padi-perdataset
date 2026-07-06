@@ -1,21 +1,3 @@
-"""
-llm.py — LLM dengan Integrasi RAG
-===================================
-3 Tier Model LLM:
-  LOW    : Qwen 2.5-3B        (Ollama, lokal)  — model kecil, sangat cepat
-  MEDIUM : Gemini 2.5 Flash   (Google API)     — seimbang, cloud, context 1M token
-  HIGH   : Llama 3.3-70B      (Groq API)       — model besar, kualitas tinggi, cepat via cloud
-
-Cara menjalankan Ollama (untuk LOW tier):
-  ollama serve
-  ollama pull qwen2.5:3b
-
-Variabel .env yang dibutuhkan:
-  GEMINI_API_KEY=...
-  GROQ_API_KEY=...
-  OLLAMA_BASE_URL=http://localhost:11434  (opsional, default lokal)
-"""
-
 import os
 import time
 import logging

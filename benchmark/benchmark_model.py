@@ -1,32 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-benchmark_model.py — Benchmark Model GABUNGAN vs SATUAN (PyTorch)
-===========================================================================
-Skripsi: Klasifikasi Penyakit Daun Padi dengan Transfer Learning (PadiCare)
-
-CATATAN:
-  - Model = checkpoint PyTorch (torch.save), meski ekstensi .h5.
-  - Model GABUNGAN output 14 kelas (urutan CLASS_NAMES API).
-  - Model SATUAN output = jumlah kelas dataset-nya sendiri (mis. paddy-v3 = 9).
-  - Jumlah & urutan kelas dideteksi OTOMATIS dari tiap checkpoint.
-  - Nama folder kelas yang panjang (mis. 'Blast (Blas)') dicocokkan otomatis
-    ke nama kanonik ('leaf_blast') via prefix/substring + ALIASES.
-
-Strategi:
-  Untuk tiap dataset ber-test-set berlabel (folder per-kelas):
-    bandingkan GABUNGAN vs SATUAN di test set yang sama (1 vs 1).
-
-Metrik:
-  Accuracy, Precision/Recall/F1 (macro), waktu inferensi/gambar (ms),
-  ukuran file model (MB).
-
-Jalankan:
-  python benchmark_model.py --limit 50   (cek cepat)
-  python benchmark_model.py               (penuh)
-===========================================================================
-"""
-
 import os
 import sys
 import time

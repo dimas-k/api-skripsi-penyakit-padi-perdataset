@@ -1,19 +1,3 @@
-"""
-isi_excel_untuk_validator.py  (v3 — Penilaian Ground Truth)
-=============================================================
-Perubahan dari v2:
-  - HAPUS kolom Jawaban Sistem AI (3 LLM)
-  - HAPUS kolom Skor LOW / MEDIUM / HIGH
-  - TAMBAH 2 kolom skor validator: Skor GT-1 dan Skor GT-2
-  - Validator (petani) menilai kelengkapan & ketepatan masing-masing Ground Truth
-  - Layout: A4 Landscape, 7 kolom
-    No | Penyakit | Query | GT-1 | GT-2 | Skor GT-1 | Skor GT-2
-
-Cara pakai:
-  python isi_excel_untuk_validator.py
-  python isi_excel_untuk_validator.py --input hasil_evaluasi_rag.json --kb knowledge_base/penyakit_padi.txt
-"""
-
 import json, re, argparse
 from pathlib import Path
 from openpyxl import Workbook

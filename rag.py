@@ -1,25 +1,3 @@
-"""
-rag.py — RAG Pipeline untuk Sistem Penyakit Padi
-=================================================
-Implementasi Retrieval-Augmented Generation (RAG) menggunakan:
-- Embedding: sentence-transformers/all-MiniLM-L6-v2
-- Vector Store: FAISS
-- Chunking: 1000 karakter dengan overlap 100 karakter
-- Top-k retrieval: k=5 chunks
-
-Kelas yang didukung (14 kelas):
-  bacterial_leaf_blight, bacterial_leaf_streak, bacterial_panicle_blight,
-  brown_spot, dead_heart, downy_mildew, healthy, hispa,
-  leaf_blast, leaf_smut, neck_blast, sheath_blight, tungro,
-  harvest_stage 
-
-Changelog v2:
-- Tambah kelas harvest_stage pada knowledge base
-- build_rag_prompt() memiliki cabang query khusus untuk harvest_stage
-- format_context() menampilkan label "Fase Panen" untuk harvest_stage
-- get_index_info() mengembalikan daftar kelas yang didukung
-"""
-
 import os
 import pickle
 import logging

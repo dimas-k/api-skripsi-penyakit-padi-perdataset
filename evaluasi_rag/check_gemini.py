@@ -1,11 +1,3 @@
-"""
-Jalankan script ini DARI KOMPUTERMU sendiri:
-    python check_gemini.py
-
-Script ini akan menampilkan:
-- Model Gemini apa saja yang tersedia di API key kamu
-- Mana yang bisa dipakai untuk generateContent
-"""
 import os, requests
 from dotenv import load_dotenv
 
