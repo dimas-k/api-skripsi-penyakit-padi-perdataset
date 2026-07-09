@@ -464,7 +464,27 @@ def get_recommendation_gemini(disease_name: str, sensor_data: dict | None = None
     return text
 
 
-def get_chat_response_groq(question: str, disease_context: str) -> str:
+def _build_chat_sensor_section(sensor_data: dict | None) -> str:
+    """Blok data sensor untuk konteks chat (dipakai groq & gemini)."""
+    if not sensor_data:
+        return ""
+    return (
+        "\nData sensor lapangan terkini yang HARUS jadi acuan jawabanmu "
+        "(jangan mengarang angka di luar data ini):\n"
+        f"- Suhu Udara       : {sensor_data.get('suhu_udara', 'N/A')} °C\n"
+        f"- Kelembaban Udara : {sensor_data.get('kelembaban_udara', 'N/A')} %\n"
+        f"- Suhu Tanah       : {sensor_data.get('suhu_tanah', 'N/A')} °C\n"
+        f"- Kelembaban Tanah : {sensor_data.get('kelembaban_tanah', 'N/A')} %\n"
+        f"- pH Tanah         : {sensor_data.get('ph_tanah', 'N/A')}\n"
+        f"- Nitrogen (N)     : {sensor_data.get('nitrogen', 'N/A')} mg/kg\n"
+        f"- Fosfor (P)       : {sensor_data.get('fosfor', 'N/A')} mg/kg\n"
+        f"- Kalium (K)       : {sensor_data.get('kalium', 'N/A')} mg/kg\n"
+        f"- Intensitas Cahaya: {sensor_data.get('intensitas_cahaya', 'N/A')} lux\n"
+        f"- Curah Hujan      : {sensor_data.get('curah_hujan', 'N/A')} mm/hari\n\n"
+    )
+
+
+def get_chat_response_groq(question: str, disease_context: str, sensor_data: dict | None = None) -> str:
     """Alias lama → pakai Groq HIGH untuk chat."""
     context = ""
     if disease_context and disease_context.strip():
@@ -472,10 +492,11 @@ def get_chat_response_groq(question: str, disease_context: str) -> str:
             f"\nKonteks: Petani sedang menangani penyakit "
             f"'{disease_context}' pada tanaman padinya.\n"
         )
+    context += _build_chat_sensor_section(sensor_data)
     return _groq_generate(context + question)
 
 
-def get_chat_response_gemini(question: str, disease_context: str) -> str:
+def get_chat_response_gemini(question: str, disease_context: str, sensor_data: dict | None = None) -> str:
     """Alias lama → pakai Gemini MEDIUM untuk chat."""
     context = ""
     if disease_context and disease_context.strip():
@@ -483,6 +504,7 @@ def get_chat_response_gemini(question: str, disease_context: str) -> str:
             f"Konteks: Petani sedang menangani penyakit "
             f"'{disease_context}' pada tanaman padinya.\n\n"
         )
+    context += _build_chat_sensor_section(sensor_data)
     text, _ = _gemini_generate(context + question)
     return text
 

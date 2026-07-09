@@ -113,6 +113,11 @@ class SensorResponse(BaseModel):
     data          : Dict[str, Any]
     detail_status : List[SensorStatus]
     kesimpulan    : str
+    # Info untuk mobile: apakah data realtime + periode data historis + sumber.
+    is_realtime   : bool          = False
+    periode_data  : Optional[str] = None
+    sumber        : Optional[str] = None
+    data_llm      : Optional[Dict[str, Any]] = None
 
 
 # ── /history (predictions) ────────────────────────────────────────

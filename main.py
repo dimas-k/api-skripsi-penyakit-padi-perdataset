@@ -24,6 +24,7 @@ from llm import (
     compare_llm_recommendation,
 )
 import database as db
+import thingsboard as tb
 
 
 # ═════════════════════════════════════════════════════════════════
@@ -317,7 +318,49 @@ async def get_user_info(device_id: str):
 # SENSOR
 # ═════════════════════════════════════════════════════════════════
 @app.get("/sensor", response_model=SensorResponse, tags=["Sensor"])
-async def get_sensor_data():
+async def get_sensor_data(source: str = "auto"):
+    """
+    Data sensor Stasiun AWS.
+    - source=auto (default): ambil data ASLI ThingsBoard, fallback dummy bila gagal.
+    - source=thingsboard   : paksa ThingsBoard (error 502 bila gagal).
+    - source=dummy         : paksa data contoh.
+    """
+    if source in ("auto", "thingsboard"):
+        try:
+            device_id = tb.resolve_device_id()
+            latest    = tb.get_average_values(device_id)   # rata-rata periode data (bukan nilai terakhir)
+            data, detail, abnormal = tb.build_snapshot(latest)
+            if data:
+                statuses = [
+                    SensorStatus(
+                        parameter=d["parameter"], nilai=d["nilai"], satuan=d["satuan"],
+                        status=d["status"], keterangan=d["keterangan"],
+                    )
+                    for d in detail
+                ]
+                kesimpulan = (
+                    "✅ Semua parameter sensor dalam batas normal."
+                    if not abnormal else
+                    f"⚠️ {len(abnormal)} parameter di luar batas normal: "
+                    + ", ".join(abnormal) + ". Perlu perhatian lebih lanjut."
+                )
+                try:
+                    periode = tb.periode_text(tb.get_data_coverage(device_id))
+                except tb.ThingsBoardError:
+                    periode = ""
+                return SensorResponse(
+                    lokasi="Stasiun AWS — ThingsBoard (PetaniTech)",
+                    timestamp=tb.latest_timestamp_iso(latest) or datetime.now().isoformat(),
+                    data=data, detail_status=statuses, kesimpulan=kesimpulan,
+                    is_realtime=False, periode_data=(periode or None), sumber="thingsboard",
+                    data_llm=tb.to_llm_sensor_dict(data),
+                )
+        except tb.ThingsBoardError as e:
+            if source == "thingsboard":
+                raise HTTPException(status_code=502, detail=str(e))
+            print(f"⚠️  ThingsBoard tidak tersedia, pakai data dummy: {e}")
+
+    # Fallback: data dummy
     data     = _generate_sensor_data()
     statuses = _evaluate_sensor(data)
     abnormal = [s for s in statuses if s.status != "normal"]
@@ -328,10 +371,108 @@ async def get_sensor_data():
         + ", ".join(s.parameter for s in abnormal) + ". Perlu perhatian lebih lanjut."
     )
     return SensorResponse(
-        lokasi="Sawah Demo — Indramayu, Jawa Barat",
+        lokasi="Sawah Demo (dummy) — Indramayu, Jawa Barat",
         timestamp=datetime.now().isoformat(),
         data=data, detail_status=statuses, kesimpulan=kesimpulan,
+        is_realtime=False, periode_data=None, sumber="dummy",
     )
+
+
+def _resolve_sensor_for_llm(use_sensor: bool, manual_sensor: Optional[str]) -> Optional[dict]:
+    """
+    Tentukan data sensor untuk konteks LLM:
+    1. Input MANUAL dari pengguna (realtime) — field boleh kosong sebagian.
+    2. Data ThingsBoard (historis) bila use_sensor=True.
+    3. None bila tidak ada.
+    """
+    import json as _json
+    if manual_sensor:
+        try:
+            manual = _json.loads(manual_sensor)
+        except Exception:
+            manual = {}
+        if isinstance(manual, dict):
+            cleaned = {k: v for k, v in manual.items() if v not in (None, "", [])}
+            if cleaned:
+                return cleaned
+    if use_sensor:
+        try:
+            device_id = tb.resolve_device_id()
+            latest = tb.get_average_values(device_id)   # rata-rata periode data (bukan nilai terakhir)
+            data, _, _ = tb.build_snapshot(latest)
+            llm_dict = tb.to_llm_sensor_dict(data)
+            if llm_dict:
+                return llm_dict
+        except tb.ThingsBoardError as e:
+            print(f"⚠️  Sensor ThingsBoard gagal, lanjut tanpa sensor: {e}")
+    return None
+
+
+# ─── ThingsBoard (data sensor asli via time series) ───────────────
+# Endpoint discovery untuk menemukan device & key telemetry aslinya.
+# Setelah key diketahui, /sensor akan dipetakan ke data asli ini.
+@app.get("/sensor/tb/devices", tags=["Sensor"])
+async def tb_list_devices(text_search: str = ""):
+    """Daftar device pada tenant ThingsBoard (untuk menemukan Device AWS)."""
+    try:
+        return {"devices": tb.list_devices(text_search)}
+    except tb.ThingsBoardError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@app.get("/sensor/tb/keys", tags=["Sensor"])
+async def tb_list_keys():
+    """Daftar key telemetry time-series pada device terkonfigurasi."""
+    try:
+        device_id = tb.resolve_device_id()
+        return {"device_id": device_id, "keys": tb.get_timeseries_keys(device_id)}
+    except tb.ThingsBoardError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@app.get("/sensor/tb/timeseries", tags=["Sensor"])
+async def tb_timeseries(
+    keys: str = "",
+    start: str = "",
+    end: str = "",
+    interval: int = 3600000,
+    agg: str = "AVG",
+    limit: int = 200,
+):
+    """
+    Data TIME SERIES (riwayat) dari ThingsBoard — untuk grafik.
+    - start/end: ISO datetime WIB, mis. 2025-01-01T00:00:00+07:00.
+      Kosongkan untuk memakai rentang default sepanjang 2025.
+    - interval: ukuran bucket agregasi (ms). 3600000 = 1 jam.
+    - agg: NONE | AVG | MIN | MAX | SUM | COUNT.
+    """
+    try:
+        device_id = tb.resolve_device_id()
+        key_list = [k.strip() for k in keys.split(",") if k.strip()] or None
+        return {
+            "device_id": device_id,
+            "timeseries": tb.get_timeseries(
+                device_id, keys=key_list,
+                start=start or None, end=end or None,
+                interval=interval, agg=agg, limit=limit,
+            ),
+        }
+    except tb.ThingsBoardError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@app.get("/sensor/tb/latest", tags=["Sensor"])
+async def tb_latest(keys: str = ""):
+    """Nilai terakhir tiap key (endpoint latest, aman saat sensor non-aktif)."""
+    try:
+        device_id = tb.resolve_device_id()
+        key_list = [k.strip() for k in keys.split(",") if k.strip()] or None
+        return {
+            "device_id": device_id,
+            "latest": tb.get_latest_values(device_id, keys=key_list),
+        }
+    except tb.ThingsBoardError as e:
+        raise HTTPException(status_code=502, detail=str(e))
 
 
 # ═════════════════════════════════════════════════════════════════
@@ -343,6 +484,7 @@ async def predict_disease(
     x_user_id    : Optional[str] = Header(None),
     x_device_info: Optional[str] = Header(None),
     use_sensor   : bool          = False,
+    manual_sensor: Optional[str] = Form(None),
     llm          : str           = "groq",
 ):
     """
@@ -422,7 +564,8 @@ async def predict_disease(
     best_confidence  = best_swin_detail.confidence_percentage if best_swin_detail else avg_confidence
 
     # ── Sensor & LLM ──────────────────────────────────────────────
-    sensor_data = _generate_sensor_data() if use_sensor else None
+    # Prioritas: input manual (realtime) > ThingsBoard (historis) > tanpa sensor.
+    sensor_data = _resolve_sensor_for_llm(use_sensor, manual_sensor)
     if llm == "gemini":
         recommendation, _ = get_recommendation_gemini_rag(majority_class, sensor_data)
         llm_used           = "gemini"
@@ -732,6 +875,8 @@ async def chat(
     disease_context: str           = Form(...),
     llm            : str           = Form("groq"),
     prediction_id  : Optional[str] = Form(None),
+    use_sensor     : bool          = Form(False),
+    manual_sensor  : Optional[str] = Form(None),
     x_user_id      : Optional[str] = Header(None),
 ):
     """
@@ -742,11 +887,13 @@ async def chat(
     if not question.strip():
         raise HTTPException(status_code=400, detail="Pertanyaan tidak boleh kosong")
 
+    # Sensor sama dengan analisa: manual (bila diisi) > ThingsBoard (historis) > none.
+    sensor_data = _resolve_sensor_for_llm(use_sensor, manual_sensor)
     if llm == "gemini":
-        answer   = get_chat_response_gemini(question, disease_context)
+        answer   = get_chat_response_gemini(question, disease_context, sensor_data)
         llm_used = "gemini"
     else:
-        answer   = get_chat_response_groq(question, disease_context)
+        answer   = get_chat_response_groq(question, disease_context, sensor_data)
         llm_used = "groq"
 
     user_id = _resolve_user(x_user_id or "anonymous")
@@ -840,7 +987,7 @@ async def get_prediction_image(prediction_id: str):
 
 # ═════════════════════════════════════════════════════════════════
 # HISTORY — Chat
-# ═════════════════════════════════════════════════════════════════
+# ════════════════════════════════════════════���════════════════════
 @app.get("/chat/history/{device_id}", response_model=ChatHistoryResponse, tags=["History"])
 async def get_chat_history(device_id: str, limit: int = 50):
     """Ambil riwayat chat berdasarkan device_id dari Supabase."""
