@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import llm_queue  # antrian + rate limiter untuk semua panggilan LLM cloud
+
 logger = logging.getLogger(__name__)
 
 # ═════════════════════════════════════════════════════════════════
@@ -124,6 +126,7 @@ def _ollama_generate(model: str, prompt: str, base_url: str = None) -> str:
 # ═════════════════════════════════════════════════════════════════
 # INTERNAL: Gemini REST call
 # ═════════════════════════════════════════════════════════════════
+@llm_queue.rate_limited("gemini")
 def _gemini_generate(prompt: str) -> tuple[str, str]:
     """
     Panggil Gemini API dengan fallback ke model/versi berikutnya jika gagal.
@@ -194,6 +197,7 @@ def _gemini_generate(prompt: str) -> tuple[str, str]:
 # ═════════════════════════════════════════════════════════════════
 # INTERNAL: Groq REST call (HIGH)
 # ═════════════════════════════════════════════════════════════════
+@llm_queue.rate_limited("groq")
 def _groq_generate(prompt: str) -> str:
     """
     Panggil Groq API dengan model Llama 3.3-70B.
