@@ -404,7 +404,11 @@ def _resolve_sensor_for_llm(use_sensor: bool, manual_sensor: Optional[str]) -> O
             if llm_dict:
                 return llm_dict
         except tb.ThingsBoardError as e:
-            print(f"⚠️  Sensor ThingsBoard gagal, lanjut tanpa sensor: {e}")
+            print(f"⚠️  Sensor ThingsBoard gagal, pakai data dummy untuk LLM: {e}")
+        # Fallback dummy agar KONSISTEN dengan endpoint /sensor (panel) yang juga
+        # jatuh ke dummy bila ThingsBoard gagal. Dengan begini LLM tetap dapat
+        # data sensor, tidak lagi menjawab "tidak ada informasi sensor".
+        return _generate_sensor_data()
     return None
 
 
@@ -483,9 +487,9 @@ async def predict_disease(
     file         : UploadFile    = File(...),
     x_user_id    : Optional[str] = Header(None),
     x_device_info: Optional[str] = Header(None),
-    use_sensor   : bool          = False,
+    use_sensor   : bool          = Form(False),
     manual_sensor: Optional[str] = Form(None),
-    llm          : str           = "groq",
+    llm          : str           = Form("groq"),
 ):
     """
     Upload gambar → prediksi MODEL GABUNGAN (Swin-B, 14 kelas) → rekomendasi LLM+RAG
