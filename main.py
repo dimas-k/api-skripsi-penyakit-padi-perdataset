@@ -18,6 +18,7 @@ from schemas import (
     UserResponse,
 )
 from model import load_model, load_all_models, predict, ARCH_LABELS, DATASET_LABELS
+from ood import load_ood_stats, check_ood
 from llm import (
     get_recommendation_groq_rag, get_recommendation_gemini_rag,
     get_chat_response_groq, get_chat_response_gemini,
@@ -119,6 +120,14 @@ async def lifespan(app: FastAPI):
         if meta["status"] == "loaded":
             ml_models[model_key] = meta
     print(f"✅ Total model siap: {len(ml_models)} / {len(all_loaded)}\n")
+
+    # ── Muat statistik OOD (deteksi "bukan padi") ─────────────────
+    print("══ Memuat statistik OOD (gate bukan-padi) ══")
+    try:
+        load_ood_stats()
+    except Exception as e:
+        # Gate OOD tidak boleh menggagalkan startup API (fail-open).
+        print(f"⚠️  Gagal memuat OOD (diabaikan, API tetap jalan): {e}")
 
     yield
     ml_model.clear()
@@ -314,7 +323,7 @@ async def get_user_info(device_id: str):
     )
 
 
-# ═════════════════════════════════════════════════════════════════
+# ════════════════════════��════════════════════════════════════════
 # SENSOR
 # ═════════════════════════════════════════════════════════════════
 @app.get("/sensor", response_model=SensorResponse, tags=["Sensor"])
@@ -524,6 +533,32 @@ async def predict_disease(
         "dataset_label": "Dataset Gabungan (14 kelas)",
     }}
 
+    # ── GATE OOD: tolak gambar yang BUKAN daun/tanaman padi ───────
+    # Dicek SEBELUM diagnosa & LLM supaya benda random (mouse, wajah, dll)
+    # tidak dipaksa jadi label penyakit. Jika stats OOD belum dimuat,
+    # check_ood mengembalikan is_ood=False (fail-open) -> alur normal.
+    ood = check_ood(image_bytes, ml_model["model"], ml_model.get("model_name", "swin_base"))
+    if ood["is_ood"]:
+        print(f"🚫 OOD terdeteksi (skor={ood['score']} > {ood['threshold']}, "
+              f"terdekat={ood['nearest']}) — gambar ditolak sebagai bukan padi.")
+        return PredictionResponse(
+            predicted_class       = "bukan_padi",
+            confidence_percentage = 0.0,
+            detection_time_ms     = 0.0,
+            recommendation        = (
+                "Gambar yang diunggah sepertinya **bukan daun atau tanaman padi**, "
+                "sehingga sistem tidak dapat mendiagnosis penyakit. \n\n"
+                "Silakan ambil ulang foto **daun padi** yang jelas, fokus, dan "
+                "cukup cahaya, lalu coba lagi."
+            ),
+            prediction_id         = str(uuid.uuid4()),
+            saved_to_database     = False,
+            total_swin_models     = 1,
+            successful_models     = 0,
+            vote_method           = "ood_rejected",
+            majority_count        = "0 / 1 model (ditolak: bukan padi)",
+        )
+
     # ── Prediksi ──────────────────────────────────────────────────
     swin_results   : dict[str, SwingModelResult] = {}
     pred_with_conf : list[tuple[str, float]]     = []
@@ -615,9 +650,9 @@ async def predict_disease(
     )
 
 
-# ═════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════��══
 # DETECTION — /predict/{model_key}
-# ═════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════��═════════════════
 @app.post("/predict/{model_key}", tags=["Detection"])
 async def predict_with_model(
     model_key  : str,
@@ -892,7 +927,11 @@ async def chat(
         raise HTTPException(status_code=400, detail="Pertanyaan tidak boleh kosong")
 
     # Sensor sama dengan analisa: manual (bila diisi) > ThingsBoard (historis) > none.
-    sensor_data = _resolve_sensor_for_llm(use_sensor, manual_sensor)
+    # Untuk objek BUKAN padi, sensor lapangan tidak relevan -> jangan diambil sama sekali
+    # agar LLM tidak menyebut/mengarang data sensor.
+    _ctx = (disease_context or "").strip().lower()
+    is_non_padi = _ctx in ("bukan_padi", "bukan tanaman padi") or "bukan tanaman padi" in _ctx
+    sensor_data = None if is_non_padi else _resolve_sensor_for_llm(use_sensor, manual_sensor)
     if llm == "gemini":
         answer   = get_chat_response_gemini(question, disease_context, sensor_data)
         llm_used = "gemini"
@@ -914,7 +953,7 @@ async def chat(
     return ChatResponse(answer=answer, disease_context=disease_context, llm_used=llm_used)
 
 
-# ═════════════════════════════════════════════════════════════════
+# ════════════════════════════════════════��════════════════════════
 # HISTORY — Predictions
 # ═════════════════════════════════════════════════════════════════
 @app.get("/history/{device_id}", response_model=HistoryResponse, tags=["History"])

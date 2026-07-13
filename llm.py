@@ -484,20 +484,32 @@ def _build_chat_sensor_section(sensor_data: dict | None) -> str:
     )
 
 
-def get_chat_response_groq(question: str, disease_context: str, sensor_data: dict | None = None) -> str:
-    """Alias lama → pakai Groq HIGH untuk chat."""
-    context = ""
-    if disease_context and disease_context.strip():
-        context = (
-            f"\nKonteks: Petani sedang menangani penyakit "
-            f"'{disease_context}' pada tanaman padinya.\n"
+def _is_non_padi_context(disease_context: str | None) -> bool:
+    """True bila konteks diagnosa menunjukkan objek BUKAN tanaman padi."""
+    c = (disease_context or "").strip().lower()
+    return c in ("bukan_padi", "bukan tanaman padi") or "bukan tanaman padi" in c
+
+
+def _build_chat_context(disease_context: str, sensor_data: dict | None) -> str:
+    """Bangun blok konteks untuk chat.
+
+    Kasus BUKAN PADI: jangan sisipkan data sensor sama sekali dan jangan
+    menganggap ada penyakit padi. Sensor lapangan tidak relevan untuk objek
+    non-padi, jadi LLM tidak boleh menyebut/mengarang angka sensor.
+    """
+    if _is_non_padi_context(disease_context):
+        return (
+            "Konteks: Gambar yang diunggah pengguna TERDETEKSI BUKAN tanaman padi, "
+            "sehingga sistem tidak dapat mendiagnosis penyakit padi dari gambar ini.\n"
+            "Aturan wajib saat menjawab:\n"
+            "- JANGAN menyebut, menampilkan, atau mengarang data sensor lapangan apa pun "
+            "(suhu, kelembaban, pH, N/P/K, curah hujan, dsb).\n"
+            "- JANGAN menganggap ada penyakit padi pada gambar ini.\n"
+            "- Jelaskan singkat & sopan bahwa objek bukan tanaman padi sehingga di luar "
+            "cakupan sistem.\n"
+            "- Sistem hanya dapat mendeteksi 14 kelas penyakit pada daun padi.\n"
+            "- Arahkan pengguna mengunggah foto daun padi yang jelas bila ingin diagnosis.\n\n"
         )
-    context += _build_chat_sensor_section(sensor_data)
-    return _groq_generate(context + question)
-
-
-def get_chat_response_gemini(question: str, disease_context: str, sensor_data: dict | None = None) -> str:
-    """Alias lama → pakai Gemini MEDIUM untuk chat."""
     context = ""
     if disease_context and disease_context.strip():
         context = (
@@ -505,6 +517,18 @@ def get_chat_response_gemini(question: str, disease_context: str, sensor_data: d
             f"'{disease_context}' pada tanaman padinya.\n\n"
         )
     context += _build_chat_sensor_section(sensor_data)
+    return context
+
+
+def get_chat_response_groq(question: str, disease_context: str, sensor_data: dict | None = None) -> str:
+    """Alias lama → pakai Groq HIGH untuk chat."""
+    context = _build_chat_context(disease_context, sensor_data)
+    return _groq_generate(context + question)
+
+
+def get_chat_response_gemini(question: str, disease_context: str, sensor_data: dict | None = None) -> str:
+    """Alias lama → pakai Gemini MEDIUM untuk chat."""
+    context = _build_chat_context(disease_context, sensor_data)
     text, _ = _gemini_generate(context + question)
     return text
 
