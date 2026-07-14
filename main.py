@@ -17,7 +17,7 @@ from schemas import (
     CompareResponse, ModelCompareResult, DetectionTimeStats,
     UserResponse,
 )
-from model import load_model, load_all_models, predict, ARCH_LABELS, DATASET_LABELS
+from model import load_model, load_all_models, load_gabungan_models, predict, ARCH_LABELS, DATASET_LABELS
 from ood import load_ood_stats, check_ood
 from llm import (
     get_recommendation_groq_rag, get_recommendation_gemini_rag,
@@ -31,8 +31,9 @@ import thingsboard as tb
 # ═════════════════════════════════════════════════════════════════
 # MODEL STORE
 # ═════════════════════════════════════════════════════════════════
-ml_model  = {}
-ml_models = {}
+ml_model           = {}
+ml_models          = {}
+ml_models_gabungan = {}   # 5 arsitektur dilatih di dataset gabungan (untuk /compare/gabungan)
 
 
 # ═════════════════════════════════════════════════════════════════
@@ -121,6 +122,17 @@ async def lifespan(app: FastAPI):
             ml_models[model_key] = meta
     print(f"✅ Total model siap: {len(ml_models)} / {len(all_loaded)}\n")
 
+    # ── Muat 5 model DATASET GABUNGAN (untuk /compare/gabungan) ───
+    print("══ Loading model DATASET GABUNGAN (5 arsitektur) ══")
+    try:
+        gab_loaded = load_gabungan_models()
+        for model_key, meta in gab_loaded.items():
+            if meta["status"] == "loaded":
+                ml_models_gabungan[model_key] = meta
+        print(f"✅ Model gabungan siap: {len(ml_models_gabungan)} / {len(gab_loaded)}\n")
+    except Exception as e:
+        print(f"⚠️  Gagal memuat model gabungan (diabaikan, API tetap jalan): {e}")
+
     # ── Muat statistik OOD (deteksi "bukan padi") ─────────────────
     print("══ Memuat statistik OOD (gate bukan-padi) ══")
     try:
@@ -132,6 +144,7 @@ async def lifespan(app: FastAPI):
     yield
     ml_model.clear()
     ml_models.clear()
+    ml_models_gabungan.clear()
 
 
 # ═════════════════════════════════════════════════════════════════
@@ -323,7 +336,7 @@ async def get_user_info(device_id: str):
     )
 
 
-# ════════════════════════��════════════════════════════════════════
+# ════════════════════════���════════════════════════════════════════
 # SENSOR
 # ═════════════════════════════════════════════════════════════════
 @app.get("/sensor", response_model=SensorResponse, tags=["Sensor"])
@@ -650,7 +663,7 @@ async def predict_disease(
     )
 
 
-# ══════════════════════════════════════════════════════════════��══
+# ═════════════════════════════════════════════════════════════����══
 # DETECTION — /predict/{model_key}
 # ═══════════════════════════════════════════════��═════════════════
 @app.post("/predict/{model_key}", tags=["Detection"])
@@ -790,6 +803,126 @@ async def compare_all_models(file: UploadFile = File(...), use_sensor: bool = Tr
 
     return CompareResponse(
         total_models=len(ml_models), successful_models=len(successful),
+        majority_class=majority_class, best_confidence_model=best_confidence_model,
+        detection_time_stats=time_stats, recommendation=recommendation,
+        sensor=sensor_info if use_sensor else None, results=results,
+    )
+
+
+# ═════════════════════════════════════════════════════════════════
+# DETECTION — /compare/gabungan  (5 arsitektur × DATASET GABUNGAN)
+# Membandingkan ANTAR ARSITEKTUR (Swin-B, ViT, ResNet-50, InceptionV3,
+# EfficientNet-B0) yang dilatih pada dataset gabungan 14 kelas yang sama.
+# ═════════════════════════════════════════════════════════════════
+@app.post("/compare/gabungan", response_model=CompareResponse, tags=["Detection"])
+async def compare_gabungan_models(
+    file         : UploadFile    = File(...),
+    use_sensor   : bool          = Form(True),
+    manual_sensor: Optional[str] = Form(None),
+    llm          : str           = Form("groq"),
+):
+    """
+    Bandingkan SEMUA model yang dilatih pada DATASET GABUNGAN (14 kelas):
+    Swin-B, ViT, ResNet-50, InceptionV3, EfficientNet-B0.
+
+    Yang dibandingkan:
+    - deteksi (predicted_class) tiap arsitektur
+    - confidence (%)
+    - kecepatan deteksi (ms) + statistik min/max/avg/tercepat/terlambat
+    - rekomendasi penanganan → LLM + **RAG** untuk kelas hasil voting
+    - konteks sensor (manual > ThingsBoard > dummy) yang ikut masuk prompt RAG
+
+    Form:
+    - use_sensor    : ikutkan sensor ke prompt LLM/RAG (default True)
+    - manual_sensor : JSON string sensor manual (opsional, prioritas tertinggi)
+    - llm           : "groq" (HIGH, default) atau "gemini" (MEDIUM) — keduanya RAG
+    """
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File harus berupa gambar")
+    image_bytes = await file.read()
+    if len(image_bytes) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Ukuran file maksimal 10MB")
+    if not ml_models_gabungan:
+        raise HTTPException(
+            status_code=503,
+            detail=("Tidak ada model gabungan yang siap. Pastikan file .h5 ada di folder "
+                    "'model_gabungan/' (swin_base_best.h5, vit_best.h5, resnet50_best.h5, "
+                    "inception_v3_best.h5, efficientnet_b0_best.h5)."),
+        )
+
+    # ── Prediksi tiap arsitektur: deteksi + confidence + waktu ────
+    results: dict[str, ModelCompareResult] = {}
+    for model_key, m in ml_models_gabungan.items():
+        try:
+            t0 = time.perf_counter()
+            predicted_class, confidence = predict(
+                image_bytes=image_bytes, model=m["model"],
+                class_names=m["class_names"], model_name=m["model_name"],
+            )
+            results[model_key] = ModelCompareResult(
+                arsitektur=m["arch_label"], dataset=m["dataset_label"],
+                predicted_class=predicted_class, confidence_percentage=confidence,
+                detection_time_ms=round((time.perf_counter() - t0) * 1000, 2), status="success",
+            )
+        except Exception as e:
+            results[model_key] = ModelCompareResult(
+                arsitektur=m.get("arch_label", model_key),
+                dataset=m.get("dataset_label", "Dataset Gabungan (14 kelas)"),
+                predicted_class=None, confidence_percentage=None,
+                detection_time_ms=None, status=f"error: {str(e)}",
+            )
+
+    successful = {k: v for k, v in results.items() if v.status == "success" and v.detection_time_ms}
+    pred_with_conf_all = [(v.predicted_class, v.confidence_percentage or 0) for v in successful.values() if v.predicted_class]
+    if not pred_with_conf_all:
+        raise HTTPException(status_code=500, detail="Semua model gabungan gagal memproses gambar")
+
+    # ── Voting terbobot → kelas mayoritas antar-arsitektur ───────
+    majority_class        = _weighted_vote(pred_with_conf_all)[0]
+    best_confidence_model = max(successful, key=lambda k: successful[k].confidence_percentage or 0)
+
+    # ── Statistik kecepatan deteksi ─────────────────────────
+    all_times  = [v.detection_time_ms for v in successful.values()]
+    arch_times : dict[str, list[float]] = {}
+    for model_key, v in successful.items():
+        arch_times.setdefault(ml_models_gabungan[model_key]["arch_label"], []).append(v.detection_time_ms)
+    time_stats = DetectionTimeStats(
+        min_ms=round(min(all_times), 2), max_ms=round(max(all_times), 2),
+        avg_ms=round(sum(all_times)/len(all_times), 2),
+        fastest_model=min(successful, key=lambda k: successful[k].detection_time_ms),
+        slowest_model=max(successful, key=lambda k: successful[k].detection_time_ms),
+        stats_per_arsitektur={k: round(sum(v)/len(v), 2) for k, v in arch_times.items()},
+        stats_per_dataset={"Dataset Gabungan (14 kelas)": round(sum(all_times)/len(all_times), 2)},
+    )
+
+    # ── Sensor (manual > ThingsBoard > dummy) ──────────────────
+    sensor_data = _resolve_sensor_for_llm(use_sensor, manual_sensor)
+    sensor_info = None
+    if use_sensor and sensor_data:
+        try:
+            statuses = _evaluate_sensor(sensor_data)
+            abnormal = [s for s in statuses if s.status != "normal"]
+            sensor_info = {
+                "data": sensor_data,
+                "detail_status": [s.model_dump() for s in statuses],
+                "kesimpulan": "✅ Semua kondisi sensor dalam batas normal." if not abnormal
+                    else f"⚠️ {len(abnormal)} parameter di luar batas: " + ", ".join(s.parameter for s in abnormal),
+            }
+        except Exception:
+            sensor_info = {"data": sensor_data}
+
+    # ── Rekomendasi LLM + RAG untuk kelas hasil voting ──────────
+    recommendation = None
+    try:
+        if llm == "gemini":
+            recommendation, _ = get_recommendation_gemini_rag(majority_class, sensor_data if use_sensor else None)
+        else:
+            recommendation, _ = get_recommendation_groq_rag(majority_class, sensor_data if use_sensor else None)
+    except Exception as e:
+        print(f"⚠️  Rekomendasi LLM+RAG gagal: {e}")
+
+    return CompareResponse(
+        total_models=len(ml_models_gabungan), successful_models=len(successful),
         majority_class=majority_class, best_confidence_model=best_confidence_model,
         detection_time_stats=time_stats, recommendation=recommendation,
         sensor=sensor_info if use_sensor else None, results=results,

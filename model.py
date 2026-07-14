@@ -26,6 +26,7 @@ DATASET_LABELS = {
     "JENIS_PENYAKIT_PADI": "Jenis Penyakit Padi",
     "paddy_dataset_v3"   : "Paddy Dataset V3 Augmentasi",
     "Paddy_disease"      : "Paddy Disease Classification",
+    "gabungan"           : "Dataset Gabungan (14 kelas)",
 }
 
 ARCH_LABELS = {
@@ -75,6 +76,21 @@ HARDCODED_MODEL_PATHS = {
     "vit__JENIS_PENYAKIT_PADI"            : "models_perdataset/vit_JENIS_PENYAKIT_PADI_best.h5",
     "vit__paddy_dataset_v3"               : "models_perdataset/vit_paddy-dataset-v3-augmentasi_best.h5",
     "vit__Paddy_disease"                  : "models_perdataset/vit_Paddy-disease-classification_best.h5",
+}
+
+
+# ─────────────────────────────────────────────────────────────────
+# 5 MODEL DATASET GABUNGAN — 1 arsitektur = 1 file, semua 14 kelas.
+# Dipakai oleh endpoint /compare/gabungan untuk membandingkan
+# arsitektur (bukan dataset). File .h5 ada di folder model_gabungan/.
+# Nama file mengikuti struktur folder model_gabungan/ (lihat screenshot).
+# ─────────────────────────────────────────────────────────────────
+GABUNGAN_MODEL_PATHS = {
+    "swin_base"       : "model_gabungan/swin_base_best.h5",
+    "vit"             : "model_gabungan/vit_best.h5",
+    "resnet50"        : "model_gabungan/resnet50_best.h5",
+    "inception_v3"    : "model_gabungan/inception_v3_best.h5",
+    "efficientnet_b0" : "model_gabungan/efficientnet_b0_best.h5",
 }
 
 
@@ -210,6 +226,41 @@ def _make_error_entry(
     }
 
 
+# ════════════════════════════════════════════════════════════════
+# LOAD 5 MODEL DATASET GABUNGAN (1 arsitektur = 1 file, 14 kelas)
+# Dipakai endpoint /compare/gabungan — membandingkan ANTAR ARSITEKTUR
+# pada dataset gabungan yang sama.
+# Key format: "{arch}__gabungan" (mis. "swin_base__gabungan").
+# ════════════════════════════════════════════════════════════════
+def load_gabungan_models() -> dict:
+    """
+    Load 5 arsitektur yang dilatih pada DATASET GABUNGAN (14 kelas).
+    Path diambil dari GABUNGAN_MODEL_PATHS (folder model_gabungan/).
+
+    Return dict key "{arch}__gabungan" → metadata sama seperti load_all_models().
+    Arsitektur sebenarnya dibangun dari 'model_name' di dalam checkpoint,
+    jadi label arch di sini hanya untuk tampilan response.
+    """
+    print("\n══ Loading 5 model DATASET GABUNGAN (model_gabungan/) ══")
+    all_models = {}
+    for arch, path in GABUNGAN_MODEL_PATHS.items():
+        model_key = f"{arch}__gabungan"
+        if not os.path.exists(path):
+            print(f"⚠️  File model gabungan tidak ditemukan: {path} — skip.")
+            all_models[model_key] = _make_error_entry(
+                arch=arch, dataset="gabungan", path=path,
+                error=f"File {path} tidak ditemukan", status="not_configured",
+            )
+            continue
+        all_models[model_key] = _try_load(arch=arch, dataset="gabungan", path=path)
+
+    loaded = sum(1 for v in all_models.values() if v["status"] == "loaded")
+    print(f"\n{'═'*50}")
+    print(f"  ✅ Model gabungan di-load : {loaded} / {len(all_models)}")
+    print(f"{'═'*50}\n")
+    return all_models
+
+
 # ═════════════════════════════════════════════════════════════════
 # LOAD MODEL DARI PATH TERTENTU
 # ═════════════════════════════════════════════════════════════════
@@ -242,8 +293,9 @@ def load_model_from_path(model_path: str):
     print(f"  Best F1   : {best_f1}")
     print(f"─────────────────────────────────────────────")
 
-    model = _build_architecture(model_name, num_classes)
-    model.load_state_dict(checkpoint['model_state_dict'])
+    state_dict = checkpoint['model_state_dict']
+    model = _build_architecture(model_name, num_classes, state_dict)
+    model.load_state_dict(state_dict)
     model.to(device)
     model.eval()
 
@@ -251,10 +303,10 @@ def load_model_from_path(model_path: str):
     return model, class_names, model_name
 
 
-# ═════════════════════════════════════════════════════════════════
+# ══════════════════════════��══════════════════════════════════════
 # BANGUN ARSITEKTUR MODEL
 # ═════════════════════════════════════════════════════════════════
-def _build_architecture(model_name: str, num_classes: int):
+def _build_architecture(model_name: str, num_classes: int, state_dict: dict | None = None):
     """
     Rebuild arsitektur model sesuai struktur yang disimpan di checkpoint.
 
@@ -271,13 +323,25 @@ def _build_architecture(model_name: str, num_classes: int):
     if model_name == 'resnet50':
         m    = models.resnet50(weights=None)
         in_f = m.fc.in_features                   # 2048
-        m.fc = nn.Sequential(
-            nn.Linear(in_f, 512),
-            nn.BatchNorm1d(512),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(512, num_classes),
-        )
+        # Auto-deteksi struktur head dari checkpoint:
+        #  - KOMPLEKS (per-dataset): punya 'fc.4.weight'
+        #    Linear(2048->512)+BN+ReLU+Dropout+Linear(512->C)
+        #  - SEDERHANA (gabungan): tidak ada 'fc.4.weight'
+        #    Dropout(0.5)+Linear(2048->C); 'fc.1.weight' berbentuk (C, 2048)
+        simple_head = state_dict is not None and "fc.4.weight" not in state_dict
+        if simple_head:
+            m.fc = nn.Sequential(
+                nn.Dropout(p=0.5),
+                nn.Linear(in_f, num_classes),
+            )
+        else:
+            m.fc = nn.Sequential(
+                nn.Linear(in_f, 512),
+                nn.BatchNorm1d(512),
+                nn.ReLU(),
+                nn.Dropout(p=0.5),
+                nn.Linear(512, num_classes),
+            )
 
     # ── EfficientNet-B0 ────────────────────────────────────────────
     elif model_name == 'efficientnet_b0':
@@ -288,7 +352,7 @@ def _build_architecture(model_name: str, num_classes: int):
             nn.Linear(in_f, num_classes),
         )
 
-    # ── InceptionV3 ────────────────────────────────────────────────
+    # ── InceptionV3 ────────��───────────────────────────────────────
     elif model_name == 'inception_v3':
         m = models.inception_v3(weights=None, init_weights=False)
         m.aux_logits = True
