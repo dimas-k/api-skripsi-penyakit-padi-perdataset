@@ -90,6 +90,7 @@ def save_prediction(
     swin_results     : Optional[dict] = None,
     vote_method      : Optional[str]  = None,
     majority_count   : Optional[str]  = None,
+    image_url        : Optional[str]  = None,
 ) -> dict:
     """
     Simpan satu hasil prediksi ke tabel `predictions`.
@@ -109,9 +110,40 @@ def save_prediction(
         "swin_results"     : swin_results,
         "vote_method"      : vote_method,
         "majority_count"   : majority_count,
+        "image_url"        : image_url,
     }
     result = db.table("predictions").insert(data).execute()
     return result.data[0] if result.data else {}
+
+
+def upload_prediction_image(
+    prediction_id: str,
+    image_bytes  : bytes,
+    content_type : Optional[str] = None,
+) -> Optional[str]:
+    """
+    Upload gambar prediksi ke Supabase Storage (bucket 'prediction-images'),
+    lalu kembalikan URL publiknya. Return None bila gagal / bucket belum dibuat.
+    """
+    bucket = "prediction-images"
+
+    # Tentukan ekstensi file dari content-type.
+    ext = "jpg"
+    if content_type and "/" in content_type:
+        sub = content_type.split("/", 1)[1].lower()
+        ext = {"jpeg": "jpg", "jpg": "jpg", "png": "png", "webp": "webp"}.get(sub, "jpg")
+    path = f"{prediction_id}.{ext}"
+
+    db = get_client()
+    db.storage.from_(bucket).upload(
+        path=path,
+        file=image_bytes,
+        file_options={"content-type": content_type or "image/jpeg", "upsert": "true"},
+    )
+    public_url = db.storage.from_(bucket).get_public_url(path)
+    if isinstance(public_url, str) and public_url:
+        return public_url.rstrip("?")
+    return None
 
 
 def get_predictions(

@@ -631,6 +631,15 @@ async def predict_disease(
 
     if user_id:
         try:
+            # Upload gambar ke Supabase Storage supaya bisa tampil di riwayat.
+            image_url = None
+            try:
+                image_url = db.upload_prediction_image(
+                    prediction_id, image_bytes, file.content_type,
+                )
+            except Exception as e:
+                print(f"⚠️  Gagal upload gambar (diabaikan): {e}")
+
             swin_dict = {k: v.model_dump() for k, v in swin_results.items()}
             db.save_prediction(
                 prediction_id    = prediction_id,
@@ -645,6 +654,7 @@ async def predict_disease(
                 swin_results     = swin_dict,
                 vote_method      = vote_method,
                 majority_count   = f"{majority_count} / {len(pred_with_conf)} model",
+                image_url        = image_url,
             )
             saved_ok = True
         except Exception as e:
@@ -1118,7 +1128,7 @@ async def get_history(device_id: str, limit: int = 20, offset: int = 0):
             confidence=row["confidence"], detection_time_ms=row.get("detection_time_ms"),
             timestamp=row["created_at"], llm_used=row.get("llm_used"),
             sensor_used=row.get("sensor_used"), recommendation=row.get("recommendation"),
-            vote_method=row.get("vote_method"),
+            vote_method=row.get("vote_method"), image_url=row.get("image_url"),
         )
         for row in rows
     ]
@@ -1158,7 +1168,9 @@ async def delete_history_item(prediction_id: str):
 
 @app.get("/prediction/{prediction_id}/image", tags=["History"])
 async def get_prediction_image(prediction_id: str):
-    return {"image_url": None}
+    """URL gambar prediksi (disimpan di Supabase Storage saat /predict)."""
+    row = db.get_prediction_by_id(prediction_id)
+    return {"image_url": (row or {}).get("image_url")}
 
 
 # ═════════════════════════════════════════════════════════════════
