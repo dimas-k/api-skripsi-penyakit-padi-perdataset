@@ -8,6 +8,7 @@ ENV/
 # ── Model files ───────────────────────────────────────────────────
 models_perdataset/
 model_gabungan/
+models/
 *.h5
 *.pt
 *.pth
